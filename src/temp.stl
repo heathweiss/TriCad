@@ -1,0 +1,86 @@
+solid SandalToe
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 0.0e0 -0.0e0 0.0e0
+vertex 0.0e0 -0.0e0 1.5e0
+vertex 2.0e1 -0.0e0 1.5e0
+endloop
+endfacet
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 0.0e0 -0.0e0 0.0e0
+vertex 2.0e1 -0.0e0 1.5e0
+vertex 2.0e1 -0.0e0 0.0e0
+endloop
+endfacet
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 0.0e0 -3.0e1 0.0e0
+vertex 0.0e0 -0.0e0 0.0e0
+vertex 2.0e1 -3.0e1 0.0e0
+endloop
+endfacet
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 2.0e1 -3.0e1 0.0e0
+vertex 0.0e0 -0.0e0 0.0e0
+vertex 2.0e1 -0.0e0 0.0e0
+endloop
+endfacet
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 0.0e0 -3.0e1 0.0e0
+vertex 2.0e1 -3.0e1 1.5e0
+vertex 0.0e0 -3.0e1 1.5e0
+endloop
+endfacet
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 0.0e0 -3.0e1 0.0e0
+vertex 2.0e1 -3.0e1 0.0e0
+vertex 2.0e1 -3.0e1 1.5e0
+endloop
+endfacet
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 0.0e0 -3.0e1 0.0e0
+vertex 0.0e0 -3.0e1 1.5e0
+vertex 0.0e0 -0.0e0 1.5e0
+endloop
+endfacet
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 0.0e0 -3.0e1 0.0e0
+vertex 0.0e0 -0.0e0 1.5e0
+vertex 0.0e0 -0.0e0 0.0e0
+endloop
+endfacet
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 2.0e1 -3.0e1 0.0e0
+vertex 2.0e1 -0.0e0 1.5e0
+vertex 2.0e1 -3.0e1 1.5e0
+endloop
+endfacet
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 2.0e1 -3.0e1 0.0e0
+vertex 2.0e1 -0.0e0 0.0e0
+vertex 2.0e1 -0.0e0 1.5e0
+endloop
+endfacet
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 0.0e0 -3.0e1 1.5e0
+vertex 2.0e1 -0.0e0 1.5e0
+vertex 0.0e0 -0.0e0 1.5e0
+endloop
+endfacet
+facet normal 0.0 0.0 0.0
+outer loop
+vertex 0.0e0 -3.0e1 1.5e0
+vertex 2.0e1 -3.0e1 1.5e0
+vertex 2.0e1 -0.0e0 1.5e0
+endloop
+endfacet
+endsolid 
