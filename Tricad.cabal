@@ -27,6 +27,8 @@ library
                    HeelGenerators.BlackRunnerHeel, HeelGenerators.SandalsToe
                    -- Sockets
                    Sockets.Bicycle
+                   -- Misc Shapes
+                   MiscShapes.RvVentCaps
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.7 && <4.8, HUnit >=1.2.5.2 
