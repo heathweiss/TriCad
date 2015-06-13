@@ -38,12 +38,15 @@ hello = do
 stlFile = newStlShape "rv vent cap" $ innerRiserJoinerTriangles
                                       ++ innerRiserTriangles
                                       ++ topPlateInnerSectionTriangles
+                                      ++ topPlateCentralJoinerTriangles
+                                      ++ topPlateDripCapJoinerTriangles
+                                      ++ dripCapTriangles
 
 writeRvCapStlFile = writeStlToFile stlFile
 
 debug =  [CubeName "" | x <- [1..]]
     +++^?
-    topPlateInnerSectionCubes 
+    dripCapCubes
 
 topOfPlateOrigin = (Point{x_axis=0, y_axis=0, z_axis=23})
 btmOfPlateOrigin = topOfRiserOrigin
@@ -51,23 +54,81 @@ btmOfPlateOrigin = topOfRiserOrigin
 btmOfRiserOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
 topOfRiserOrigin = (Point{x_axis=0, y_axis=0, z_axis=20})
 
+btmOfDripCapOrigin = (Point{x_axis=0, y_axis=0, z_axis=10})
+
 
 --this is for all angles
 angles = [0,10..360]
 
---radius for the ring that sits in the existing trailer piece.
-innerConnectorRingRadius = [Radius 23 | x <- [1..37]]
-outerConnectorRingRadius = [Radius 33 | x <- [1..37]]
-
---radius for the outer ring that forms the rain shield
-innerShieldRingRadius = [Radius 55 | x <- [1..37]]
-outerShieldRingRadius = [Radius 58 | x <- [1..37]]
-
 --radius for the central piece of the top plate
 topPlateInnerCoverRadius =  [Radius 0 | x <- [1..37]]
 
+--radius for the ring that sits in the existing trailer piece.
+innerConnectorRingRadius = [Radius 23 | x <- [1..37]] 
+outerConnectorRingRadius = map (\(Radius x) -> Radius (x + 10)) innerConnectorRingRadius
+
+--radius for the outer ring that forms the rain shield
+--This is still inside of the drip cap joiner.
+topPlateMiddleCoverRadius = map (\(Radius x) -> Radius (x + 12)) outerConnectorRingRadius
+
+--the part of the top plate that joins the drip cap (the sections that hangs down.)
+topPlateDripCapJoinerOuterRadius =  map (\(Radius x) -> Radius (x + 3)) topPlateMiddleCoverRadius
+
+{-------------------- drip cap -------------------------}
+dripCapTriangles =
+   [FacesAll | x <- [1..36]]
+  +++^
+  dripCapCubes
+  
+dripCapCubes =  ring
+    btmOfDripCapOrigin
+    topPlateMiddleCoverRadius
+    topPlateDripCapJoinerOuterRadius
+    btmOfPlateOrigin
+    topPlateMiddleCoverRadius
+    topPlateDripCapJoinerOuterRadius
+    angles 
+
+{------------------- top plate drip cap joiner ---
+the part of the top plate that joins the drip cap (the sections that hangs down.)
+
+--}
+topPlateDripCapJoinerTriangles =
+  [FacesAll | x <- [1..36]]
+  +++^
+  topPlateDripCapJoinerCubes
+  
+  
+
+topPlateDripCapJoinerCubes =
+  ring
+    btmOfPlateOrigin
+    topPlateMiddleCoverRadius
+    topPlateDripCapJoinerOuterRadius
+    topOfPlateOrigin
+    topPlateMiddleCoverRadius
+    topPlateDripCapJoinerOuterRadius
+    angles 
 
 
+{---------------------------
+Part of top plate.
+Section between the riser joiner and the drip cap joiner
+-}
+topPlateCentralJoinerTriangles =
+   [FacesAll | x <- [1..36]]
+   +++^
+   topPlateCentralJoinerCubes
+
+topPlateCentralJoinerCubes =
+  ring
+    btmOfPlateOrigin
+    outerConnectorRingRadius
+    topPlateMiddleCoverRadius
+    topOfPlateOrigin
+    outerConnectorRingRadius
+    topPlateMiddleCoverRadius
+    angles 
     
 
 {---------------------- top plate central section ---------------------------------
