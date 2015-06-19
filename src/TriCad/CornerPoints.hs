@@ -486,9 +486,14 @@ data Faces =
  | FacesAllButLeft
  | FacesAllButRight
  | FacesBackBottomFront
+ | FacesBackBottomFrontLeft
+ | FacesBackBottomFrontLeftTop
+ | FacesBackBottomFrontRight
+ | FacesBackBottomFrontRightTop
  | FacesBackBottomFrontTop
  | FacesBackBottomLeft
  | FacesBackBottomLeftRight
+ | FacesBackBottomTop
  | FacesBackFront
  | FacesBackFrontLeftRight
  | FacesBackFrontLeftRightTop
