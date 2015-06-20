@@ -21,7 +21,7 @@ import TriCad.StlCornerPoints((+++^))
 import TriCad.StlBase (StlShape(..), newStlShape)
 import TriCad.CornerPointsFaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace ) 
 import TriCad.CornerPointsFaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine)
-import TriCad.CornerPointsTranspose ( transposeCornerPointsZ, transposeCornerPointsX, transposeCornerPointsY)
+import TriCad.CornerPointsTranspose ( transposeZ, transposeX)
 import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
 
 bicycleSocketDebug = v0CubesDebug

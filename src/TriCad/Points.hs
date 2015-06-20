@@ -1,5 +1,5 @@
-module TriCad.Points (Point(..), transposePointz) where
-
+module TriCad.Points (Point(..), transposeZ) where
+import TriCad.Transposable(Transpose, transposeX, transposeY, transposeZ)
 {-------------------------- Point------------------------------
 Points in 3D geometry.
 
@@ -27,6 +27,11 @@ instance Eq Point where
       | otherwise = False
 
 
+instance Transpose Point where
+  transposeZ f (Point x y z) = Point x y (f z)
+  transposeX f (Point x y z) = Point (f x) y z
+  transposeY f (Point x y z) = Point x (f y) z
+
    
-transposePointz :: (Double -> Double) -> Point -> Point
-transposePointz transposeFormula (Point x y z) = Point x y (transposeFormula z)
+--transposePointz :: (Double -> Double) -> Point -> Point
+--transposePointz transposeFormula (Point x y z) = Point x y (transposeFormula z)

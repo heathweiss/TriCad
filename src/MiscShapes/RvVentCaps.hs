@@ -28,7 +28,7 @@ import TriCad.MathPolar(
   flatYSlope,
   )
 import TriCad.StlCornerPoints((+++^))
-import TriCad.Points(Point(..), transposePointz)
+import TriCad.Points(Point(..), transposeZ)
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.StlBase (StlShape(..), newStlShape)
 import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
@@ -63,7 +63,8 @@ debug =  [CubeName "" | x <- [1..]]
     +++^?
     dripCapCubes
 
-plateTopOrigin = (plateBtmOrigin {z_axis=   ((z_axis plateBtmOrigin) + 3)   } )
+plateTopOrigin = transposeZ (+3) plateBtmOrigin
+  --(plateBtmOrigin {z_axis=   ((z_axis plateBtmOrigin) + 3)   } )
   --(Point{x_axis=0, y_axis=0, z_axis=23})
 plateBtmOrigin = riserTopOrigin
 
