@@ -27,16 +27,13 @@ import TriCad.MathPolar(
   flatXSlope,
   flatYSlope,
   )
-import TriCad.Points(Point(..))
-import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.StlCornerPoints((+++^))
+import TriCad.Points(Point(..), transposePointz)
+import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.StlBase (StlShape(..), newStlShape)
-import TriCad.CornerPointsFaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace )
-
-import TriCad.CornerPointsFaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine)
-import TriCad.CornerPointsTranspose ( transposeCornerPointsZ, transposeCornerPointsX, transposeCornerPointsY)
 import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
 import TriCad.StlFileWriter(writeStlToFile)
+import TriCad.Shapes.Cylindrical(cylinderHollow, cylinderSolid)
 
 {--------------------------- overview -------------------------------------------
 The cap has to be printed upside-down, but flip it using Slic3r.
@@ -66,7 +63,8 @@ debug =  [CubeName "" | x <- [1..]]
     +++^?
     dripCapCubes
 
-plateTopOrigin = (Point{x_axis=0, y_axis=0, z_axis=23})
+plateTopOrigin = (plateBtmOrigin {z_axis=   ((z_axis plateBtmOrigin) + 3)   } )
+  --(Point{x_axis=0, y_axis=0, z_axis=23})
 plateBtmOrigin = riserTopOrigin
 
 riserBtmOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
@@ -96,7 +94,7 @@ dripCapTriangles =
   dripCapCubes
   
 dripCapCubes =
-  cylinder
+  cylinderHollow
     dripCapBtmOrigin
     dripCapTopOrigin
     dripCapBackRadius
@@ -115,10 +113,8 @@ dripCapJoinerTriangles =
   
 
 dripCapJoinerCubes =
-  ring
+  cylinderHollow
     plateBtmOrigin
-    dripCapBackRadius
-    dripCapFrontRadius
     plateTopOrigin
     dripCapBackRadius
     dripCapFrontRadius
@@ -135,10 +131,8 @@ outerPlateTriangles =
    outerPlateCubes
 
 outerPlateCubes =
-  ring
+  cylinderHollow
     plateBtmOrigin
-    outerPlateBackRadius
-    outerPlateFrontRadius
     plateTopOrigin
     outerPlateBackRadius
     outerPlateFrontRadius
@@ -154,12 +148,9 @@ innerPlateTriangles =  [FacesBackBottomTop | x <- [1..36]]
                                  +++^
                                  innerPlateCubes
 
-innerPlateCubes = ring
+innerPlateCubes = cylinderSolid
                               plateBtmOrigin
-                              innerPlateBackRadius
-                              riserBackRadius
                               plateTopOrigin
-                              innerPlateBackRadius
                               riserBackRadius
                               angles
 
@@ -209,8 +200,12 @@ riserJoinerTriangles =
    (riserJoinerFaces +++^ riserJoinerCubes)
    
 
-riserJoinerCubes = ring plateBtmOrigin riserBackRadius riserFrontRadius 
-                        plateTopOrigin  riserBackRadius riserFrontRadius angles
+riserJoinerCubes = cylinderHollow
+                     plateBtmOrigin
+                     plateTopOrigin
+                     riserBackRadius
+                     riserFrontRadius
+                     angles
  
 
 {------------------------- inner riser ring----------------------------------
@@ -267,42 +262,12 @@ riserFacesCloseTop = concat [
 riserTriangles = (riserFaces +++^ riserCubes)
                 
 
-riserCubes = ring riserBtmOrigin riserBackRadius riserFrontRadius riserTopOrigin
-                 riserBackRadius riserFrontRadius angles
+riserCubes = cylinderHollow
+               riserBtmOrigin
+               riserTopOrigin
+               riserBackRadius
+               riserFrontRadius
+               angles
  
 
-{--------- ring ------------------------
-Create a ring function.
-The top and bottom radius must be included so the values can vary.
 
-The top and bottom origin must be given so that it can stand at an angle, instead
-of straight up.
-
-The top and bottom are level horizontally, as no slope is given.
--}
-ring btmOrigin btmInnerRadius btmOuterRadius topOrigin topInnerRadius topOuterRadius angles  =
-  topFaces ++++ btmFaces
-   where
-     topFaces =
-       (map (extractFrontTopLine) (createTopFaces topOrigin topOuterRadius angles flatXSlope (PosYSlope 0)))
-       ++++
-       (map
-        (backTopLineFromFrontTopLine . extractFrontTopLine)
-        (createTopFaces topOrigin topInnerRadius angles flatXSlope flatYSlope)
-       )
-     
-     btmFaces =
-       (map (extractBottomFrontLine)
-        (createBottomFaces btmOrigin btmOuterRadius angles flatXSlope flatYSlope))
-       ++++
-       (map
-        (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
-        (createBottomFaces btmOrigin btmInnerRadius angles flatXSlope flatYSlope)
-       )
-  
-{------------ cylinder ----------------------------
-A ring which has the same circumference, and therefore the same bottom/top radius.
-Reduces the number of params req'd, to make code more readable
--}
-cylinder btmOrigin topOrigin backRadius frontRadius angles =
-  ring btmOrigin backRadius frontRadius topOrigin backRadius frontRadius angles
