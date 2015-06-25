@@ -30,7 +30,7 @@ library
                    -- Misc Shapes
                    MiscShapes.RvVentCaps
                    --Shapes
-                   TriCad.Shapes.Cylindrical
+                   TriCad.Shapes.Cylindrical, TriCad.Shapes.Cubical
   -- other-modules:       
   -- other-extensions:    
   build-depends:       base >=4.7 && <4.8, HUnit >=1.2.5.2 

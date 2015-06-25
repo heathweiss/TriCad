@@ -1,8 +1,10 @@
 module TriCad.CornerPoints(
 CornerPoints(..),
 (+++),
+(+++$),
 (++++),
 (++>),
+(+++>>),
 scaleCornerPoints,
 scaleCornerPointsZ,
 --transposePointZ,
@@ -14,7 +16,9 @@ import TriCad.Points (Point(..))
 import    Control.Applicative
 
 
-infix 6 +++
+infix 7 +++
+infix 6 +++$
+infix 5 +++>> 
 infix 5 ++>
 infix 4 ++++
 --infix 3 +++^
@@ -267,9 +271,27 @@ Creating single or chains of cubes by adding faces together.
 (++++) :: [CornerPoints] -> [CornerPoints] -> [CornerPoints]
 c1 ++++ c2 = zipWith (+++) c1 c2
 
-(+++) :: CornerPoints -> CornerPoints -> CornerPoints
+{--with a lower infix than +++. Usefull for chaining together +++
+Ex: BackBottomLine +++ BottomFrontLine +++$ BackTopLine +++ FrontTopLine
+               BottomFace              +++$         TopFace
+                                CubePoints
+Without the lower infix +++$ this would have tried to add the BackTopLine to the BottomFace. NFG.
+-}
+(+++$) :: CornerPoints -> CornerPoints -> CornerPoints
+(+++$) = (+++)
 
---testCubes = layer1OuterBottomFaces ++++ map (upperFaceFromLowerFace) layer1OuterBottomFaces
+{-A monadic style +++
+-}
+(+++>>) :: CornerPoints -> (CornerPoints -> CornerPoints) -> CornerPoints
+(BottomFace b1 f1 b4 f4) +++>> f = (BottomFace b1 f1 b4 f4) +++ (f (BottomFace b1 f1 b4 f4))
+
+
+{-Add CornerPoints together.
+Must follow all the rules of adding.
+Ex: FrontFace can be added to BackFace
+but
+    FrontFace can't be added to a TopFace.-}
+(+++) :: CornerPoints -> CornerPoints -> CornerPoints
 
 (BottomFace b1 f1 b4 f4) +++ (TopFace b2 f2 b3 f3) = 
   CubePoints {f1=f1, f2=f2, f3=f3, f4=f4, b1=b1, b2=b2, b3=b3, b4=b4}
@@ -353,6 +375,9 @@ c1 ++++ c2 = zipWith (+++) c1 c2
 
 (B1 b1) +++ (B4 b4) =
      BackBottomLine {b1=b1, b4=b4}
+
+(B4 b4) +++ (B1 b1) =
+    BackBottomLine {b1=b1, b4=b4}
 
 (B2 b2) +++ (B3 b3) =
      BackTopLine {b2=b2, b3=b3}

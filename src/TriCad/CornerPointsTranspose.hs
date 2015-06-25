@@ -11,8 +11,7 @@ import TriCad.Transposable(Transpose, transposeX, transposeY, transposeZ)
 Used for: changing points by adding values, as opposed to mulipling with the scalePoints
 -}
 instance Transpose CornerPoints where
-
-  
+ 
   ---------------- z-axis ----------------------
 
   transposeZ _ (CornerPointsError err) = CornerPointsError err
@@ -74,7 +73,19 @@ instance Transpose CornerPoints where
     BottomFace {f1=(transposeX f f1),
                 f4=(transposeX f f4),
                 b1=(transposeX f b1),
-                b4=(transposeX f b4)}  
+                b4=(transposeX f b4)}
+
+  transposeX f (F1 f1 ) =
+    F1 {f1=(transposeX f f1)}
+
+  transposeX f (F4 f4 ) =
+    F4 {f4=(transposeX f f4)}
+
+  transposeX f (B1 b1 ) =
+    B1 {b1=(transposeX f b1)}
+
+  transposeX f (B4 b4 ) =
+    B4 {b4=(transposeX f b4)}
 
   ------------- y-axis -----------------
 
@@ -97,6 +108,18 @@ instance Transpose CornerPoints where
                 b4=(transposeY f b4)}
 
 
+
+  transposeY f (B1 b1 ) =
+    B1 {b1=(transposeY f b1)}
+
+  transposeY f (B4 b4 ) =
+    B4 {b4=(transposeY f b4)}
+
+  transposeY f (F1 f1 ) =
+    F1 {f1=(transposeY f f1)}
+
+  transposeY f (F4 f4 ) =
+    F4 {f4=(transposeY f f4)}
 
 {-
 get rid of all this, replaces with Transposable class.
