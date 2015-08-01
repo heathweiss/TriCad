@@ -17,3 +17,5 @@ cabal.sandbox.config
 *.aux
 *.hp
 *.hs~
+*.*#
+*.#*
