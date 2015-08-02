@@ -3,6 +3,7 @@ module TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
   createBottomFaces,
+  createRightFaces,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
@@ -26,7 +27,7 @@ Creates a radial shape using polar cood's.
 -}
 
 {---------------------------------------------------------------------------
-
+e
 
 Functions for calculating the current x and y values adjusted for xy degrees
 
@@ -384,3 +385,62 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
        | currXSlope <- tail xSlope
        | currYSlope <- tail ySlope
     ]
+
+
+{----------------------------------------- create right faces ----------------------------------------------------------
+Known uses:
+Scanning
+Scanning is done vertically, so it would be best to build the model that way, instead of transforing the data
+to fit the horizontal model supplied by 'createBottomFaces'/'createTopFaces'
+
+Create a set of right faces, which will be used as the initial faces, to which all the subsequent left
+faces will be added.
+
+Create in a top down direction, as that is the way the openCV data is supplied.
+-}
+
+createRightFaces inOrigin inRadius inAngles xSlope ySlope  =
+    (createCornerPoint
+      (F3)
+      inOrigin
+      (head inRadius) 
+      (radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles))))
+      (xyQuadrantAngle (head inAngles))
+      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles)))
+    ) 
+    +++
+    B3 inOrigin
+    ++>
+    [(createCornerPoint
+      (F4)
+      inOrigin
+      currRadius
+      (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle)))
+      (xyQuadrantAngle angle)
+      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle))
+     ) 
+     +++
+     B4 inOrigin
+       | angle <- tail inAngles
+       | currRadius <- tail inRadius
+    ]
+
+{-
+additions required
+F3 +++ B3
+present: y
+tested:  y
+
+F4 +++ B4
+present: y
+tested:  y
+
+TopRightLine +++ BottomRightLine
+present: y
+tested:  y
+
+RightFace +++ BottomRightLine
+present: y
+tested:  y
+
+-}

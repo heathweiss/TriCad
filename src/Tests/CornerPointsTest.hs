@@ -6,8 +6,8 @@ import TriCad.Points (Point(..))
 
 cornerPointsTestDo = do
 
-  
-
+  runTestTT rightFacePPPBottomRightLineTest
+  runTestTT topRightLinePlusPlusPlusBtmRightLineTest
   runTestTT f4PlusPlusPlusB4Test
   runTestTT f1PlusPlusPlusB1Test
   runTestTT bottomRightLinePlusPlusPlusBottomLeftLineTest
@@ -27,6 +27,7 @@ cornerPointsTestDo = do
   runTestTT backBottomLinePlusPlusPlusBottomFrontLineTest
   runTestTT f1PlusPlusPlusF4Test 
   runTestTT bottomFrontLinePlusPlusPlusbackBottomLineTest
+  runTestTT f3PlusPlusPlusb3Test
 
   putStrLn ""
   putStrLn "Infix tests"
@@ -35,6 +36,21 @@ cornerPointsTestDo = do
 {-
 Test +++
 -}
+
+rightFacePPPBottomRightLineTest = TestCase $ assertEqual
+  "RightFace +++ BottomRightLine = RightFace"
+  (RightFace (Point 1 0 5) (Point 1 0 4) (Point 1 5 5) (Point 1 5 4))
+  (   (RightFace (Point 1 0 6) (Point 1 0 5) (Point 1 5 6) (Point 1 5 5))   +++      (BottomRightLine (Point 1 0 4) (Point 1 5 4))              )
+
+topRightLinePlusPlusPlusBtmRightLineTest = TestCase $ assertEqual
+  "TopRightLine +++ BottomRightLine = RightFace"
+  (RightFace (Point 1 0 1) (Point 1 0 0) (Point 1 1 1) (Point 1 1 0))
+  (    (TopRightLine (Point 1 0 1) (Point 1 1 1))  +++  (BottomRightLine) (Point 1 0 0) (Point 1 1 0)  )
+
+f3PlusPlusPlusb3Test = TestCase $ assertEqual
+  "F3 +++ B3 = TopRightLine"
+  (TopRightLine (Point 0 0 0) (Point 0 10 0))
+  (     (F3 (Point 0 10 0)) +++ (B3 (Point 0 0 0))        )
 
 f4PlusPlusPlusF1Test = TestCase $ assertEqual
   "F4 +++ F1 = BottomFrontLine"
