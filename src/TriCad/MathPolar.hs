@@ -26,6 +26,9 @@ import TriCad.CornerPointsTranspose (transposeZ)
 Creates a radial shape using polar cood's.
 
 0 degrees is as the max neg y axis, and rotates clockwise into the pos x axis.
+
+For some reason, it has a slight drift. Eg: At 90 degrees, the y axis should be 0,
+but it drifts of the y-axis by about 5%. WTF?
 -}
 
 {---------------------------------------------------------------------------
@@ -445,8 +448,8 @@ createVerticalFaces :: Point -> Double -> Slope -> Slope -> [Double] -> [Radius]
 createVerticalFaces topOrigin degree xSlope ySlope zTransposeFactor inRadius
                     topFrontConstructor topBackConstructor btmFrontConstructor btmBackConstructor =
   
-  zipWith  (\x y -> transposeZ ((-x)+) y  ) --negating x causes the z_axis to decrease from the top, as it should.
-   zTransposeFactor --this should be an infinit of the height for each pixel, measured from topOrigin.
+  --zipWith  (\x y -> transposeZ ((-x)+) y  ) --negating x causes the z_axis to decrease from the top, as it should.
+  -- zTransposeFactor --this should be an infinit of the height for each pixel, measured from topOrigin.
   
    ((createCornerPoint
       (topFrontConstructor)
@@ -461,15 +464,16 @@ createVerticalFaces topOrigin degree xSlope ySlope zTransposeFactor inRadius
     ++>
     [(createCornerPoint
       (btmFrontConstructor)
-      topOrigin
+      (transposeZ (+(-currZVal)) topOrigin)  --topOrigin
       currRadius
       (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle degree)))
       (xyQuadrantAngle degree)
       (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle degree))
      ) 
      +++
-     btmBackConstructor topOrigin
+     btmBackConstructor (transposeZ (+(-currZVal)) topOrigin)  --topOrigin
        | currRadius <- tail inRadius
+       | currZVal <-  tail zTransposeFactor
     ]
    )
 
