@@ -38,6 +38,20 @@ instance Transpose CornerPoints where
                 b1=(transposeZ f b1 ),
                 b4=(transposeZ f b4 )}
 
+  transposeZ f (RightFace b3 b4 f3 f4) =
+    RightFace  {b3=(transposeZ f b3),
+                b4=(transposeZ f b4),
+                f3=(transposeZ f f3),
+                f4=(transposeZ f f4)}
+
+  transposeZ f (LeftFace b1 b2 f1 f2)=
+    LeftFace   {b1=(transposeZ f b1),
+                b2=(transposeZ f b2),
+                f1=(transposeZ f f1),
+                f2=(transposeZ f f2)
+
+               }
+
   transposeZ f (BottomFrontLine f1 f4) = 
     BottomFrontLine {f1=(transposeZ f f1),
                      f4=(transposeZ f f4)}

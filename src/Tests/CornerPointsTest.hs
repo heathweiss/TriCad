@@ -6,6 +6,8 @@ import TriCad.Points (Point(..))
 
 cornerPointsTestDo = do
 
+  runTestTT leftFacePPPBottomLeftLineTest
+  runTestTT topLeftLinePPPBottomLeftLineTest
   runTestTT rightFacePPPBottomRightLineTest
   runTestTT topRightLinePlusPlusPlusBtmRightLineTest
   runTestTT f4PlusPlusPlusB4Test
@@ -36,6 +38,16 @@ cornerPointsTestDo = do
 {-
 Test +++
 -}
+
+leftFacePPPBottomLeftLineTest = TestCase $ assertEqual
+  "LeftFace +++ BottomLeftLine = LeftFace"
+  (LeftFace  (Point 0 0 0)  (Point 0 0 1)  (Point 0 1 0) (Point 0 1 1) )
+  (    (LeftFace  (Point 0 0 1)  (Point 0 0 2)  (Point 0 1 1) (Point 0 1 2) ) +++   (BottomLeftLine (Point 0 0 0) (Point 0 1 0) )  )
+
+topLeftLinePPPBottomLeftLineTest = TestCase $ assertEqual
+  "TopLeftLine +++ BottomLeftLine = LeftFace"
+  (LeftFace  (Point 0 0 0)  (Point 0 0 1)  (Point 0 1 0) (Point 0 1 1) )
+  ( (TopLeftLine (Point 0 0 1) (Point 0 1 1))  +++   (BottomLeftLine (Point 0 0 0) (Point 0 1 0) ) )
 
 rightFacePPPBottomRightLineTest = TestCase $ assertEqual
   "RightFace +++ BottomRightLine = RightFace"

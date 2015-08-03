@@ -3,6 +3,7 @@ import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
 import TriCad.MathPolar(
   createRightFaces,
+  createLeftFaces,
   Slope(..),
   Radius(..),
   flatXSlope,
@@ -10,6 +11,7 @@ import TriCad.MathPolar(
   )
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+
 
 generate :: IO ()
 generate = do
@@ -22,11 +24,12 @@ generate = do
       splitSpace =  map (LS.splitOn " ") splitColon
       --array length = 5 as that is how many were read from the file
       arrayOfRadiusForEachDegree =  [ map (Radius .readDouble) x |  x <- splitSpace]
-      origin = (Point{x_axis=0, y_axis=0, z_axis=0})
+      heightPerPixel = 0.1
+      origin = (Point{x_axis=0, y_axis=0, z_axis=50})
       
       
               
-  print $ show $ createFirstVerticalLine origin (head arrayOfRadiusForEachDegree)
+  print $ show $ generateLeftFaces origin (head arrayOfRadiusForEachDegree) heightPerPixel
 
 
 
@@ -47,9 +50,20 @@ Will be different from subsequent lines because this on needs to be a front righ
 while all the others will be a front left line.
 
 -}
-createFirstVerticalLine :: Point ->  [Radius] -> [CornerPoints]
-createFirstVerticalLine topOrigin radList  = 
+generateRightFaces :: Point ->  [Radius] -> Double -> [CornerPoints]
+generateRightFaces topOrigin radList heightPerPixel  = 
   --first point will be a front right top
   --all the rest will be bottom front right
-  createRightFaces topOrigin radList [0..] flatXSlope flatYSlope
-  
+  createRightFaces topOrigin 0 flatXSlope flatYSlope [0.0,heightPerPixel..] radList
+
+{-
+For now it just creates a [LeftFace] from the 0 degree Radius
+Next figure out how to map this onto the tail of all the degrees Radius.
+Then figure out how to [RighFace] ++> [[LeftFace] as opposed to what I have done before. eg:
+ RightFace ++> [LeftFace]
+-}
+generateLeftFaces :: Point ->  [Radius] -> Double -> [CornerPoints]
+generateLeftFaces topOrigin radList heightPerPixel  = 
+  --first point will be a front right top
+  --all the rest will be bottom front right
+  createLeftFaces topOrigin 0 flatXSlope flatYSlope [0.0,heightPerPixel..] radList

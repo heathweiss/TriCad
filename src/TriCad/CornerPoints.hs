@@ -257,6 +257,10 @@ instance Eq CornerPoints where
     RightFace b3 b4 f3 f4 == RightFace b3a b4a f3a f4a
       | (b3 == b3a) && (b4 == b4a) && (f3 == f3a) && (f4 == f4a) = True
       | otherwise = False
+
+    LeftFace b1 b2 f1 f2 == LeftFace b1a b2a f1a f2a
+      | (b1 == b1a) && (b2 == b2a) && (f1 == f1a) && (f2 == f2a) = True
+      | otherwise = False
     ---------------------------------- cubes --------------------
     CubePoints f1 f2 f3 f4 b1 b2 b3 b4 == CubePoints f1a f2a f3a f4a b1a b2a b3a b4a
       | (f1 == f1a) && (f2 == f2a) && (f3 == f3a) && (f4 == f4a) && (b1 == b1a) && ( b2 == b2a) && (b3 == b3a) && (b4 == b4a) = True
@@ -322,6 +326,9 @@ but
 (LeftFace b1t b2t f1t f2t) +++ (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) =
   CubePoints {b1=b1t, b4=b1, b2=b2t, b3=b2, f1=f1t, f2=f2t, f3=f2, f4=f1}
 
+(LeftFace b1 b2 f1 f2) +++ (BottomLeftLine b1a f1a) =
+  (LeftFace b1a b1 f1a f1)
+
 (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) +++ (LeftFace b1t b2t f1t f2t) =
      CubePoints {b1=b1t, b4=b1, b2=b2t, b3=b2, f1=f1t, f2=f2t, f3=f2, f4=f1}
 
@@ -354,6 +361,9 @@ but
 
 (TopLeftLine b2 f2) +++ (TopRightLine b3 f3) =
     TopFace b2 f2 b3 f3
+
+(TopLeftLine b2 f2) +++ (BottomLeftLine b1 f1) =
+    LeftFace b1 b2 f1 f2
 
 (TopRightLine b3 f3) +++ (TopLeftLine b2 f2) =
     TopFace b2 f2 b3 f3

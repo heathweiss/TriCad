@@ -4,6 +4,7 @@ module TriCad.MathPolar(
   createTopFaces,
   createBottomFaces,
   createRightFaces,
+  createLeftFaces,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
@@ -19,6 +20,7 @@ module TriCad.MathPolar(
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.Math(sinDegrees, cosDegrees)
+import TriCad.CornerPointsTranspose (transposeZ)
 
 {--------------------overview----------------------------------------
 Creates a radial shape using polar cood's.
@@ -387,60 +389,101 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
     ]
 
 
-{----------------------------------------- create right faces ----------------------------------------------------------
+
+{----------------------------------------- create left/right faces ----------------------------------------------------------
+This is a base that gets called by createLeftFaces and createRightFaces, with just a different set of CornerPoints constructors.
+
+Build [Left/RightFaces], from an array of Radius that runs downwards along
+a single degree. This is the way that the scanner process the images, and gives them to TriCad.
+If the data is supplied in an upwards direction, reverse the data, then use this same function, instead of
+building a separate function for that purpose.
+
+The vertical distance of each height, is the same for all pixels. Therefore, the height of each pixel
+is a factor of location in the array. So to calculate the z_axis(height), an array is passed in which
+will be zipped with the RightFaces after they have been created, using TransposeZ.
+It would be more efficient to calculate it as the Faces are made up, but then would not be able to re-use
+the createCornerPoint function.
+
+
 Known uses:
 Scanning
 Scanning is done vertically, so it would be best to build the model that way, instead of transforing the data
 to fit the horizontal model supplied by 'createBottomFaces'/'createTopFaces'
 
 Create a set of right faces, which will be used as the initial faces, to which all the subsequent left
-faces will be added.
+faces will be added via ++>. This is used to build both right/left faces.
 
 Create in a top down direction, as that is the way the openCV data is supplied.
+
+------------ given -----------
+topOrigin:
+-Point that gives the inner origin for the topmost face caculated. This is also the first Radius.
+
+degree:
+-The current degree on xy axis. Should be 0.
+
+xSlope:
+-x-axis slope on the top of the shape
+
+ySlope:
+-y-axis slope on the top of the shape
+
+zTransposeFactor:
+-An array of the heights(z_axis value) associated with each face. This value will be subtracted
+ from the topOrigin z_axis.
+
+inRadius:
+-The array of Radius, which is the value read in from the file, as was calculated openCV.
+ This is the location of the target value, in pixels. It needs to be translated into a distance.
+
+---------returns ----------
+An array of RightFace.
 -}
 
-createRightFaces inOrigin inRadius inAngles xSlope ySlope  =
-    (createCornerPoint
-      (F3)
-      inOrigin
+createVerticalFaces :: Point -> Double -> Slope -> Slope -> [Double] -> [Radius] -> (Point-> CornerPoints) ->
+                       (Point-> CornerPoints) -> (Point-> CornerPoints) -> (Point-> CornerPoints) -> [CornerPoints]
+createVerticalFaces topOrigin degree xSlope ySlope zTransposeFactor inRadius
+                    topFrontConstructor topBackConstructor btmFrontConstructor btmBackConstructor =
+  
+  zipWith  (\x y -> transposeZ ((-x)+) y  ) --negating x causes the z_axis to decrease from the top, as it should.
+   zTransposeFactor --this should be an infinit of the height for each pixel, measured from topOrigin.
+  
+   ((createCornerPoint
+      (topFrontConstructor)
+      topOrigin
       (head inRadius) 
-      (radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles))))
-      (xyQuadrantAngle (head inAngles))
-      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles)))
+      (radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle degree)))
+      (xyQuadrantAngle degree)
+      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle degree))
     ) 
     +++
-    B3 inOrigin
+    topBackConstructor topOrigin
     ++>
     [(createCornerPoint
-      (F4)
-      inOrigin
+      (btmFrontConstructor)
+      topOrigin
       currRadius
-      (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle)))
-      (xyQuadrantAngle angle)
-      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle))
+      (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle degree)))
+      (xyQuadrantAngle degree)
+      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle degree))
      ) 
      +++
-     B4 inOrigin
-       | angle <- tail inAngles
+     btmBackConstructor topOrigin
        | currRadius <- tail inRadius
     ]
+   )
 
-{-
-additions required
-F3 +++ B3
-present: y
-tested:  y
+--RightFace version of createVerticalFaces
+createRightFaces :: Point -> Double -> Slope -> Slope -> [Double] -> [Radius] -> [CornerPoints]
+createRightFaces topOrigin degree xSlope ySlope zTransposeFactor inRadius  =
+  createVerticalFaces topOrigin degree xSlope ySlope zTransposeFactor inRadius (F3) (B3) (F4) (B4)
 
-F4 +++ B4
-present: y
-tested:  y
+--LeftFace version of createVerticalFaces
+createLeftFaces :: Point -> Double -> Slope -> Slope -> [Double] -> [Radius] -> [CornerPoints]
+createLeftFaces topOrigin degree xSlope ySlope zTransposeFactor inRadius  =
+  createVerticalFaces topOrigin degree xSlope ySlope zTransposeFactor inRadius (F2) (B2) (F1) (B1)
 
-TopRightLine +++ BottomRightLine
-present: y
-tested:  y
 
-RightFace +++ BottomRightLine
-present: y
-tested:  y
 
--}
+
+
