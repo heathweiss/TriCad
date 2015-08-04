@@ -5,6 +5,8 @@ module TriCad.MathPolar(
   createBottomFaces,
   createRightFaces,
   createLeftFaces,
+  createVerticalCubes,
+  createLeftFacesMultiColumns,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
@@ -487,7 +489,32 @@ createLeftFaces :: Point -> Double -> Slope -> Slope -> [Double] -> [Radius] -> 
 createLeftFaces topOrigin degree xSlope ySlope zTransposeFactor inRadius  =
   createVerticalFaces topOrigin degree xSlope ySlope zTransposeFactor inRadius (F2) (B2) (F1) (B1)
 
+{-
+Can already create LeftFace, problem is to create an array of them from the vertical [Radius].
+Cannot just map over them with createLeftFaces, because the degree is changing from column to column.
+For this reason, will have to use recursion.
 
+createVerticalFaces :: Point -> Double -> Slope -> Slope -> [Double] -> [Radius] ->  [CornerPoints]
+createVerticalFaces topOrigin degree xSlope ySlope zTransposeFactor inRadius
+                    topFrontConstructor topBackConstructor btmFrontConstructor btmBackConstructor =
+-}
+createLeftFacesMultiColumns ::  Point -> [Double] -> Slope -> Slope -> [Double] -> [[Radius]] -> [[CornerPoints]]
+--createLeftFacesMultiColumns  topOrigin degrees     xSlope   ySlope zTransposeFactor radii
+createLeftFacesMultiColumns _ _ _ _ _ [] = []
+createLeftFacesMultiColumns topOrigin (d:ds) xSlope ySlope zTransposeFactor (r:rs) =
+  (createLeftFaces topOrigin d xSlope ySlope zTransposeFactor r) :
+    (createLeftFacesMultiColumns topOrigin ds xSlope ySlope zTransposeFactor rs)
 
+{-
+Join a [RightFace] to [[LeftFace]] using a ++>
+Normally: RightFace ++> [LeftFaces] so need recursion to work through the extra level of lists.
 
+I stopped the test for now, till I can create a [[LeftFace]].
+At this point I can only create a[LeftFace]
+-}
+createVerticalCubes :: [CornerPoints] -> [[CornerPoints]] -> [CornerPoints]
+createVerticalCubes ([]) _ = []
+createVerticalCubes (x:xs) (ys) =
+  let headOfLeftFaces = map (head) ys
+  in (x ++> headOfLeftFaces) ++  (createVerticalCubes xs (map (tail) ys) )
 

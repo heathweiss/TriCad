@@ -22,7 +22,7 @@ library
                    TriCad.StlFileWriter, TriCad.CornerPointsTranspose
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
-                   Tests.MathTest, Tests.MathPolarTest
+                   Tests.MathTest, Tests.MathPolarTest, Tests.ScannerTest
                    -- HeelGenerators
                    HeelGenerators.BlackRunnerHeel, HeelGenerators.SandalsToe
                    -- Sockets
