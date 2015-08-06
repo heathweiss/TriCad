@@ -1,6 +1,6 @@
 module Tests.ScannerTest where
 import Test.HUnit
-import  Scan.Parse(parseMinsToChar, parseMinsToDouble, parseMinsToRadius)
+import  Scan.Parse.Mins(parseMinsToChar, parseMinsToDouble, parseMinsToRadius)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.Points(Point(..))

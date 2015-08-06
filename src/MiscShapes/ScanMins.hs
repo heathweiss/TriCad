@@ -17,7 +17,7 @@ import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.StlCornerPoints((+++^))
 import TriCad.StlBase (StlShape(..), newStlShape)
 import TriCad.StlFileWriter(writeStlToFile)
-import Scan.Parse(parseMinsToRadius)
+import Scan.Parse.Mins(parseMinsToRadius)
 
 generate :: IO ()
 generate = do
