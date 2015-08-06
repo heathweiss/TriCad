@@ -1,3 +1,10 @@
-module Tests.ParseRawTest () where
+module Tests.ParseRawTest (parseRawDo) where
+import Test.HUnit
 
-hello = "hello from ParseRawTest"
+parseRawDo = do
+  runTestTT hello
+
+hello = TestCase $ assertEqual
+  "hello from ParseRawTest"
+  (1)
+  (1)
