@@ -1,6 +1,6 @@
 module Tests.ScannerTest where
 import Test.HUnit
-import  Scan.Parse(parseToChar, parseToDouble, parseToRadius)
+import  Scan.Parse(parseMinsToChar, parseMinsToDouble, parseMinsToRadius)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.Points(Point(..))
@@ -28,22 +28,22 @@ scannerTestDo = do
 parseToCharTest = TestCase $ assertEqual 
   "parseToChareee"
   ([["1","2"],["3","4"]])
-  (parseToChar $ BL.pack "1 2;3 4")
+  (parseMinsToChar $ BL.pack "1 2;3 4")
 
 parseToDoubleTest = TestCase $ assertEqual
   "parseToDoubleTest"
   ([[1,2],[3,4]])
-  (parseToDouble $ BL.pack "1 2;3 4")
+  (parseMinsToDouble $ BL.pack "1 2;3 4")
 
 parseToDoubleSingleColumnTest = TestCase $ assertEqual
   "parseToDoubleTest with a single column"
   ([[1,2]])
-  (parseToDouble $ BL.pack "1 2")
+  (parseMinsToDouble $ BL.pack "1 2")
 
 parseToRadiusTest = TestCase $ assertEqual
   "parseToRadiusTest"
   ([[(Radius 1),(Radius 2)],[(Radius 3),(Radius 4)]])
-  (parseToRadius $ BL.pack "1 2;3 4")
+  (parseMinsToRadius $ BL.pack "1 2;3 4")
 
   
 
@@ -59,7 +59,7 @@ createRightFacesAt90DegreesTest = TestCase $ assertEqual
     ])
 
    (
-     let radii  = (parseToRadius $ BL.pack "1 2 3")
+     let radii  = (parseMinsToRadius $ BL.pack "1 2 3")
          origin = (Point{x_axis=0, y_axis=0, z_axis=50})
          heightPerPixel = 10
          degree = 90
@@ -75,7 +75,7 @@ createListOfRightFacesTest = TestCase $  assertEqual
     ])
 
    (
-     let radii  = (parseToRadius $ BL.pack "1 2 3")
+     let radii  = (parseMinsToRadius $ BL.pack "1 2 3")
          origin = (Point{x_axis=0, y_axis=0, z_axis=50})
          heightPerPixel = 10
          degree = 0
@@ -91,7 +91,7 @@ createListOfLeftFaces  = TestCase $  assertEqual
     ])
 
    (
-     let radii  = (parseToRadius $ BL.pack "1 2 3")
+     let radii  = (parseMinsToRadius $ BL.pack "1 2 3")
          origin = (Point{x_axis=0, y_axis=0, z_axis=50})
          heightPerPixel = 10
          degree = 0
@@ -108,7 +108,7 @@ createLeftFacesMultiColumnsTest = TestCase $ assertEqual
        [(LeftFace {b1=(Point 0 0 49), b2=(Point 0 0 50 ), f1=(Point 4 0 49) ,    f2=(Point 3 0 50 )})],
        [(LeftFace {b1=(Point 0 0 49), b2=(Point 0 0 50 ), f1=(Point 0 6 49),     f2=(Point 0 5 50 )})]
     ])
-  (let radii = parseToRadius $ BL.pack "1 2;3 4;5 6"
+  (let radii = parseMinsToRadius $ BL.pack "1 2;3 4;5 6"
        origin = (Point{x_axis=0, y_axis=0, z_axis=50})
        heightPerPixel = 1
        degrees = [0,90,180]
@@ -126,7 +126,7 @@ createListOfCubes = TestCase $  assertEqual
    (CubePoints {b1=(Point 0 0 49), b2=(Point 0 0 50), b3=(Point 0 0 50), b4=(Point 0 0 49),
                 f1=(Point 0 6 49), f2=(Point 0 5 50), f3=(Point 3 0 50), f4=(Point 4 0 49)})
   ])
-  (let radii  = (parseToRadius $ BL.pack "1 2;3 4;5 6")
+  (let radii  = (parseMinsToRadius $ BL.pack "1 2;3 4;5 6")
        origin = (Point{x_axis=0, y_axis=0, z_axis=50})
        heightPerPixel = 1
        degree = [0,90,180]

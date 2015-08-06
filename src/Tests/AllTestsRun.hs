@@ -3,6 +3,9 @@ import Tests.CornerPointsDebugTest(cornerPointsDebugTestDo)
 import Tests.CornerPointsTest(cornerPointsTestDo )
 import Tests.MathTest(mathTestDo)
 import Tests.MathPolarTest(mathPolarTestDo)
+import Tests.MathTest(mathTestDo)
+import Tests.ParseTest(parseTestDo)
+import Tests.ScannerTest(scannerTestDo)
 
 runAllTestsDo = do
   putStrLn "corner points debug test"
