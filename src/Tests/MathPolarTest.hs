@@ -9,12 +9,15 @@ import TriCad.MathPolar(
   --yRadiusAdjustedForZslope,
   radiusAdjustedForZslope,
   xValue,
+  yValue,
   Radius(..),
   xyQuadrantAngle,
   QuadrantAngle(..),
   createCornerPoint,
   Slope(..),
   )
+import TriCad.Math(sinDegrees,cosDegrees)
+
 
 mathPolarTestDo = do
 
@@ -29,9 +32,12 @@ mathPolarTestDo = do
   runTestTT getQuadrantAngleTest7
 
   runTestTT getXValueTest
+  runTestTT getYValueTest
   runTestTT getXValueTest2
+  runTestTT getXValueTest2a
   runTestTT getXValueTest3
   runTestTT getXValueTest4
+  runTestTT getXValueTest4a
   runTestTT getXValueTest5
   runTestTT getXValueTest6
   runTestTT getXValueTest7
@@ -109,11 +115,13 @@ mathPolarTestDo = do
 
   runTestTT createCornerPointTestR10PosX1NegY10XY190
   runTestTT createCornerPointTestR10PosX1NegY10XY170
+  runTestTT createFrontCornerTest
   {-This will test all the layer A F1 corners-}
   putStrLn "\n\n" 
   putStrLn "bottomFrontLeftCorners"
   -- runTestTT listOfF1PointsTest
-
+ 
+ 
 {----------------------------------- Try the quadrant angles -------------------------------------------------------------------
 xyQuadrantAngle currAngle 
 -}
@@ -140,8 +148,7 @@ getQuadrantAngleTest7 = TestCase $ assertEqual
 
 
 
-
-{----------------------------------- Test the get x  values without slope -------------------------------------------------
+{----------------------------------- Test the get x/y  values without slope -------------------------------------------------
 xValue :: Radius -> QuadrantAngle -> Point -> Double
 
 don't even seem to be using this function. Should look at getting rid of it.
@@ -150,14 +157,23 @@ don't even seem to be using this function. Should look at getting rid of it.
 getXValueTest = TestCase $ assertEqual 
   "getXValueTest" (1.7364817766693033) (xValue (Radius 10) (xyQuadrantAngle 10) (Point 0 0 0)  )
 
+getYValueTest = TestCase $ assertEqual 
+  "getYValueTest" (9.84807753012208) (yValue (Radius 10) (xyQuadrantAngle 10) (Point 0 0 0)  )
+
 getXValueTest2 = TestCase $ assertEqual 
   "getXValueTest2" (9.84807753012208) (xValue (Radius 10) (xyQuadrantAngle 80) (Point 0 0 0)  )
+
+getXValueTest2a = TestCase $ assertEqual 
+  "getXValueTest2a" (10) (xValue (Radius 10) (xyQuadrantAngle 90) (Point 0 0 0)  )
 
 getXValueTest3 = TestCase $ assertEqual 
   "getXValueTest3" (9.84807753012208) (xValue (Radius 10) (xyQuadrantAngle 100) (Point 0 0 0)  )
 
 getXValueTest4 = TestCase $ assertEqual 
   "getXValueTest4" (1.7364817766693033) (xValue (Radius 10) (xyQuadrantAngle 170) (Point 0 0 0)  )
+
+getXValueTest4a = TestCase $ assertEqual 
+  "getXValueTest4a" (0) (xValue (Radius 10) (xyQuadrantAngle 180) (Point 0 0 0)  )
 
 getXValueTest5 = TestCase $ assertEqual 
   "getXValueTest5" (-1.7364817766693033) (xValue (Radius 10) (xyQuadrantAngle 190) (Point 0 0 0)  )
@@ -515,7 +531,17 @@ singleF4PointTest  = TestCase $ assertEqual
 createCornerPoint :: (Point-> CornerPoints) -> Point -> Radius ->  QuadrantAngle -> Slope -> CornerPoints  
 -}
 
-
+createFrontCornerTest = TestCase $ assertEqual
+  "recreate the front corner to see what is wrong with my vertical faces"
+  (F3 (Point 1 (-6.123233995736766e-17) 50))
+  (createCornerPoint
+    (F3)
+    (Point{x_axis=0, y_axis=0, z_axis=50})
+    (Radius 1)
+    (radiusAdjustedForZslope (Radius 1) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 90)))
+    (xyQuadrantAngle 90)
+    (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 90))
+  ) 
 
 createCornerPointTestR10PosX0PosY0XY10  = TestCase $ assertEqual 
   "createCornerPointTestR10PosX0PosY0XY10"

@@ -21,9 +21,24 @@ data Point =  Point { x_axis :: Double, y_axis :: Double, z_axis :: Double }
 	     b: back of cube
 	Now each corner can be named with corner # and f (front) or b (back)
 -}
+
+{----------------       instance of equal ---------------
+In order to avoid double rounding errors and  trig errors which cause
+the same point, and thus CornerPoints, to be /= due to tiny differences,
+give it a range of .01, and still allow the points to be equal.
+
+All the restrictions are just boilerplate to get it to compile.
+(Eq a, Num a, Ord a, Fractional a) =>
+-}
+axisEqual :: (Eq a, Num a, Ord a, Fractional a) => a -> a -> Bool
+axisEqual  a b
+  
+  | (abs (a - b)) <= 0.011 = True
+  | otherwise      = False
+
 instance Eq Point where
     Point x y z == Point xa ya za
-      | (x == xa) && (y == ya)  && (z == za) = True 
+      |  (axisEqual x xa) && (axisEqual y ya)  &&(axisEqual z za) = True 
       | otherwise = False
 
 

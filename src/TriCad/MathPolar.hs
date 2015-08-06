@@ -11,6 +11,7 @@ module TriCad.MathPolar(
   createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
   xValue,
+  yValue,
   xyQuadrantAngle,
   QuadrantAngle(..),
   createCornerPoint,
@@ -18,6 +19,7 @@ module TriCad.MathPolar(
   Radius(..),
   flatXSlope,
   flatYSlope,
+  
   ) where
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
@@ -31,6 +33,8 @@ Creates a radial shape using polar cood's.
 
 For some reason, it has a slight drift. Eg: At 90 degrees, the y axis should be 0,
 but it drifts of the y-axis by about 5%. WTF?
+
+safari books: Triginometry 3rd edition is a good ref.
 -}
 
 {---------------------------------------------------------------------------
@@ -41,7 +45,8 @@ Functions for calculating the current x and y values adjusted for xy degrees
 
 -}
 
-
+--many shapes, if not most, do not have sloped tops, therefore it is handy
+--to have these easily callable.
 flatXSlope = PosXSlope 0
 flatYSlope = PosYSlope 0
 
@@ -54,6 +59,10 @@ data Radius = Radius {radius :: Double}
              | UpRadius {radius :: Double}
    deriving (Show, Eq)
 
+{-
+There are 4 quadrants to work with therfore the Quadarant1/2/3/4Angle
+What was the Angle for?
+-}
 data QuadrantAngle = Quadrant1Angle Double
                    | Quadrant2Angle Double
                    | Quadrant3Angle Double
@@ -97,6 +106,13 @@ xValue (Radius radius) (Quadrant1Angle angle) origin = x_axis origin + sinDegree
 xValue (Radius radius) (Quadrant2Angle angle) origin = x_axis origin + sinDegrees angle * radius
 xValue (Radius radius) (Quadrant3Angle angle) origin = x_axis origin - sinDegrees angle * radius
 xValue (Radius radius) (Quadrant4Angle angle) origin = x_axis origin - sinDegrees angle * radius
+
+yValue :: Radius -> QuadrantAngle -> Point -> Double
+yValue (Radius radius) (Quadrant1Angle angle) origin = y_axis origin + cosDegrees angle * radius
+yValue (Radius radius) (Quadrant2Angle angle) origin = y_axis origin + cosDegrees angle * radius
+yValue (Radius radius) (Quadrant3Angle angle) origin = y_axis origin - cosDegrees angle * radius
+yValue (Radius radius) (Quadrant4Angle angle) origin = y_axis origin - cosDegrees angle * radius
+
 
 {-
 Functions for calculating the current Z plane angle. It is a combination of the slope,
@@ -442,7 +458,7 @@ inRadius:
  This is the location of the target value, in pixels. It needs to be translated into a distance.
 
 ---------returns ----------
-An array of RightFace.
+An array of LeftFace or RightFace depending on data constructors passed in.
 -}
 
 createVerticalFaces :: Point -> Double -> Slope -> Slope -> [Double] -> [Radius] -> (Point-> CornerPoints) ->

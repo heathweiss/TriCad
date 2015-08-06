@@ -4,6 +4,8 @@ radiansToDegrees,
 --upperYValueOfWedge,
 sinDegrees,
 cosDegrees) where
+import qualified Data.Decimal as D
+
 
 {-
 If degrees < 0, make them positive
@@ -22,7 +24,7 @@ Prelude sin uses radians. This puts a wrapper around it to pass in degrees.
 -}
 sinDegrees :: Double -> Double
 sinDegrees degrees = sin $ degreesToRadians degrees
-
+                   
 {-
 Prelude cos uses radians. This puts a wrapper around it to pass in degrees.
 -}

@@ -6,6 +6,8 @@ import TriCad.Points (Point(..))
 
 cornerPointsTestDo = do
 
+  
+
   runTestTT leftFacePPPBottomLeftLineTest
   runTestTT topLeftLinePPPBottomLeftLineTest
   runTestTT rightFacePPPBottomRightLineTest
@@ -34,6 +36,21 @@ cornerPointsTestDo = do
   putStrLn ""
   putStrLn "Infix tests"
   runTestTT f2PlusPlusPlusB2PlusPlusFwdF3PlusPlusPlusB3
+
+  -- equality tests
+  runTestTT shouldBeEqualF3
+  runTestTT shouldBeEqualPoints
+
+------------------------ equality tests ------------------------------
+shouldBeEqualPoints = TestCase $ assertEqual
+  "points should be equal:-6.123233995736766e-1 "
+  (Point {x_axis = 1.0, y_axis = (-6.123233995736766e-17), z_axis = 50.0})
+  (Point {x_axis = 1.0, y_axis = (-6.123233995736766e-17), z_axis = 50.0})
+
+shouldBeEqualF3 = TestCase $ assertEqual
+  "these cornerpoints should be equal: -6.123233995736766e-17 "
+  (F3 (Point {x_axis = 1.0, y_axis = (-6.123233995736766e-17), z_axis = 50.0}))
+  (F3 (Point {x_axis = 1.0, y_axis = (-6.123233995736766e-17), z_axis = 50.0}))
 
 {-
 Test +++

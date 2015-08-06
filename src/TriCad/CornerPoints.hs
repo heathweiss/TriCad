@@ -194,12 +194,16 @@ They are not the same constructor.
 x y z axis are not all equal.
 
 Need to be implemented for each constuctor
+
+Due to rounding errors, etc. a special function to compare x y z axis values is required
+to make sure they are withing 0.01 of each othere
 -}
+
 instance Eq CornerPoints where
     -------------------------- points -------------------
     B4 b4 == B4 b4a
-      | b4 == b4a = True
-      | otherwise = False
+       |  b4 == b4a = True
+       | otherwise = False
 
     F1 f1 == F1 f1a  
        | f1 == f1a = True 
@@ -207,6 +211,10 @@ instance Eq CornerPoints where
 
     F4 f4  == F4 f4a  
       | f4 == f4a = True
+      | otherwise = False
+
+    F3 f3  == F3 f3a  
+      | f3 == f3a = True
       | otherwise = False
 
     --------------------------- lines ----------------------
