@@ -28,7 +28,7 @@ library
                    -- Sockets
                    Sockets.Bicycle
                    -- Misc Shapes
-                   MiscShapes.RvVentCaps,  MiscShapes.ScanTest1,
+                   MiscShapes.RvVentCaps,  MiscShapes.ScanMins,
                    --Shapes
                    TriCad.Shapes.Cylindrical, TriCad.Shapes.Cubical
                    --Scanning

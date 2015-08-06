@@ -1,5 +1,5 @@
 {-# LANGUAGE ParallelListComp #-}
-module MiscShapes.ScanTest1 () where
+module MiscShapes.ScanMins () where
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
 import TriCad.MathPolar(
