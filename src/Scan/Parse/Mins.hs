@@ -1,4 +1,4 @@
-module Scan.Parse.Mins(parseMinsToChar, parseMinsToDouble, parseMinsToRadius ) where
+module Scan.Parse.Mins(parseToChar, parseToDouble, parseToRadius ) where
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
 import Scan.Parse(readDouble)
@@ -25,14 +25,14 @@ rather than processing it in C++.
 Testing done in Tests/ParseMinsTest.hs
 -}
 
-parseMinsToChar :: BL.ByteString -> [[[Char]]]
-parseMinsToChar bs =
+parseToChar :: BL.ByteString -> [[[Char]]]
+parseToChar bs =
   let splitColon =  LS.splitOn ";"   $ BL.unpack bs
       splitSpace =  map (LS.splitOn " ") splitColon
   in  splitSpace
   
-parseMinsToDouble ::  BL.ByteString -> [[Double]]
-parseMinsToDouble bs =  [ map (readDouble) x |  x <- parseMinsToChar bs]
+parseToDouble ::  BL.ByteString -> [[Double]]
+parseToDouble bs =  [ map (readDouble) x |  x <- parseToChar bs]
 
-parseMinsToRadius bs =  [ map (Radius . readDouble) x |  x <- parseMinsToChar bs]
+parseToRadius bs =  [ map (Radius . readDouble) x |  x <- parseToChar bs]
 

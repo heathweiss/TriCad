@@ -17,7 +17,7 @@ import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.StlCornerPoints((+++^))
 import TriCad.StlBase (StlShape(..), newStlShape)
 import TriCad.StlFileWriter(writeStlToFile)
-import Scan.Parse.Mins(parseMinsToRadius)
+import Scan.Parse.Mins(parseToRadius)
 
 generate :: IO ()
 generate = do
@@ -25,7 +25,7 @@ generate = do
   contents <- BL.readFile "/home/heath/zeromq/openCvCsvFileWrite/mins.txt"
 
   let
-      allDegreesRadius = parseMinsToRadius contents
+      allDegreesRadius = parseToRadius contents
       heightPerPixel = 1
       origin = (Point{x_axis=0, y_axis=0, z_axis=50})
 
@@ -68,7 +68,7 @@ generateCubesFromImage topOrigin degree heightPerPixel radii =
 generateSingleCube :: [CornerPoints]
 generateSingleCube =
 
-   let radii  = (parseMinsToRadius $ BL.pack "1 2 3 4 5 6 7;1 2 3 4 5 6 7;1 2 3 4 5 6 7;1 2 3 4 5 6 7;1 2 3 4 5 6 7")
+   let radii  = (parseToRadius $ BL.pack "1 2 3 4 5 6 7;1 2 3 4 5 6 7;1 2 3 4 5 6 7;1 2 3 4 5 6 7;1 2 3 4 5 6 7")
        origin = (Point{x_axis=0, y_axis=0, z_axis=50})
        heightPerPixel = 10
        degree = [0,90,180,270,360]
