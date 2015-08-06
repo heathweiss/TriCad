@@ -4,7 +4,7 @@ import qualified Data.List.Split as LS
 import Scan.Parse(readDouble)
 import TriCad.MathPolar( Radius(..))
 
-hello = "hello"
+
 
 {---------- parse min values
 The format of the file must be:
@@ -21,6 +21,8 @@ It will be 1-dim data such as from gray-scale or black and white.
 
 It is possible that all the mins will be removed, as it may be better to have full data in haskell,
 rather than processing it in C++.
+
+Testing done in Tests/ParseMinsTest.hs
 -}
 
 parseMinsToChar :: BL.ByteString -> [[[Char]]]

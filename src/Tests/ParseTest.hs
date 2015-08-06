@@ -1,10 +1,11 @@
 module Tests.ParseTest (parseTestDo) where
 import Test.HUnit
+import Scan.Parse( readDouble)
 
 parseTestDo = do
-  runTestTT hello
+  runTestTT readDoubleTest
 
-hello = TestCase $ assertEqual
- "hello test"
+readDoubleTest = TestCase $ assertEqual
+ "read in a double"
  (1)
- (1)
+ (readDouble "1")
