@@ -23,13 +23,14 @@ library
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.ScannerTest, Tests.ParseTest,
-                   Tests.ParseRawTest, Tests.ParseMinsTest, Tests.TransformTest
+                   Tests.ParseRawTest, Tests.ParseMinsTest, Tests.TransformTest,
+                   
                    -- HeelGenerators
                    HeelGenerators.BlackRunnerHeel, HeelGenerators.SandalsToe
                    -- Sockets
                    Sockets.Bicycle
                    -- Misc Shapes
-                   MiscShapes.RvVentCaps,  MiscShapes.ScanMins,
+                   MiscShapes.RvVentCaps,  MiscShapes.ScanMins, MiscShapes.ScanRaw
                    --Shapes
                    TriCad.Shapes.Cylindrical, TriCad.Shapes.Cubical
                    --Scanning
