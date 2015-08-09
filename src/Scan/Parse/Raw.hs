@@ -1,10 +1,13 @@
 {-# LANGUAGE ParallelListComp #-}
-module Scan.Parse.Raw(parseToChar, parseToDouble, parseToDoubleFiltered, parseToDoubleFilteredRadius) where
+module Scan.Parse.Raw(parseToChar, parseToDouble, parseToDoubleFiltered, parseToRadiusFiltered) where
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
 import Scan.Parse(readDouble)
 import TriCad.MathPolar( Radius(..))
 
+{-
+Parse
+-}
 parseToChar :: BL.ByteString -> [[[[Char]]]]
 parseToChar bs =
   let splitDegree = LS.splitOn "$"  $ BL.unpack bs --[[degree]]
@@ -29,8 +32,10 @@ parseToDoubleFiltered f bs =  do contents <- LS.splitOn "$" $ BL.unpack bs
                                  [[f y  | y  <-  x] | x <- readToDoubles ]
 
 
-parseToDoubleFilteredRadius f bs =  do contents <- LS.splitOn "$" $ BL.unpack bs
+parseToRadiusFiltered       f bs =  do contents <- LS.splitOn "$" $ BL.unpack bs
                                        let splitToSpaces = ((map (LS.splitOn ";") (LS.splitOn "$" contents)))
                                            splitToChars = [map (LS.splitOn " ") x | x <- splitToSpaces]
                                            readToDoubles = [[map ( readDouble) y | y <-  x] | x <- splitToChars ]
-                                       [[((Radius) . f) y  | y  <-  x] | x <- readToDoubles ]
+                                       [[((Radius) . f ) y  | y  <-  x] | x <- readToDoubles ]
+
+

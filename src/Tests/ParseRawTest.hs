@@ -1,15 +1,17 @@
 module Tests.ParseRawTest (parseRawDo) where
 import Test.HUnit
-import Scan.Parse.Raw(parseToChar, parseToDouble, parseToDoubleFiltered, parseToDoubleFilteredRadius)
+import Scan.Parse.Raw(parseToChar, parseToDouble, parseToDoubleFiltered, parseToRadiusFiltered)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Scan.Transform(minValueIndices, average)
 import TriCad.MathPolar( Radius(..))
+import qualified Data.List  as L (filter)
 
 parseRawDo = do
   runTestTT parseToCharTest
   runTestTT parseToDoubleTest
   runTestTT parseToDoubleFilteredTest
   runTestTT parseToDoubleFilteredRadiusTest
+  
 
 parseToCharTest = TestCase $ assertEqual
   "parse to char"
@@ -35,6 +37,11 @@ parseToDoubleFilteredRadiusTest = TestCase $ assertEqual
   "parse to average indice of all values <= 5, and put them in a Radius"
   
   ( [[Radius {radius = 0.5},Radius {radius = 1.0}],[Radius {radius = 0.5},Radius {radius = 0.5}]])
-  ( parseToDoubleFilteredRadius (average . minValueIndices 5 ) $ BL.pack  "1 3 6;3 4 5 7$2 4 6;3 4 8"
+  ( parseToRadiusFiltered (average . minValueIndices 5 ) $ BL.pack  "1 3 6;3 4 5 7$2 4 6;3 4 8"
     
   )
+
+
+
+
+
