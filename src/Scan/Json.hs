@@ -1,12 +1,49 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Scan.Json(Degree(..)) where
+module Scan.Json(Degree(..), Scan(..)) where
 import TriCad.MathPolar(Radius(..))
 import Data.Aeson
 import Control.Applicative
 import Control.Monad
 import Data.Text as T
---import qualified Data.ByteString.Lazy as BL
+{-
+Write and parse scans as json using Data.Aeson package.
 
+Started off with MathPolar.Radius
+-The radius measurement used by MathPolar to create shapes using Radius and degrees of a circular object.
+
+Have added:
+-Degree:
+  -A degree at which a scan occurred, and all the assoc'd [Radius]. As scanning happens on the vertical
+   axis, a single degree will contain many Radius.
+  -Should probably be moved into a TriCad module, along with Radius and Scan
+-Scan:
+  -A [Degree] which gives all the Radius for an entire scan of an object.
+
+Future things:
+-Figure out where to put Radius, Degree, and Scan datatypes and the To/FromJSON instance declarations.
+-}
+
+---------------------------- Scan -------------------------------------------
+{-
+name:
+Could come in handy later on, if I want to store in Mongo.
+If not for mongo, why not just use the file name.
+The stlBuilder could use it for naming the stl object, which is required by the stl format.
+-}
+data Scan = Scan {name::String, degrees::[Degree]}
+          deriving (Show, Eq)
+
+instance ToJSON Scan where
+  toJSON (Scan name degrees) = object ["name" .= name, "degrees" .= degrees]
+
+  
+instance FromJSON Scan where
+  parseJSON (Object v) = Scan <$>
+                         v .: "name" <*>
+                         v .: "degrees"
+  parseJSON _          = mzero
+
+--------------------------- Degree ------------------------------------------------
 data Degree = Degree {degree::Int, radii::[Radius]}
      deriving (Show, Eq)
 
@@ -18,8 +55,16 @@ instance FromJSON Degree where
                          v .: "degree" <*>
                          v .: "radii"
   parseJSON _          = mzero
-  
 
+
+
+
+  
+---------------------------- Radius ------------------------------------
+{-
+I have only used the Radius constructor, and not the Up/DownRadius constructors.
+Those 2 only get used later on, when dealing with slopes.
+-}
 instance FromJSON Radius where
   parseJSON (Object v) = Radius <$>
                          v .: "radius"
