@@ -5,6 +5,8 @@ import Data.Aeson
 import Control.Applicative
 import Control.Monad
 import Data.Text as T
+--import System.IO
+import qualified Data.ByteString.Lazy as BL
 {-
 Write and parse scans as json using Data.Aeson package.
 
@@ -73,3 +75,33 @@ instance FromJSON Radius where
 
 instance ToJSON Radius where
   toJSON (Radius radius) = object ["radius" .= radius]
+
+
+
+--------------------------------test some file output-----------------------------
+{-
+create/overwrites the file haskell_project/TriCad/scan.json
+-}
+writeToFileScan = do
+  BL.writeFile "scan.json" 
+     (encode (Scan
+               { name = "myScan",
+                 degrees =
+                  [
+                   Degree {degree=0, radii=[Radius {radius=12}, Radius {radius=120}]},
+                   Degree {degree=10, radii=[Radius {radius=120}, Radius {radius=1200}]}
+                  ]
+               }
+          )
+     )
+
+{-
+depends on the file haskell_project/TriCad/scan.json which was written with writeToFileScan
+-}
+readFromFileScan = do
+  contents <- BL.readFile "/home/heath/haskell_projects/Tricad/scan.json"
+  case (decode contents) of
+      Just (Scan name degrees) -> print $ show $  (Scan name degrees)
+      Nothing                  -> putStrLn "Nothing"
+  
+  
