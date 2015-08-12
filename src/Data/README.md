@@ -19,4 +19,9 @@ debug.txt
 scanRawData.raww
 -the output from the C++ opencv, for the raw image data.
 -It does not have the extra degree info attached
+-used by src/MiscShapes/ScanRaw.hs
+
+scanRawDataWitDegrees.raww
+-the output from the C++ opencv, for the raw image data.
+-It has the extra degree info attached
 -used by src/MiscShapes/ScanRaw.hs 
