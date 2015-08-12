@@ -26,6 +26,7 @@ import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.Math(sinDegrees, cosDegrees)
 import TriCad.CornerPointsTranspose (transposeZ)
 
+
 {--------------------overview----------------------------------------
 Creates a radial shape using polar cood's.
 
@@ -52,12 +53,25 @@ flatYSlope = PosYSlope 0
 
 
 
---type Radius = Double
 
+{-
+Represents a radius, which is what all shapes in math polar, are create from.
+This is, a set of degrees, each with an associated radius.
+
+Known uses:
+-Everywhere that a CornerPoints is made via MathPolar.
+
+-Scan.Parse.Raw uses it for parsing raw image data into json.
+
+-Scan.Json uses it for encoding/decoding scanner data.
+ It is made an instance of ToJSON and FromJSON in Scan.Json module.
+
+-}
 data Radius = Radius {radius :: Double}
              | DownRadius {radius :: Double}
              | UpRadius {radius :: Double}
    deriving (Show, Eq)
+
 
 {-
 There are 4 quadrants to work with therfore the Quadarant1/2/3/4Angle

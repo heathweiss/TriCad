@@ -23,8 +23,8 @@ library
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.ScannerTest, Tests.ParseTest,
-                   Tests.ParseRawTest, Tests.ParseMinsTest, Tests.TransformTest, Tests.JsonTest
-                   
+                   Tests.ParseRawTest, Tests.ParseMinsTest, Tests.TransformTest, Tests.JsonTest,
+                   Tests.ParseRawToADTTest
                    -- HeelGenerators
                    HeelGenerators.BlackRunnerHeel, HeelGenerators.SandalsToe
                    -- Sockets
@@ -35,7 +35,7 @@ library
                    TriCad.Shapes.Cylindrical, TriCad.Shapes.Cubical
                    --Scanning
                    Scan.Parse, Scan.Parse.Raw, Scan.Parse.Mins, Scan.Transform,
-                   Scan.Json
+                   Scan.Json, Scan.Parse.RawToADT
   -- other-modules:       
   -- other-extensions:    
   build-depends:       HUnit >=1.2.5.2

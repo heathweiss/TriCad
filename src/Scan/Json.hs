@@ -46,7 +46,7 @@ instance FromJSON Scan where
   parseJSON _          = mzero
 
 --------------------------- Degree ------------------------------------------------
-data Degree = Degree {degree::Int, radii::[Radius]}
+data Degree = Degree {degree::Double, radii::[Radius]}
      deriving (Show, Eq)
 
 instance ToJSON Degree where

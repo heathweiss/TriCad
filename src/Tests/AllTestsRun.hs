@@ -8,6 +8,8 @@ import Tests.ParseTest(parseTestDo)
 import Tests.ScannerTest(scannerTestDo)
 import Tests.ParseMinsTest(parseMinsDo)
 import Tests.ParseRawTest(parseRawDo)
+import Tests.JsonTest(jsonTestDo)
+import Tests.ParseRawToADTTest(parseRawToADTTestDo)  
 
 runAllTestsDo = do
   putStrLn "corner points debug test"
@@ -24,3 +26,7 @@ runAllTestsDo = do
   parseMinsDo
   putStrLn "parse raw test"
   parseRawDo
+  putStrLn "json test"
+  jsonTestDo
+  putStrLn "parse raw to adt test"
+  parseRawToADTTestDo
