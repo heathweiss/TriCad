@@ -83,7 +83,7 @@ instance ToJSON Radius where
 create/overwrites the file haskell_project/TriCad/scan.json
 -}
 writeToFileScan = do
-  BL.writeFile "scan.json" 
+  BL.writeFile "src/Data/scan.json" 
      (encode (Scan
                { name = "myScan",
                  degrees =
@@ -96,10 +96,10 @@ writeToFileScan = do
      )
 
 {-
-depends on the file haskell_project/TriCad/scan.json which was written with writeToFileScan
+depends on the file  written with writeToFileScan
 -}
 readFromFileScan = do
-  contents <- BL.readFile "/home/heath/haskell_projects/Tricad/scan.json"
+  contents <- BL.readFile "src/Data/scan.json"
   case (decode contents) of
       Just (Scan name degrees) -> print $ show $  (Scan name degrees)
       Nothing                  -> putStrLn "Nothing"

@@ -5,7 +5,7 @@ import TriCad.CornerPointsDebug((+++^?), (++^?), CubeName(..), CubeDebug(..), Cu
 import System.IO
 
 {-
-Writes the temp.stl file to Tricad/src/temp.stl folder when run from emacs repl.
+Writes the temp.stl file to /src/Data/temp.stl folder when run from emacs repl.
 Should have a config file in which this can be set.
 given:
   shape: an StlShape generated form a file such as HeelGenerators, or Sockets
@@ -15,13 +15,13 @@ return:
   Fails if file does not already exist.
 
 Known uses:
-BlackRunnerHeel uses this to write of the stl file.
+All code which outputs the final stl, uses this to write the stl file.
 -}
 writeStlToFile :: StlShape -> IO()
-writeStlToFile shape =  writeFile "temp.stl" $ stlShapeToText shape
+writeStlToFile shape =  writeFile "src/Data/temp.stl" $ stlShapeToText shape
 
 {-
-Writes the debyg.txt file to Tricad/src/debug.txt folder when run from emacs repl.
+Writes the debug.txt file to src/Data/debug.txt folder when run from emacs repl.
 Should have a config file in which this can be set.
 given:
   shape: an [CubeDebug] generated from a file such as HeelGenerators, or Sockets
@@ -36,4 +36,4 @@ Known uses:
 BlackRunnerHeel uses this to write of the stl file.
 -}
 writeStlDebugToFile :: [CubeDebug] -> IO()
-writeStlDebugToFile debugs = writeFile "debug.txt" $ show debugs
+writeStlDebugToFile debugs = writeFile "src/Data/debug.txt" $ show debugs

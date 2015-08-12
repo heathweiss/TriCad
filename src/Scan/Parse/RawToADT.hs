@@ -59,7 +59,7 @@ testFromContrivedByteString = do contents <- LS.splitOn "%" $  BL.unpack $ BL.pa
                                  let t = (parseToScan (average . minValueIndices 5 ) contents)
                                  show t
 
-testFromFile = do contents <-   BL.readFile "/home/heath/haskell_projects/Tricad/sample.raww"
+testFromFile = do contents <-   BL.readFile "src/Data/sample.raww"
                   let temp =  BL.unpack contents
                   print $ show $  (parseToScan (average . minValueIndices 5 ) temp)
 
