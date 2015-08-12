@@ -5,8 +5,7 @@ import Test.HUnit
 import Scan.Parse.RawToADT(parseToScan)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Scan.Transform(minValueIndices, average)
-import Scan.Json(Degree(..), Scan(..))
-import TriCad.MathPolar( Radius(..))
+import TriCad.MathPolar( Radius(..),Degree(..), Scan(..))
 
 parseRawToADTTestDo = do
   runTestTT parseToScanTest

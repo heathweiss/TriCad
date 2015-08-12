@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Scan.Json(Degree(..), Scan(..)) where
-import TriCad.MathPolar(Radius(..))
+module Scan.Json() where
+import TriCad.MathPolar(Radius(..),Degree(..), Scan(..))
 import Data.Aeson
 import Control.Applicative
 import Control.Monad
@@ -8,21 +8,11 @@ import Data.Text as T
 --import System.IO
 import qualified Data.ByteString.Lazy as BL
 {-
-Write and parse scans as json using Data.Aeson package.
+Write and parse Scan datatype as json using Data.Aeson package.
 
-Started off with MathPolar.Radius
--The radius measurement used by MathPolar to create shapes using Radius and degrees of a circular object.
-
-Have added:
--Degree:
-  -A degree at which a scan occurred, and all the assoc'd [Radius]. As scanning happens on the vertical
-   axis, a single degree will contain many Radius.
-  -Should probably be moved into a TriCad module, along with Radius and Scan
--Scan:
-  -A [Degree] which gives all the Radius for an entire scan of an object.
-
-Future things:
--Figure out where to put Radius, Degree, and Scan datatypes and the To/FromJSON instance declarations.
+Known uses:
+Once the raw data for an image has been process, save it to file or mongo as json, so it does not
+have to be processed again.
 -}
 
 ---------------------------- Scan -------------------------------------------
@@ -31,14 +21,11 @@ name:
 Could come in handy later on, if I want to store in Mongo.
 If not for mongo, why not just use the file name.
 The stlBuilder could use it for naming the stl object, which is required by the stl format.
--}
-data Scan = Scan {name::String, degrees::[Degree]}
-          deriving (Show, Eq)
-
+-} 
 instance ToJSON Scan where
   toJSON (Scan name degrees) = object ["name" .= name, "degrees" .= degrees]
 
-  
+ 
 instance FromJSON Scan where
   parseJSON (Object v) = Scan <$>
                          v .: "name" <*>
@@ -46,9 +33,6 @@ instance FromJSON Scan where
   parseJSON _          = mzero
 
 --------------------------- Degree ------------------------------------------------
-data Degree = Degree {degree::Double, radii::[Radius]}
-     deriving (Show, Eq)
-
 instance ToJSON Degree where
   toJSON (Degree degree radii) = object ["degree" .= degree, "radii" .=radii]
 

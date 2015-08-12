@@ -4,8 +4,7 @@ module Scan.Parse.RawToADT(parseToScan) where
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
 import Scan.Parse(readDouble)
-import TriCad.MathPolar( Radius(..))
-import Scan.Json(Degree(..), Scan(..))
+import TriCad.MathPolar( Radius(..),Degree(..), Scan(..))
 import Scan.Transform(minValueIndices, average)
 
 

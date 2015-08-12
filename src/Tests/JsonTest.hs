@@ -2,10 +2,10 @@
 module Tests.JsonTest where
 import Test.HUnit
 import TriCad.MathPolar(Radius())
-import Scan.Json(Degree(..), Scan(..))
+import Scan.Json
 import Data.Aeson
 import qualified Data.ByteString.Lazy as BS
-import TriCad.MathPolar(Radius(..))
+import TriCad.MathPolar(Radius(..),Degree(..),Scan(..))
 
 
 jsonTestDo = do
@@ -19,7 +19,7 @@ jsonTestDo = do
 ---------------------------------scan----------------------------------------------
 scanEncodeTest = TestCase $ assertEqual
   "encode scan"
-  ( "{\"degrees\":[{\"radii\":[{\"radius\":12},{\"radius\":120}],\"degree\":0},{\"radii\":[{\"radius\":120},{\"radius\":1200}],\"degree\":10}],\"name\":\"myScan\"}" )
+  ( "{\"degrees\":[{\"radii\":[{\"radius\":12},{\"radius\":120}],\"degree\":0.0},{\"radii\":[{\"radius\":120},{\"radius\":1200}],\"degree\":10}],\"name\":\"myScan\"}" )
 
   (encode (Scan
                { name = "myScan",
@@ -52,7 +52,7 @@ scanDecodeTest = TestCase $ assertEqual
 ------------------------- degree -------------------------------------------------
 degreeEncodeTest = TestCase $ assertEqual
   "encode radius"
-  ("{\"radii\":[{\"radius\":12},{\"radius\":120}],\"degree\":0}")
+  ("{\"radii\":[{\"radius\":12},{\"radius\":120}],\"degree\":0.0}")
   (encode (Degree {degree=0, radii=[Radius {radius=12}, Radius {radius=120}]}))
 
 degreeDecodeTest = TestCase $ assertEqual

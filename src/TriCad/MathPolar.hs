@@ -7,6 +7,10 @@ module TriCad.MathPolar(
   createLeftFaces,
   createVerticalCubes,
   createLeftFacesMultiColumns,
+  createRightFacesFromScan,
+  createLeftFacesFromScan,
+  createVerticalCubesFromScan,
+  createLeftFacesMultiColumnsFromScan,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
@@ -17,6 +21,8 @@ module TriCad.MathPolar(
   createCornerPoint,
   Slope(..),
   Radius(..),
+  Degree(..),
+  Scan(..),
   flatXSlope,
   flatYSlope,
   
@@ -25,7 +31,6 @@ import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.Math(sinDegrees, cosDegrees)
 import TriCad.CornerPointsTranspose (transposeZ)
-
 
 {--------------------overview----------------------------------------
 Creates a radial shape using polar cood's.
@@ -65,6 +70,7 @@ Known uses:
 
 -Scan.Json uses it for encoding/decoding scanner data.
  It is made an instance of ToJSON and FromJSON in Scan.Json module.
+ Allows it to be stored as json data, so the raw data only has to be processed once.
 
 -}
 data Radius = Radius {radius :: Double}
@@ -72,7 +78,32 @@ data Radius = Radius {radius :: Double}
              | UpRadius {radius :: Double}
    deriving (Show, Eq)
 
+{-
+Contains the [Radius] associated with a single degree from a vertical scan.
 
+Scan.Json module declares it an instance of ToJSON and FromJSON for the aeson package.
+
+Known uses:
+Raw image data is parse into Scan datatype, which contains [Degree]. This is then
+processed into cubes.
+
+Store the processed raw data as json, so the processing only has to be done once.
+-}
+data Degree = Degree {degree::Double, radii::[Radius]}
+     deriving (Show, Eq)
+
+{-
+Contains all the filtered data from a scan.
+Is a [Degree] and an assoc'd name.
+
+Known uses:
+Raw image data is parse into Scan datatype, which contains [Degree]. This is then
+processed into cubes.
+
+Store the processed raw data as json, so the processing only has to be done once.
+-}
+data Scan = Scan {name::String, degrees::[Degree]}
+          deriving (Show, Eq)
 {-
 There are 4 quadrants to work with therfore the Quadarant1/2/3/4Angle
 What was the Angle for?
@@ -425,8 +456,9 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
 
 
 
-{----------------------------------------- create left/right faces ----------------------------------------------------------
+{----------------------------------------- create left/right faces, no Scan datatype----------------------------------------------------
 This is a base that gets called by createLeftFaces and createRightFaces, with just a different set of CornerPoints constructors.
+It uses [[Radius]] and [degrees], instead of the new Scan datatype. Once the Scan datatype can be used, this will be removed.
 
 Build [Left/RightFaces], from an array of Radius that runs downwards along
 a single degree. This is the way that the scanner process the images, and gives them to TriCad.
@@ -548,3 +580,85 @@ createVerticalCubes (x:xs) (ys) =
   let headOfLeftFaces = map (head) ys
   in (x ++> headOfLeftFaces) ++  (createVerticalCubes xs (map (tail) ys) )
 
+
+
+
+
+
+
+----------------------------------------- create left/right faces from Scan datatype------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+{- .
+-}
+createVerticalFacesFromScan :: Point -> Degree -> Slope -> Slope -> [Double] -> (Point-> CornerPoints) ->
+                       (Point-> CornerPoints) -> (Point-> CornerPoints) -> (Point-> CornerPoints) -> [CornerPoints]
+createVerticalFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor topFrontConstructor topBackConstructor
+                            btmFrontConstructor btmBackConstructor =
+  
+  --zipWith  (\x y -> transposeZ ((-x)+) y  ) --negating x causes the z_axis to decrease from the top, as it should.
+  -- zTransposeFactor --this should be an infinit of the height for each pixel, measured from topOrigin.
+  
+   ((createCornerPoint
+      (topFrontConstructor)
+      topOrigin
+      (head $ radii inDegree) 
+      (radiusAdjustedForZslope (head $ radii inDegree) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree))))
+      (xyQuadrantAngle (degree inDegree))
+      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree)))
+    ) 
+    +++
+    topBackConstructor topOrigin
+    ++>
+    [(createCornerPoint
+      (btmFrontConstructor)
+      (transposeZ (+(-currZVal)) topOrigin)  --topOrigin
+      currRadius
+      (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree))))
+      (xyQuadrantAngle (degree inDegree))
+      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree)))
+     ) 
+     +++
+     btmBackConstructor (transposeZ (+(-currZVal)) topOrigin)  --topOrigin
+       | currRadius <- tail $ radii inDegree
+       | currZVal <-  tail zTransposeFactor
+    ]
+   )
+
+
+--RightFace version of createVerticalFaces
+createRightFacesFromScan :: Point -> Degree -> Slope -> Slope -> [Double] -> [CornerPoints]
+createRightFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor  =
+  createVerticalFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor (F3) (B3) (F4) (B4)
+
+
+--LeftFace version of createVerticalFaces
+createLeftFacesFromScan :: Point -> Degree -> Slope -> Slope -> [Double] -> [CornerPoints]
+createLeftFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor  =
+  createVerticalFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor (F2) (B2) (F1) (B1)
+
+
+
+{-
+Can already create LeftFace, problem is to create an array of them from the vertical [Radius].
+Cannot just map over them with createLeftFaces, because the degree is changing from column to column.
+For this reason, will have to use recursion.
+-}
+createLeftFacesMultiColumnsFromScan ::  Point -> [Degree] -> Slope -> Slope -> [Double] -> [[CornerPoints]]
+createLeftFacesMultiColumnsFromScan _ [] _ _ _ = []
+createLeftFacesMultiColumnsFromScan topOrigin (d:ds) xSlope ySlope zTransposeFactor =
+  (createLeftFacesFromScan topOrigin d xSlope ySlope zTransposeFactor ) :
+    (createLeftFacesMultiColumnsFromScan topOrigin ds xSlope ySlope zTransposeFactor)
+
+
+
+{-
+Join a [RightFace] to [[LeftFace]] using a ++>
+Normally: RightFace ++> [LeftFaces] so need recursion to work through the extra level of lists.
+
+I stopped the test for now, till I can create a [[LeftFace]].
+At this point I can only create a[LeftFace]
+-}
+createVerticalCubesFromScan :: [CornerPoints] -> [[CornerPoints]] -> [CornerPoints]
+createVerticalCubesFromScan ([]) _ = []
+createVerticalCubesFromScan (x:xs) (ys) =
+  let headOfLeftFaces = map (head) ys
+  in (x ++> headOfLeftFaces) ++  (createVerticalCubesFromScan xs (map (tail) ys) )
