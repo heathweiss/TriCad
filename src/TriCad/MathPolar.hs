@@ -53,7 +53,7 @@ Functions for calculating the current x and y values adjusted for xy degrees
 
 --many shapes, if not most, do not have sloped tops, therefore it is handy
 --to have these easily callable.
-flatXSlope = PosXSlope 0
+flatXSlope = PosXSlope 0generateTrianglesFromJsonFile
 flatYSlope = PosYSlope 0
 
 
