@@ -24,7 +24,6 @@ library
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.ScannerTest, Tests.ParseTest,
                    Tests.TransformTest, Tests.JsonTest,
-                   Tests.ParseRawToADTTest
                    -- HeelGenerators
                    HeelGenerators.BlackRunnerHeel, HeelGenerators.SandalsToe
                    -- Sockets
