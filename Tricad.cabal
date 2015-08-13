@@ -35,7 +35,7 @@ library
                    TriCad.Shapes.Cylindrical, TriCad.Shapes.Cubical
                    --Scanning
                    Scan.Parse, Scan.Transform,
-                   Scan.Json, Scan.Parse.RawToADT
+                   Scan.Json
   -- other-modules:       
   -- other-extensions:    
   build-depends:       HUnit >=1.2.5.2

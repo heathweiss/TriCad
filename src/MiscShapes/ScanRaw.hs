@@ -23,7 +23,7 @@ import TriCad.StlCornerPoints((+++^))
 import TriCad.StlBase (StlShape(..), newStlShape)
 import TriCad.StlFileWriter(writeStlToFile)
 import Scan.Transform(minValueIndices, average, reduceRows)
-import Scan.Parse.RawToADT(parseToScan)
+import Scan.Parse(parseToScan)
 import Scan.Transform(minValueIndices, average)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Data.Aeson

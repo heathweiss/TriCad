@@ -9,7 +9,7 @@ import TriCad.MathPolar(createRightFaces, createLeftFaces, createRightFacesFromS
                         createVerticalCubes, createLeftFacesMultiColumns,
                         createVerticalCubesFromScan, createLeftFacesMultiColumnsFromScan,
                         createCornerPoint)
-import Scan.Parse.RawToADT(parseToScan)
+import Scan.Parse(parseToScan)
 import Scan.Transform(minValueIndices, average)
 
 scannerTestDo = do

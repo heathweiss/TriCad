@@ -2,7 +2,7 @@
 --{-# LANGUAGE OverloadedStrings #-}
 module Tests.ParseRawToADTTest(parseRawToADTTestDo)  where
 import Test.HUnit
-import Scan.Parse.RawToADT(parseToScan)
+import Scan.Parse(parseToScan)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Scan.Transform(minValueIndices, average)
 import TriCad.MathPolar( Radius(..),Degree(..), Scan(..))
