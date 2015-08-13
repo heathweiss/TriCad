@@ -24,7 +24,7 @@ readDouble str = read str
 
 
 
-parseToScan :: ([Double] -> Double) -> [Char] -> Scan
+parseToScan :: ([Double] -> Double) -> [Char] -> Maybe Scan
 parseToScan f str = 
                       let splitToSpaces = ((map (LS.splitOn ";") (LS.splitOn "$" str)))
                           splitToChars = [map (LS.splitOn " ") x | x <- splitToSpaces]
@@ -35,7 +35,7 @@ parseToScan f str =
                           degrees = zipWith (Degree) degreeVals readToRadius
                           scan = Scan {name= "myScan", degrees= degrees}
                         in
-                        scan
+                        Just scan
 
 
 testFromString = (parseToScan (average . minValueIndices 5 ) "0 1 3 6;0 3 4 5 7$90 2 4 6; 90 3 4 8")

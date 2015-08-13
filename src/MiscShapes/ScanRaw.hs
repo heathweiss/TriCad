@@ -40,13 +40,20 @@ import Scan.Json()
 parseRawDataAndSaveToJson = do
   contents <- BL.readFile "src/Data/scanRawDataWitDegrees.raww"
   let tempContents = BL.unpack contents
-      --parsedData = (parseToScan (average . minValueIndices 75 ) tempContents )
-      scan1 = (parseToScan  ((*1.35) .  average . minValueIndices 75 ) tempContents )
-      --need to reduce rows with a Radius instead of an int
-      degrees2 = [ Degree {degree=(degree x),  radii = (reduceRows 10 $ radii x)}      | x <- degrees scan1]
-      scan2 = (Scan {name=(name scan1), degrees=degrees2} )
-      parsedDataJson = encode scan2
-  BL.writeFile "src/Data/scanFullData.json" parsedDataJson
+      
+  case (parseToScan  ((*1.35) .  average . minValueIndices 75 ) tempContents ) of
+   Just (Scan name_ deg) ->
+                        let scan1 = Scan name_ deg
+                            degrees2 = [ Degree {degree=(degree x),  radii = (reduceRows 10 $ radii x)}      | x <- degrees scan1]
+                            scan2 = (Scan {name=(name scan1), degrees=degrees2} )
+                            parsedDataJson = encode scan2
+                        in  BL.writeFile "src/Data/scanFullData.json" parsedDataJson
+   Nothing           -> let scan = Scan "error" []
+                        in  BL.writeFile "src/Data/scanFullData.json" $ encode scan
+      
+      
+      
+  
 
 {- bypasses json
    uses the new MathPolar fromScan functions
@@ -54,15 +61,9 @@ parseRawDataAndSaveToJson = do
 parseRawDataToScanWriteStlFile = do
   contents <- BL.readFile "src/Data/scanRawDataWitDegrees.raww"
   let tempContents = BL.unpack contents
-      --parsedData = (parseToScan (average . minValueIndices 75 ) tempContents )
-      parsedData = (parseToScan  ((*1.35) .  average . minValueIndices 75 ) tempContents )
-  writeStlFileFromScan parsedData
-{-
-parseRawDataToScanUseOldCreateCubeFunctionToWriteStl = do
-  contents <- BL.readFile "src/Data/scanRawDataWitDegrees.raww"
-  let tempContents = BL.unpack contents
-      parsedData = (parseToScan  ((*1.35) .  average . minValueIndices 75 ) tempContents )
--}      
+  case (parseToScan  ((*1.35) .  average . minValueIndices 75 ) tempContents ) of
+   Just (Scan name_ deg) -> writeStlFileFromScan (Scan name_ deg)
+   Nothing               -> writeStlFileFromScan (Scan "error" [])
 
 readTrianglesFromJsonFileAndWriteToStlFile = do
   contents <- BL.readFile "src/Data/scanFullData.json"

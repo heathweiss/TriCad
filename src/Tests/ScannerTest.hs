@@ -25,12 +25,25 @@ createListOfCubesFromScanTest = TestCase $  assertEqual
    (CubePoints {b1=(Point  0 0 49), b2=(Point 0 0 50), b3=(Point 0 0 50 ), b4=(Point 0 0 49),
                 f1=(Point 0 0.5 49), f2=(Point 0 0.5 50), f3=(Point 0.5 0 50), f4=(Point 0.5 0 49)})
   ])
-  (let scan  = (parseToScan (average . minValueIndices 2 ) "0 1 2 3;0 1 2 36$90 1 2 3;90 1 2 3$180 1 2 3;180 1 2 3")
-       origin = (Point{x_axis=0, y_axis=0, z_axis=50})
+  (let origin = (Point{x_axis=0, y_axis=0, z_axis=50})
        heightPerPixel = 1
-       leftFaces = createLeftFacesMultiColumnsFromScan origin (tail $ degrees scan) flatXSlope flatYSlope [0,heightPerPixel..]
-       rightFaces =  createRightFacesFromScan origin (head $ degrees scan) flatXSlope flatYSlope [0,heightPerPixel..]
-   in  createVerticalCubesFromScan rightFaces leftFaces
+       maybeScan  = (parseToScan (average . minValueIndices 2 ) "0 1 2 3;0 1 2 36$90 1 2 3;90 1 2 3$180 1 2 3;180 1 2 3")
+       
+   in  
+       case maybeScan of
+        Just (Scan name deg)    -> let scan = Scan {name=name, degrees=deg}
+                                       rightFaces =  createRightFacesFromScan origin (head $ degrees scan) flatXSlope flatYSlope
+                                                     [0,heightPerPixel..]
+                                       leftFaces = createLeftFacesMultiColumnsFromScan origin (tail $ degrees scan) flatXSlope
+                                                   flatYSlope [0,heightPerPixel..]
+                                   in  createVerticalCubesFromScan rightFaces leftFaces 
+        Nothing               ->   let  scan = Scan {name="error", degrees=[]}
+                                        rightFaces =  createRightFacesFromScan origin (head $ degrees scan) flatXSlope flatYSlope
+                                                             [0,heightPerPixel..]                    
+                                        leftFaces = createLeftFacesMultiColumnsFromScan origin (tail $ degrees scan)
+                                                           flatXSlope flatYSlope [0,heightPerPixel..]
+                                   in   createVerticalCubesFromScan rightFaces leftFaces
+       
   )
 
 
