@@ -23,7 +23,7 @@ library
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.ScannerTest, Tests.ParseTest,
-                   Tests.ParseRawTest, Tests.TransformTest, Tests.JsonTest,
+                   Tests.TransformTest, Tests.JsonTest,
                    Tests.ParseRawToADTTest
                    -- HeelGenerators
                    HeelGenerators.BlackRunnerHeel, HeelGenerators.SandalsToe
@@ -34,7 +34,7 @@ library
                    --Shapes
                    TriCad.Shapes.Cylindrical, TriCad.Shapes.Cubical
                    --Scanning
-                   Scan.Parse, Scan.Parse.Raw, Scan.Transform,
+                   Scan.Parse, Scan.Transform,
                    Scan.Json, Scan.Parse.RawToADT
   -- other-modules:       
   -- other-extensions:    

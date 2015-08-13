@@ -6,7 +6,6 @@ import Tests.MathPolarTest(mathPolarTestDo)
 import Tests.MathTest(mathTestDo)
 import Tests.ParseTest(parseTestDo)
 import Tests.ScannerTest(scannerTestDo)
-import Tests.ParseRawTest(parseRawDo)
 import Tests.JsonTest(jsonTestDo)
 import Tests.ParseRawToADTTest(parseRawToADTTestDo)  
 
@@ -21,8 +20,6 @@ runAllTestsDo = do
   mathPolarTestDo
   putStrLn "parse test"
   parseTestDo
-  putStrLn "parse raw test"
-  parseRawDo
   putStrLn "json test"
   jsonTestDo
   putStrLn "parse raw to adt test"
