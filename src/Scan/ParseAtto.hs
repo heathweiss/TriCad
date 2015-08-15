@@ -25,19 +25,11 @@ These data types parallel TriCad.MathPolar Scan and SingleDegreeScan but with th
 -The RawSingleDegreeScan.radii is [[Double]] instead of [Radius], because the row has not yet been
  reduced to a single value, representing a Radius. This is done later, during the transform stage of the parse.
 -}
-data RawScan = RawScan {name::String, degrees::[RawSingleDegreeScan]}
+data RawScan = RawScan {degrees::[RawSingleDegreeScan]}
           deriving (Show, Eq)
 
 data RawSingleDegreeScan = RawSingleDegreeScan {degree::Double, radii::[[Double]]}
      deriving (Show, Eq)
-
-{-
---The name assoc'd with the scan.
-Having it in the raw data, will mean having a command line arg, in the opencv scanner.
-Perhaps it will be better to add the name later, during the Haskell processing.
-Leave it in for now, but probably remove before changing the opencv server to produce the raw data for parseAtto.
--}
-newtype ScanName = ScanName {scanName::String}
 
 {-The row data come in the form of Double,space,Double...
 This processes a single Double,space combination.
@@ -74,13 +66,6 @@ getDegreeScan = do
   radii <- getPixelRowMulti
   return $ RawSingleDegreeScan degree radii
 
-{-
-Remove before doing opencv server.
--}
-getName :: Parser ScanName
-getName = do
-  name <- Data.Attoparsec.Char8.takeWhile (/=' ')
-  return $ ScanName $ BS.unpack  name
 
 {-
 Need to remove name.
@@ -91,6 +76,16 @@ the process of reducing each pixel data row, down to a single Radius, as well as
 -}
 getMultiDegreeScan :: Parser RawScan
 getMultiDegreeScan = do
-  scanName' <- getName
   degreeScans <- sepBy  getDegreeScan (char '$')
-  return RawScan {name=(scanName scanName'), degrees=degreeScans}
+  return RawScan {degrees=degreeScans}
+
+
+{-
+No longer used.
+Leave it here for now, as it is a nice example of how to read a string terminated by a space.
+
+getName :: Parser ScanName
+getName = do
+  name <- Data.Attoparsec.Char8.takeWhile (/=' ')
+  return $ ScanName $ BS.unpack  name
+-}

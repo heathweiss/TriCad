@@ -86,5 +86,5 @@ getADegreeThenARowOfInts = TestCase $ assertEqual
 
 getACompleteScan = TestCase $ assertEqual
   "get a complete scan"
-  (Right(RawScan {name="myScan", degrees=[(RawSingleDegreeScan {degree=1, radii= [[10.0,20.0],[10.0,20.0]]})]}))
-  (Right (B.pack $strToWord8s "myScan 1 10 20;10 20$2 1 2;3 4")  >>=  parseOnly  getMultiDegreeScan)
+  (Right(RawScan {degrees=[(RawSingleDegreeScan {degree=1, radii= [[10.0,20.0],[10.0,20.0]]})]}))
+  (Right (B.pack $strToWord8s "1 10 20;10 20$2 1 2;3 4")  >>=  parseOnly  getMultiDegreeScan)
