@@ -4,7 +4,7 @@ import Test.HUnit
 import Scan.Parse( readDouble, parseToScan)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Scan.Transform(minValueIndices, average)
-import TriCad.MathPolar( Radius(..),Degree(..), Scan(..))
+import TriCad.MathPolar( Radius(..),SingleDegreeScan(..), Scan(..))
 
 parseTestDo = do
   runTestTT readDoubleTest
@@ -17,5 +17,5 @@ readDoubleTest = TestCase $ assertEqual
 
 parseToScanTest = TestCase $ assertEqual
   "parseTest"
-  (Just (Scan {name="myScan", degrees=([(Degree{degree=0,radii=[Radius 0.5, Radius 1.0]}),(Degree{degree=90,radii=[Radius 0.5, Radius 0.5]}) ])}))
+  (Just (Scan {name="myScan", degrees=([(SingleDegreeScan{degree=0,radii=[Radius 0.5, Radius 1.0]}),(SingleDegreeScan{degree=90,radii=[Radius 0.5, Radius 0.5]}) ])}))
   (parseToScan (average . minValueIndices 5 ) "0 1 3 6;0 3 4 5 7$90 2 4 6;90 3 4 8")

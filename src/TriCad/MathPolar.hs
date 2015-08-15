@@ -21,7 +21,7 @@ module TriCad.MathPolar(
   createCornerPoint,
   Slope(..),
   Radius(..),
-  Degree(..),
+  SingleDegreeScan(..),
   Scan(..),
   flatXSlope,
   flatYSlope,
@@ -89,7 +89,7 @@ processed into cubes.
 
 Store the processed raw data as json, so the processing only has to be done once.
 -}
-data Degree = Degree {degree::Double, radii::[Radius]}
+data SingleDegreeScan = SingleDegreeScan {degree::Double, radii::[Radius]}
      deriving (Show, Eq)
 
 {-
@@ -102,7 +102,7 @@ processed into cubes.
 
 Store the processed raw data as json, so the processing only has to be done once.
 -}
-data Scan = Scan {name::String, degrees::[Degree]}
+data Scan = Scan {name::String, degrees::[SingleDegreeScan]}
           deriving (Show, Eq)
 {-
 There are 4 quadrants to work with therfore the Quadarant1/2/3/4Angle
@@ -589,7 +589,7 @@ createVerticalCubes (x:xs) (ys) =
 ----------------------------------------- create left/right faces from Scan datatype------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 {- .
 -}
-createVerticalFacesFromScan :: Point -> Degree -> Slope -> Slope -> [Double] -> (Point-> CornerPoints) ->
+createVerticalFacesFromScan :: Point -> SingleDegreeScan -> Slope -> Slope -> [Double] -> (Point-> CornerPoints) ->
                        (Point-> CornerPoints) -> (Point-> CornerPoints) -> (Point-> CornerPoints) -> [CornerPoints]
 createVerticalFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor topFrontConstructor topBackConstructor
                             btmFrontConstructor btmBackConstructor =
@@ -625,13 +625,13 @@ createVerticalFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor to
 
 
 --RightFace version of createVerticalFaces
-createRightFacesFromScan :: Point -> Degree -> Slope -> Slope -> [Double] -> [CornerPoints]
+createRightFacesFromScan :: Point -> SingleDegreeScan -> Slope -> Slope -> [Double] -> [CornerPoints]
 createRightFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor  =
   createVerticalFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor (F3) (B3) (F4) (B4)
 
 
 --LeftFace version of createVerticalFaces
-createLeftFacesFromScan :: Point -> Degree -> Slope -> Slope -> [Double] -> [CornerPoints]
+createLeftFacesFromScan :: Point -> SingleDegreeScan -> Slope -> Slope -> [Double] -> [CornerPoints]
 createLeftFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor  =
   createVerticalFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor (F2) (B2) (F1) (B1)
 
@@ -642,7 +642,7 @@ Can already create LeftFace, problem is to create an array of them from the vert
 Cannot just map over them with createLeftFaces, because the degree is changing from column to column.
 For this reason, will have to use recursion.
 -}
-createLeftFacesMultiColumnsFromScan ::  Point -> [Degree] -> Slope -> Slope -> [Double] -> [[CornerPoints]]
+createLeftFacesMultiColumnsFromScan ::  Point -> [SingleDegreeScan] -> Slope -> Slope -> [Double] -> [[CornerPoints]]
 createLeftFacesMultiColumnsFromScan _ [] _ _ _ = []
 createLeftFacesMultiColumnsFromScan topOrigin (d:ds) xSlope ySlope zTransposeFactor =
   (createLeftFacesFromScan topOrigin d xSlope ySlope zTransposeFactor ) :

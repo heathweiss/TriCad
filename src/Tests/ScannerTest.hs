@@ -5,7 +5,7 @@ import qualified Data.ByteString.Lazy.Char8 as BL
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.Points(Point(..))
 import TriCad.MathPolar(createRightFaces, createLeftFaces, createRightFacesFromScan, createLeftFacesFromScan,
-                        Radius(..),Degree(..), Scan(..), flatXSlope, flatYSlope,
+                        Radius(..),SingleDegreeScan(..), Scan(..), flatXSlope, flatYSlope,
                         createVerticalCubes, createLeftFacesMultiColumns,
                         createVerticalCubesFromScan, createLeftFacesMultiColumnsFromScan,
                         createCornerPoint)

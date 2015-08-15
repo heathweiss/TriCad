@@ -2,7 +2,7 @@
 module Scan.Parse( readDouble, parseToScan) where
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
-import TriCad.MathPolar( Radius(..),Degree(..), Scan(..))
+import TriCad.MathPolar( Radius(..),SingleDegreeScan(..), Scan(..))
 import Scan.Transform(minValueIndices, average)
 
 import qualified Data.List as L
@@ -32,7 +32,7 @@ parseToScan f str =
                           degreeVals = map head degreeValsMulti
                           readToDoublesNoDegreeVals = [[map ( readDouble) ys | y:ys <-  x] | x <- splitToChars ]
                           readToRadius =  [[((Radius) . f ) y  | y  <-  x] | x <- readToDoublesNoDegreeVals ]
-                          degrees = zipWith (Degree) degreeVals readToRadius
+                          degrees = zipWith (SingleDegreeScan) degreeVals readToRadius
                           scan = Scan {name= "myScan", degrees= degrees}
                         in
                         Just scan

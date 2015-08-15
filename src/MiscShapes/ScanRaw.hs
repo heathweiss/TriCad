@@ -9,7 +9,7 @@ import TriCad.MathPolar(
   Slope(..),
   Radius(..),
   Scan(..),
-  Degree(..),
+  SingleDegreeScan(..),
   flatXSlope,
   flatYSlope,
   createLeftFacesMultiColumns,
@@ -44,7 +44,7 @@ parseRawDataAndSaveToJson = do
   case (parseToScan  ((*1.35) .  average . minValueIndices 75 ) tempContents ) of
    Just (Scan name_ deg) ->
                         let scan1 = Scan name_ deg
-                            degrees2 = [ Degree {degree=(degree x),  radii = (reduceRows 10 $ radii x)}      | x <- degrees scan1]
+                            degrees2 = [ SingleDegreeScan {degree=(degree x),  radii = (reduceRows 10 $ radii x)}      | x <- degrees scan1]
                             scan2 = (Scan {name=(name scan1), degrees=degrees2} )
                             parsedDataJson = encode scan2
                         in  BL.writeFile "src/Data/scanFullData.json" parsedDataJson

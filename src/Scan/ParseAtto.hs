@@ -43,6 +43,7 @@ getDegreeScan = do
 
 
 data MultiDegreeScan = MultiDegreeScan {name::String, degrees::[DegreeScan]}
+  deriving (Show, Eq)
 
 data ScanName = ScanName {scanName::String}
 
