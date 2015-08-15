@@ -1,7 +1,7 @@
-module Tests.ParseAttoTest where
+module Tests.ParseAttoTest(parseAttoTestDo) where
 import Test.HUnit
-import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getDegreeScan, DegreeScan(..),
-                      getMultiDegreeScan, MultiDegreeScan(..))
+import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getDegreeScan, RawSingleDegreeScan(..),
+                      getMultiDegreeScan, RawScan(..))
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import Control.Applicative
@@ -9,7 +9,7 @@ import Data.Char
 import Data.Word
 import Data.Attoparsec.Char8
 import Control.Applicative
-
+import TriCad.MathPolar(Radius(..))
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import qualified  Data.ByteString.Char8 as BC (pack) 
 import GHC.Word (Word8)
@@ -81,10 +81,10 @@ getADegree = TestCase $ assertEqual
  
 getADegreeThenARowOfInts = TestCase $ assertEqual
   "get a degree, then a row of ints"
-  (Right (DegreeScan {degree=1, radii= [[10.0,20.0],[10.0,20.0]]}) )
+  (Right (RawSingleDegreeScan {degree=1, radii= [[10.0,20.0],[10.0,20.0]]}) )
   (Right (B.pack $strToWord8s "1 10 20;10 20")  >>=  parseOnly  getDegreeScan)
 
 getACompleteScan = TestCase $ assertEqual
   "get a complete scan"
-  (Right(MultiDegreeScan {name="myScan", degrees=[(DegreeScan {degree=1, radii= [[10.0,20.0],[10.0,20.0]]})]}))
+  (Right(RawScan {name="myScan", degrees=[(RawSingleDegreeScan {degree=1, radii= [[10.0,20.0],[10.0,20.0]]})]}))
   (Right (B.pack $strToWord8s "myScan 1 10 20;10 20$2 1 2;3 4")  >>=  parseOnly  getMultiDegreeScan)
