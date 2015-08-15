@@ -1,5 +1,8 @@
 files are used by:
 
+parseAttoCanned.raww
+-string of raw data for parsing into Scan object via attoparse in Scan.ParseAtto.
+
 sample.raww
 -a small string of raw scan data, that has the degree info attached.
 -src/Scan/Parse/RawToADT.hs uses it for testing.
