@@ -1,7 +1,7 @@
 module Tests.ParseAttoTest(parseAttoTestDo) where
 import Test.HUnit
-import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getDegreeScan, RawSingleDegreeScan(..),
-                      getMultiDegreeScan, RawScan(..))
+import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan, RawSingleDegreeScan(..),
+                      getRawMultiDegreeScan, RawScan(..), rawScanToScan)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import Control.Applicative
@@ -9,7 +9,7 @@ import Data.Char
 import Data.Word
 import Data.Attoparsec.Char8
 import Control.Applicative
-import TriCad.MathPolar(Radius(..))
+import TriCad.MathPolar(Radius(..), Scan(..), SingleDegreeScan(..))
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import qualified  Data.ByteString.Char8 as BC (pack) 
 import GHC.Word (Word8)
@@ -31,6 +31,8 @@ parseAttoTestDo = do
   --degrees
   runTestTT getADegree
   runTestTT getADegreeThenARowOfInts
+  runTestTT getACompleteRawScan
+  runTestTT getAScanFromARawScan
 
 readARowOfInts = TestCase $ assertEqual
   "read a list of ints"
@@ -81,10 +83,22 @@ getADegree = TestCase $ assertEqual
  
 getADegreeThenARowOfInts = TestCase $ assertEqual
   "get a degree, then a row of ints"
-  (Right (RawSingleDegreeScan {degree=1, radii= [[10.0,20.0],[10.0,20.0]]}) )
-  (Right (B.pack $strToWord8s "1 10 20;10 20")  >>=  parseOnly  getDegreeScan)
+  (Right (RawSingleDegreeScan {rawDegree=1, rawRadii= [[10.0,20.0],[10.0,20.0]]}) )
+  (Right (B.pack $strToWord8s "1 10 20;10 20")  >>=  parseOnly  getRawDegreeScan)
 
-getACompleteScan = TestCase $ assertEqual
+getACompleteRawScan = TestCase $ assertEqual
   "get a complete scan"
-  (Right(RawScan {degrees=[(RawSingleDegreeScan {degree=1, radii= [[10.0,20.0],[10.0,20.0]]})]}))
-  (Right (B.pack $strToWord8s "1 10 20;10 20$2 1 2;3 4")  >>=  parseOnly  getMultiDegreeScan)
+  (Right(RawScan {rawDegrees=[(RawSingleDegreeScan {rawDegree=1, rawRadii= [[10.0,20.0],[10.0,20.0]]}),
+                              (RawSingleDegreeScan {rawDegree=2, rawRadii= [[1.0,2.0],[3.0,4.0]]})
+                             ]}))
+  (Right (B.pack $strToWord8s "1 10 20;10 20$2 1 2;3 4")  >>=  parseOnly  getRawMultiDegreeScan)
+
+getAScanFromARawScan = TestCase $ assertEqual
+  "get a Scan from a RawScan"
+  (Right(Scan {       name="myScan",
+                      degrees=[(SingleDegreeScan {degree=1, radii= [Radius 0.5,Radius 0.5]}),
+                              (SingleDegreeScan {degree=2, radii= [Radius 0.5,Radius 0.0]})
+                             ]}))
+  ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
+    in  rawScanToScan  "myScan" (average . minValueIndices 2) rawScan
+  )

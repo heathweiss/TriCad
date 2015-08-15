@@ -21,6 +21,8 @@ the use of TriCad.MathPolar module.
 
 
 
+
+
 {-
 Gets a [Int] of indices of all values <= threshold value.
 
@@ -29,6 +31,9 @@ Reduce a row of raw image data, to a [Double] that represents the pixel location
 This can be smoothed out further, perhaps with average. 
 
 -}
+
+
+
 minValueIndices :: Double -> [Double] -> [Int]
 minValueIndices threshold rawData  = ( L.findIndices) (<=threshold) rawData
 
