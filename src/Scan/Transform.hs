@@ -1,5 +1,6 @@
-module Scan.Transform(minValueIndices, average, reduceRows) where
+module Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows) where
 import qualified Data.List as L
+import TriCad.MathPolar( Radius(..), Scan(..), SingleDegreeScan(..))
 
 {-------------------------------------- overview-----------------------------------------------
 Takes a Scan.ParseAtto.RawScan datatype, and does reductions/tranformations on it, resulting in
@@ -48,7 +49,14 @@ average list = (fromIntegral $ L.sum list)  / (fromIntegral $ length list)
 
 {-Take every xth element from a list.
 Used for: reduce rows from the raw source data, as the usual 480 rows from an
-image, is probably overkill.
+image, is probably overkill for a 3D printer.
+
+ (mod counter factor == 0) is saying: divide the current row index by the reduction factor, and if there is no
+ remainder, include the row.
+
+Starts of with a row index of 1, which is passed into reduceRows' to do the actual recursive work.
+
+Must be something in Data.List such as scanl or foldl that would do this same thing.
 -}
 reduceRows :: Int -> [a] -> [a]
 reduceRows factor x = reduceRows' factor 1 x
@@ -59,3 +67,26 @@ reduceRows' 0 _ _ = []
 reduceRows' factor counter (x:xs)
         | (mod counter factor == 0) = x : reduceRows' factor (counter + 1) xs
         | otherwise            = reduceRows' factor (counter + 1) xs
+
+
+{-
+Reduce the of rows of data, as a scanned image will typically supply 480 rows. Way too much for a 3D scanner.
+Will return a Left msg if:
+- try to reduce to 0,
+- by a factor larger than the available rows. Note that this only checks the 1st degree radii, as all degrees should
+  have the same # of rows.
+
+id: 1
+-}
+reduceScanRows :: Int -> Scan -> Either String Scan
+reduceScanRows 0 _ = Left "Can't use 0 for row reduction"
+reduceScanRows reduceFactor scan
+  | reduceFactor > (length $ radii $ head $ degrees scan)  = Left "reduction factor > number of rows"
+  | otherwise =
+     let degreesReduced = [ SingleDegreeScan {degree=(degree x),  radii = (reduceRows reduceFactor $ radii x)} | x <- degrees scan]
+     in  Right $  scan {degrees=degreesReduced}
+        
+        
+
+
+
