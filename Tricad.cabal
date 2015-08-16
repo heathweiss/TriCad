@@ -22,7 +22,7 @@ library
                    TriCad.StlFileWriter, TriCad.CornerPointsTranspose
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
-                   Tests.MathTest, Tests.MathPolarTest, Tests.ScannerTest, Tests.ParseTest,
+                   Tests.MathTest, Tests.MathPolarTest, 
                    Tests.TransformTest, Tests.JsonTest, Tests.ParseAttoTest
                    -- HeelGenerators
                    HeelGenerators.BlackRunnerHeel, HeelGenerators.SandalsToe
@@ -33,7 +33,7 @@ library
                    --Shapes
                    TriCad.Shapes.Cylindrical, TriCad.Shapes.Cubical
                    --Scanning
-                   Scan.Parse, Scan.Transform,
+                   Scan.Transform,
                    Scan.Json, Scan.ParseAtto
   -- other-modules:       
   -- other-extensions:    

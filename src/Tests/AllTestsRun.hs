@@ -4,8 +4,6 @@ import Tests.CornerPointsTest(cornerPointsTestDo )
 import Tests.MathTest(mathTestDo)
 import Tests.MathPolarTest(mathPolarTestDo)
 import Tests.MathTest(mathTestDo)
-import Tests.ParseTest(parseTestDo)
-import Tests.ScannerTest(scannerTestDo)
 import Tests.JsonTest(jsonTestDo)
 import Tests.ParseAttoTest(parseAttoTestDo)
 
@@ -18,8 +16,6 @@ runAllTestsDo = do
   mathTestDo
   putStrLn "math polar test"
   mathPolarTestDo
-  putStrLn "parse test"
-  parseTestDo
   putStrLn "json test"
   jsonTestDo
   putStrLn "parseAtto test"

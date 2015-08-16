@@ -23,7 +23,6 @@ import TriCad.StlCornerPoints((+++^))
 import TriCad.StlBase (StlShape(..), newStlShape)
 import TriCad.StlFileWriter(writeStlToFile)
 import Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows)
-import Scan.Parse(parseToScan)
 import Scan.Transform(minValueIndices, average)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString as B
@@ -44,22 +43,7 @@ strToWord8s :: String -> [Word8]
 strToWord8s = BI.unpackBytes . BC.pack
 
 --------------------------------------------- raw data with degree data attached -----------------------------
---This has been done. The file has been created.
-parseRawDataAndSaveToJson = do
-  contents <- BL.readFile "src/Data/scanRawDataWitDegrees.raww"
-  let tempContents = BL.unpack contents
-      
-  case (parseToScan  ((*1.35) .  average . minValueIndices 75 ) tempContents ) of
-   Just (Scan name_ deg) ->
-                        let scan1 = Scan name_ deg
-                            degrees2 = [ SingleDegreeScan {degree=(degree x),  radii = (reduceRows 10 $ radii x)}      | x <- degrees scan1]
-                            scan2 = (Scan {name=(name scan1), degrees=degrees2} )
-                            parsedDataJson = encode scan2
-                        in  BL.writeFile "src/Data/scanFullData.json" parsedDataJson
-   Nothing           -> let scan = Scan "error" []
-                        in  BL.writeFile "src/Data/scanFullData.json" $ encode scan
-      
-      
+   
       
 parseRawDataToScanAndSaveToJson  = do
    contents <- B.readFile "src/Data/scanRawDataWitDegrees.raww"
@@ -70,16 +54,6 @@ parseRawDataToScanAndSaveToJson  = do
     Right (Scan name degrees_) -> BL.writeFile "src/Data/scanFullData.json" $ encode $ Scan name degrees_
 
    putStrLn "done" 
-
-{- bypasses json
-   uses the new MathPolar fromScan functions
--}
-parseRawDataToScanWriteStlFileWithOldParseSystem = do
-  contents <- BL.readFile "src/Data/scanRawDataWitDegrees.raww"
-  let tempContents = BL.unpack contents
-  case (parseToScan  ((*1.35) .  average . minValueIndices 75 ) tempContents ) of
-   Just (Scan name_ deg) -> writeStlFileFromScan (Scan name_ deg)
-   Nothing               -> writeStlFileFromScan (Scan "error" [])
 
 
 {-
