@@ -27,6 +27,9 @@ import Scan.Parse(parseToScan)
 import Scan.Transform(minValueIndices, average)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString as B
+import qualified  Data.ByteString.Char8 as BC (pack)
+import qualified  Data.ByteString.Internal as BI (unpackBytes)
+import GHC.Word (Word8)
 import Data.Aeson
 --import Control.Applicative
 --import Control.Monad
@@ -35,7 +38,10 @@ import Scan.Json()
 import Scan.ParseAtto( getRawMultiDegreeScan, rawScanToScan, RawScan(..))
 import Data.Attoparsec.Char8
 
-
+--create a [Word8] for: Right(B.pack $ strToWord8s)
+--which gets a bytstring of word8
+strToWord8s :: String -> [Word8]
+strToWord8s = BI.unpackBytes . BC.pack
 
 --------------------------------------------- raw data with degree data attached -----------------------------
 --This has been done. The file has been created.
@@ -55,7 +61,15 @@ parseRawDataAndSaveToJson = do
       
       
       
-  
+parseRawDataToScanAndSaveToJson  = do
+   contents <- B.readFile "src/Data/scanRawDataWitDegrees.raww"
+   let scanRaw = parseOnly  getRawMultiDegreeScan  contents
+       scan = rawScanToScan "myScan" (average . minValueIndices 75) scanRaw  >>= reduceScanRows 10
+   case (scan) of
+    Left msg -> putStrLn msg
+    Right (Scan name degrees_) -> BL.writeFile "src/Data/scanFullData.json" $ encode $ Scan name degrees_
+
+   putStrLn "done" 
 
 {- bypasses json
    uses the new MathPolar fromScan functions
@@ -71,6 +85,8 @@ parseRawDataToScanWriteStlFileWithOldParseSystem = do
 {-
 Create an stl file from raw data using ParseAtto.
 Note that I can't use json yet, as it has not been changed for the new Scan datatype changes.
+
+For some reason the shape is not write in netfabb.
 -}
 parseRawDataToScanWriteStlFileWithParseAtto =   do
    contents <- B.readFile "src/Data/scanRawDataWitDegrees.raww"
@@ -81,9 +97,22 @@ parseRawDataToScanWriteStlFileWithParseAtto =   do
     Right (Scan name degrees_) -> writeStlFileFromScan $ Scan name degrees_
 
    putStrLn "done"
-   
-  
 
+
+
+{-
+Use some canned data with ParseAtto to create an stl file.
+-} 
+parseCannedRawDataToScanWriteStlFileWithParseAtto = do  
+   let rawScan = (Right(B.pack $strToWord8s "0 1 2 3;1 2 3;1 2 3$90 1 2 3;1 2 3;1 2 3$180 1 2 3;1 2 3;1 2 3$270 1 2 3;1 2 3;1 2 3$360 1 2 3;1 2 3;1 2 3")  >>=  parseOnly  getRawMultiDegreeScan)
+       scan = rawScanToScan "myScan" (average . minValueIndices 2) rawScan  >>= reduceScanRows 1
+
+   case (scan) of
+    Left msg -> putStrLn msg
+    Right (Scan name degrees_) -> writeStlFileFromScan $ Scan name degrees_
+
+   putStrLn "done"
+  
 
 readTrianglesFromJsonFileAndWriteToStlFile = do
   contents <- BL.readFile "src/Data/scanFullData.json"

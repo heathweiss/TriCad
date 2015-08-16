@@ -13,7 +13,7 @@ import TriCad.MathPolar(Radius(..), Scan(..), SingleDegreeScan(..))
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import qualified  Data.ByteString.Char8 as BC (pack) 
 import GHC.Word (Word8)
-import Scan.Transform(minValueIndices, average, reduceRows)
+import Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows)
 
 --create a [Word8] for: Right(B.pack $ strToWord8s)
 --which gets a bytstring of word8
@@ -33,6 +33,7 @@ parseAttoTestDo = do
   runTestTT getADegreeThenARowOfInts
   runTestTT getACompleteRawScan
   runTestTT getAScanFromARawScan
+  runTestTT reduceScanRowsTest
 
 readARowOfInts = TestCase $ assertEqual
   "read a list of ints"
@@ -101,4 +102,18 @@ getAScanFromARawScan = TestCase $ assertEqual
                              ]}))
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
     in  rawScanToScan  "myScan" (average . minValueIndices 2) rawScan
+  )
+
+
+{-
+create a 2 row raw scan the same as from my scan raw project to see what is going wrong.
+-}
+reduceScanRowsTest = TestCase $ assertEqual
+  "get a Scan from a RawScan and use ReduceScanRows on it"
+  
+  (Right (Scan {name = "myScan", degrees = [SingleDegreeScan {degree = 0.0, radii = [Radius {radius = 0.5}]},SingleDegreeScan {degree = 90.0, radii = [Radius {radius = 0.5}]},SingleDegreeScan {degree = 180.0, radii = [Radius {radius = 0.5}]},SingleDegreeScan {degree = 270.0, radii = [Radius {radius = 0.5}]},SingleDegreeScan {degree = 360.0, radii = [Radius {radius = 0.5}]}]}))
+  
+  ( let rawScan = (Right (B.pack $strToWord8s "0 1 2 3;1 2 3;1 2 3$90 1 2 3;1 2 3;1 2 3$180 1 2 3;1 2 3;1 2 3$270 1 2 3;1 2 3;1 2 3$360 1 2 3;1 2 3;1 2 3")  >>=  parseOnly  getRawMultiDegreeScan)
+    in  rawScanToScan "myScan" (average . minValueIndices 2) rawScan  >>= reduceScanRows 2
+    
   )
