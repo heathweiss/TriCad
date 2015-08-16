@@ -3,10 +3,6 @@ files are used by:
 parseAttoCanned.raww
 -string of raw data for parsing into Scan object via attoparse in Scan.ParseAtto.
 
-sample.raww
--a small string of raw scan data, that has the degree info attached.
--src/Scan/Parse/RawToADT.hs uses it for testing.
-
 scan.json
 -a small Scan object written as json
 -used by src/Scan/Json.hs
@@ -18,11 +14,6 @@ temp.stl
 debug.txt
 -the output from TriCad.StlFileWriter.writeStlDebugToFile
 -any shape module which outputs debug info, (over)writes to this file
-
-scanRawData.raww
--the output from the C++ opencv, for the raw image data.
--It does not have the extra degree info attached
--used by src/MiscShapes/ScanRaw.hs
 
 scanRawDataWitDegrees.raww
 -the output from the C++ opencv, for the raw image data.
