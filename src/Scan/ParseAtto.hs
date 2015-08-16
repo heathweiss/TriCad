@@ -129,6 +129,8 @@ getRawMultiDegreeScan = do
   return RawScan {rawDegrees=degreeScans}
 
 
+
+
 {-
 No longer used.
 Leave it here for now, as it is a nice example of how to read a string terminated by a space.

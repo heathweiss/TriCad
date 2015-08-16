@@ -27,4 +27,4 @@ scanRawData.raww
 scanRawDataWitDegrees.raww
 -the output from the C++ opencv, for the raw image data.
 -It has the extra degree info attached
--used by src/MiscShapes/ScanRaw.hs 
+-used by src/MiscShapes/ScanRaw.hs for the ParseAtto

@@ -22,16 +22,18 @@ import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.StlCornerPoints((+++^))
 import TriCad.StlBase (StlShape(..), newStlShape)
 import TriCad.StlFileWriter(writeStlToFile)
-import Scan.Transform(minValueIndices, average, reduceRows)
+import Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows)
 import Scan.Parse(parseToScan)
 import Scan.Transform(minValueIndices, average)
 import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Data.ByteString as B
 import Data.Aeson
 --import Control.Applicative
 --import Control.Monad
 --import Data.Text as T
 import Scan.Json()
-
+import Scan.ParseAtto( getRawMultiDegreeScan, rawScanToScan, RawScan(..))
+import Data.Attoparsec.Char8
 
 
 
@@ -58,12 +60,30 @@ parseRawDataAndSaveToJson = do
 {- bypasses json
    uses the new MathPolar fromScan functions
 -}
-parseRawDataToScanWriteStlFile = do
+parseRawDataToScanWriteStlFileWithOldParseSystem = do
   contents <- BL.readFile "src/Data/scanRawDataWitDegrees.raww"
   let tempContents = BL.unpack contents
   case (parseToScan  ((*1.35) .  average . minValueIndices 75 ) tempContents ) of
    Just (Scan name_ deg) -> writeStlFileFromScan (Scan name_ deg)
    Nothing               -> writeStlFileFromScan (Scan "error" [])
+
+
+{-
+Create an stl file from raw data using ParseAtto.
+Note that I can't use json yet, as it has not been changed for the new Scan datatype changes.
+-}
+parseRawDataToScanWriteStlFileWithParseAtto =   do
+   contents <- B.readFile "src/Data/scanRawDataWitDegrees.raww"
+   let scanRaw = parseOnly  getRawMultiDegreeScan  contents
+       scan = rawScanToScan "myScan" (average . minValueIndices 75) scanRaw  >>= reduceScanRows 10
+   case (scan) of
+    Left msg -> putStrLn msg
+    Right (Scan name degrees_) -> writeStlFileFromScan $ Scan name degrees_
+
+   putStrLn "done"
+   
+  
+
 
 readTrianglesFromJsonFileAndWriteToStlFile = do
   contents <- BL.readFile "src/Data/scanFullData.json"
@@ -72,6 +92,9 @@ readTrianglesFromJsonFileAndWriteToStlFile = do
       Nothing                  -> putStrLn "Nothing"
 
 
+
+
+--this is set up to have rows reduced by 10
 writeStlFileFromScan scan = 
   let origin = (Point{x_axis=0, y_axis=0, z_axis=50})
       heightPerPixel = 10
