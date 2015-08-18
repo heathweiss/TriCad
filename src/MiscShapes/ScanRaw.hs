@@ -2,8 +2,6 @@ module MiscShapes.ScanRaw() where
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
 import TriCad.MathPolar(
-  createRightFaces,
-  createLeftFaces,
   createRightFacesFromScan,
   createLeftFacesFromScan ,
   Slope(..),
@@ -12,9 +10,7 @@ import TriCad.MathPolar(
   SingleDegreeScan(..),
   flatXSlope,
   flatYSlope,
-  createLeftFacesMultiColumns,
   createLeftFacesMultiColumnsFromScan,
-  createVerticalCubes,
   createVerticalCubesFromScan,
   )
 import TriCad.Points(Point(..))
