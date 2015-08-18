@@ -122,6 +122,24 @@ Neg/Pos XY Slope:
 -Describe the slope resulting from the combining of the Neg/Pos X/Y slopes
 -Neg slopes downwards from the neg x/y quadrants
 -Pos slopes upwards from the neg x/y quadrants
+
+The NegYSlope and PosYSlope describe a slope(change of z axis) along the y axis.
+NegYSlope:
+-in quadrants 1 & 4, which are the -y quads, slope upwards from the origin to the front faces.
+-in quads 2 & 3, the + y quads, slope downwards from the origin to the front faces.
+
+PosYSlope:
+-in quads 1 & 4 , the - y quads, slope from the origin, downwards to the front faces.
+-in quads 2 & 3, the  + y quads, slope from the origin, updwards to the front faces.
+
+The NegXSlope and PosXSlope describe a slope(change of z axis) along the x axis.
+NegXSlope
+-in quads 1 & 2, the + x quads, slope from the origin, downwards to the front faces.
+-in quads 3 & 4, the - x quads, slope from the origin, upwards to the front faces.
+
+PosXSlope
+-in quads 1 & 2, the + x quads, slope from the origin, upwards to the front faces.
+-in quads 3 & 4, the - x quads, slope from the origin, downwards to the front faces.
 -}
 data Slope = NegXYSlope {angle :: Double}
            | PosXYSlope {angle :: Double}
