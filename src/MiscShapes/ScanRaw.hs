@@ -2,16 +2,16 @@ module MiscShapes.ScanRaw() where
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
 import TriCad.MathPolar(
-  createRightFacesFromScan,
-  createLeftFacesFromScan ,
+  createRightFaces,
+  createLeftFaces ,
   Slope(..),
   Radius(..),
   Scan(..),
   SingleDegreeScan(..),
   flatXSlope,
   flatYSlope,
-  createLeftFacesMultiColumnsFromScan,
-  createVerticalCubesFromScan,
+  createLeftFacesMultiColumns,
+  createVerticalCubes,
   )
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
@@ -97,15 +97,15 @@ readTrianglesFromJsonFileAndWriteToStlFile = do
 writeStlFileFromScan scan = 
   let origin = (Point{x_axis=0, y_axis=0, z_axis=50})
       heightPerPixel = 10
-      leftFaces = createLeftFacesMultiColumnsFromScan origin (tail $ degrees scan) flatXSlope flatYSlope [0,heightPerPixel..]
-      rightFaces = createRightFacesFromScan origin (head $ degrees scan) flatXSlope flatYSlope [0,heightPerPixel..]
+      leftFaces = createLeftFacesMultiColumns origin (tail $ degrees scan) flatXSlope flatYSlope [0,heightPerPixel..]
+      rightFaces = createRightFaces origin (head $ degrees scan) flatXSlope flatYSlope [0,heightPerPixel..]
       triangles =  concat
         [ [FacesFrontTop | x <- [1..4]],
           [FaceFront | x <- [5..224]],
           [FacesBottomFront | x <- [1,2,3,4]]
         ]
         +++^
-        createVerticalCubesFromScan rightFaces leftFaces
+        createVerticalCubes rightFaces leftFaces
       stlFile = newStlShape "backscratcher" triangles
   in
       writeStlToFile stlFile

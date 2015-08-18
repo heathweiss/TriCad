@@ -3,10 +3,10 @@ module TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
   createBottomFaces,
-  createRightFacesFromScan,
-  createLeftFacesFromScan,
-  createVerticalCubesFromScan,
-  createLeftFacesMultiColumnsFromScan,
+  createRightFaces,
+  createLeftFaces,
+  createVerticalCubes,
+  createLeftFacesMultiColumns,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
@@ -527,9 +527,9 @@ An array of LeftFace or RightFace depending on data constructors passed in.
 
 
 
-createVerticalFacesFromScan :: Point -> SingleDegreeScan -> Slope -> Slope -> [Double] -> (Point-> CornerPoints) ->
+createVerticalFaces :: Point -> SingleDegreeScan -> Slope -> Slope -> [Double] -> (Point-> CornerPoints) ->
                        (Point-> CornerPoints) -> (Point-> CornerPoints) -> (Point-> CornerPoints) -> [CornerPoints]
-createVerticalFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor topFrontConstructor topBackConstructor
+createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor topFrontConstructor topBackConstructor
                             btmFrontConstructor btmBackConstructor =
   
   --zipWith  (\x y -> transposeZ ((-x)+) y  ) --negating x causes the z_axis to decrease from the top, as it should.
@@ -563,15 +563,15 @@ createVerticalFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor to
 
 
 --RightFace version of createVerticalFaces
-createRightFacesFromScan :: Point -> SingleDegreeScan -> Slope -> Slope -> [Double] -> [CornerPoints]
-createRightFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor  =
-  createVerticalFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor (F3) (B3) (F4) (B4)
+createRightFaces :: Point -> SingleDegreeScan -> Slope -> Slope -> [Double] -> [CornerPoints]
+createRightFaces topOrigin inDegree xSlope ySlope zTransposeFactor  =
+  createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor (F3) (B3) (F4) (B4)
 
 
 --LeftFace version of createVerticalFaces
-createLeftFacesFromScan :: Point -> SingleDegreeScan -> Slope -> Slope -> [Double] -> [CornerPoints]
-createLeftFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor  =
-  createVerticalFacesFromScan topOrigin inDegree xSlope ySlope zTransposeFactor (F2) (B2) (F1) (B1)
+createLeftFaces :: Point -> SingleDegreeScan -> Slope -> Slope -> [Double] -> [CornerPoints]
+createLeftFaces topOrigin inDegree xSlope ySlope zTransposeFactor  =
+  createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor (F2) (B2) (F1) (B1)
 
 
 
@@ -580,11 +580,11 @@ Can already create LeftFace, problem is to create an array of them from the vert
 Cannot just map over them with createLeftFaces, because the degree is changing from column to column.
 For this reason, will have to use recursion.
 -}
-createLeftFacesMultiColumnsFromScan ::  Point -> [SingleDegreeScan] -> Slope -> Slope -> [Double] -> [[CornerPoints]]
-createLeftFacesMultiColumnsFromScan _ [] _ _ _ = []
-createLeftFacesMultiColumnsFromScan topOrigin (d:ds) xSlope ySlope zTransposeFactor =
-  (createLeftFacesFromScan topOrigin d xSlope ySlope zTransposeFactor ) :
-    (createLeftFacesMultiColumnsFromScan topOrigin ds xSlope ySlope zTransposeFactor)
+createLeftFacesMultiColumns ::  Point -> [SingleDegreeScan] -> Slope -> Slope -> [Double] -> [[CornerPoints]]
+createLeftFacesMultiColumns _ [] _ _ _ = []
+createLeftFacesMultiColumns topOrigin (d:ds) xSlope ySlope zTransposeFactor =
+  (createLeftFaces topOrigin d xSlope ySlope zTransposeFactor ) :
+    (createLeftFacesMultiColumns topOrigin ds xSlope ySlope zTransposeFactor)
 
 
 
@@ -595,8 +595,8 @@ Normally: RightFace ++> [LeftFaces] so need recursion to work through the extra 
 I stopped the test for now, till I can create a [[LeftFace]].
 At this point I can only create a[LeftFace]
 -}
-createVerticalCubesFromScan :: [CornerPoints] -> [[CornerPoints]] -> [CornerPoints]
-createVerticalCubesFromScan ([]) _ = []
-createVerticalCubesFromScan (x:xs) (ys) =
+createVerticalCubes :: [CornerPoints] -> [[CornerPoints]] -> [CornerPoints]
+createVerticalCubes ([]) _ = []
+createVerticalCubes (x:xs) (ys) =
   let headOfLeftFaces = map (head) ys
-  in (x ++> headOfLeftFaces) ++  (createVerticalCubesFromScan xs (map (tail) ys) )
+  in (x ++> headOfLeftFaces) ++  (createVerticalCubes xs (map (tail) ys) )
