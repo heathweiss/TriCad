@@ -10,8 +10,6 @@ module TriCad.MathPolar(
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
-  xValue,
-  yValue,
   xyQuadrantAngle,
   QuadrantAngle(..),
   createCornerPoint,
@@ -158,19 +156,6 @@ xyQuadrantAngle currAngle
   | currAngle <= 360 = Quadrant4Angle (360 - currAngle)
   | currAngle > 360 = xyQuadrantAngle (currAngle - 360)
 
-
-{-Don't seem to be using this function, should look at getting rid of it.-}
-xValue :: Radius -> QuadrantAngle -> Point -> Double
-xValue (Radius radius) (Quadrant1Angle angle) origin = x_axis origin + sinDegrees angle * radius
-xValue (Radius radius) (Quadrant2Angle angle) origin = x_axis origin + sinDegrees angle * radius
-xValue (Radius radius) (Quadrant3Angle angle) origin = x_axis origin - sinDegrees angle * radius
-xValue (Radius radius) (Quadrant4Angle angle) origin = x_axis origin - sinDegrees angle * radius
-
-yValue :: Radius -> QuadrantAngle -> Point -> Double
-yValue (Radius radius) (Quadrant1Angle angle) origin = y_axis origin + cosDegrees angle * radius
-yValue (Radius radius) (Quadrant2Angle angle) origin = y_axis origin + cosDegrees angle * radius
-yValue (Radius radius) (Quadrant3Angle angle) origin = y_axis origin - cosDegrees angle * radius
-yValue (Radius radius) (Quadrant4Angle angle) origin = y_axis origin - cosDegrees angle * radius
 
 
 {-

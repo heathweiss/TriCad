@@ -5,11 +5,7 @@ import TriCad.CornerPoints(CornerPoints(..), (+++))
 import TriCad.Points(Point(..))
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
-  --xRadiusAdjustedForZslope,
-  --yRadiusAdjustedForZslope,
   radiusAdjustedForZslope,
-  xValue,
-  yValue,
   Radius(..),
   xyQuadrantAngle,
   QuadrantAngle(..),
@@ -30,18 +26,6 @@ mathPolarTestDo = do
   runTestTT getQuadrantAngleTest5
   runTestTT getQuadrantAngleTest6
   runTestTT getQuadrantAngleTest7
-
-  runTestTT getXValueTest
-  runTestTT getYValueTest
-  runTestTT getXValueTest2
-  runTestTT getXValueTest2a
-  runTestTT getXValueTest3
-  runTestTT getXValueTest4
-  runTestTT getXValueTest4a
-  runTestTT getXValueTest5
-  runTestTT getXValueTest6
-  runTestTT getXValueTest7
-  runTestTT getXValueTest8
 
   runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY90
   runTestTT slopeForXYAngleAndYslopeTestX0Ypos0XY0
@@ -146,46 +130,6 @@ getQuadrantAngleTest6 = TestCase $ assertEqual
 getQuadrantAngleTest7 = TestCase $ assertEqual 
   "getQuadrantAngleTest7" (Quadrant4Angle 10) (xyQuadrantAngle 350  )
 
-
-
-{----------------------------------- Test the get x/y  values without slope -------------------------------------------------
-xValue :: Radius -> QuadrantAngle -> Point -> Double
-
-don't even seem to be using this function. Should look at getting rid of it.
--}
-
-getXValueTest = TestCase $ assertEqual 
-  "getXValueTest" (1.7364817766693033) (xValue (Radius 10) (xyQuadrantAngle 10) (Point 0 0 0)  )
-
-getYValueTest = TestCase $ assertEqual 
-  "getYValueTest" (9.84807753012208) (yValue (Radius 10) (xyQuadrantAngle 10) (Point 0 0 0)  )
-
-getXValueTest2 = TestCase $ assertEqual 
-  "getXValueTest2" (9.84807753012208) (xValue (Radius 10) (xyQuadrantAngle 80) (Point 0 0 0)  )
-
-getXValueTest2a = TestCase $ assertEqual 
-  "getXValueTest2a" (10) (xValue (Radius 10) (xyQuadrantAngle 90) (Point 0 0 0)  )
-
-getXValueTest3 = TestCase $ assertEqual 
-  "getXValueTest3" (9.84807753012208) (xValue (Radius 10) (xyQuadrantAngle 100) (Point 0 0 0)  )
-
-getXValueTest4 = TestCase $ assertEqual 
-  "getXValueTest4" (1.7364817766693033) (xValue (Radius 10) (xyQuadrantAngle 170) (Point 0 0 0)  )
-
-getXValueTest4a = TestCase $ assertEqual 
-  "getXValueTest4a" (0) (xValue (Radius 10) (xyQuadrantAngle 180) (Point 0 0 0)  )
-
-getXValueTest5 = TestCase $ assertEqual 
-  "getXValueTest5" (-1.7364817766693033) (xValue (Radius 10) (xyQuadrantAngle 190) (Point 0 0 0)  )
-
-getXValueTest6 = TestCase $ assertEqual 
-  "getXValueTest6" (-9.84807753012208) (xValue (Radius 10) (xyQuadrantAngle 260) (Point 0 0 0)  )
-
-getXValueTest7 = TestCase $ assertEqual 
-  "getXValueTest7" (-9.84807753012208) (xValue (Radius 10) (xyQuadrantAngle 280) (Point 0 0 0)  )
-
-getXValueTest8 = TestCase $ assertEqual 
-  "getXValueTest8" (-1.7364817766693033) (xValue (Radius 10) (xyQuadrantAngle 350) (Point 0 0 0)  )
 
 
 
