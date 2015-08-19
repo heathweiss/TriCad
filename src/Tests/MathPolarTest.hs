@@ -88,25 +88,23 @@ mathPolarTestDo = do
   runTestTT createCornerPointTestR10PosX0PosY0XY10
   runTestTT createCornerPointTestR10PosX0PosY10XY10
   runTestTT createCornerPointTestR10PosX0PosY10XY80
-  --runTestTT fail1
   runTestTT createCornerPointTestR10PosX1PosY10XY100
-  --runTestTT fail2
   runTestTT createCornerPointTestR10PosX1PosY10XY170
   runTestTT createCornerPointTestR10PosX10PosY1XY170
   runTestTT createCornerPointTestR10PosX1PosY10XY190 
   runTestTT createCornerPointTestR10PosX1PosY10XY260
   runTestTT createCornerPointTestR10PosX1PosY10XY280 
   runTestTT createCornerPointTestR10PosX1PosY10XY350
+  runTestTT createCornerPointTestR10PosX1NegY10XY190
+  runTestTT createCornerPointTestR10PosX1NegY10XY170
+  runTestTT createFrontCornerTest
 
-  
-  --following 2 have not been calc'd/verified the output, though they look good in netfabb
+   --following 2 have not been calc'd/verified the output, though they look good in netfabb
   --Leave them till all createCornerPoints changes are done
   --runTestTT createCornerPoint10DegTestSlopedMaleLegos
   --runTestTT createCornerPointTest90DegSlopedMaleLegos
 
-  runTestTT createCornerPointTestR10PosX1NegY10XY190
-  runTestTT createCornerPointTestR10PosX1NegY10XY170
-  runTestTT createFrontCornerTest
+  
   {-This will test all the layer A F1 corners-}
   putStrLn "\n\n" 
   putStrLn "bottomFrontLeftCorners"
@@ -615,7 +613,7 @@ createCornerPointTestR10PosX1NegY10XY170  = TestCase $ assertEqual
     (Point{x_axis=0, y_axis=0, z_axis=0})
     (Radius 10)
     (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 170)))
-    (Quadrant2Angle 170)--(xyQuadrantAngle 170)
+    (Angle 170)--(xyQuadrantAngle 170)
     (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 170))
   ) 
 

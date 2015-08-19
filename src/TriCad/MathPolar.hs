@@ -328,7 +328,7 @@ createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  
                                     (--z:
                                      z_axis origin + horizRadius * (sinDegrees (slope)))
                                   )
-
+{-
 createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
                                     
                                     (--x:
@@ -345,16 +345,16 @@ createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  
                                      z_axis origin + horizRadius * (sinDegrees (slope)))
                                   )
 
-
-
-createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Quadrant2Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
+-}
+{-
+createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
                                     (--x:
                                      x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
                                       adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle  xyAngle))))--tested good 
                                     
                                     
                                     (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Quadrant2Angle xyAngle) $
+                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
                                        adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
 
                                     
@@ -362,7 +362,7 @@ createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)
                                      z_axis origin - horizRadius * (sinDegrees (slope)))
                                   )
 
-
+-}
 
 createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Quadrant3Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
                                     
