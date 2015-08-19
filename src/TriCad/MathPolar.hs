@@ -11,7 +11,6 @@ module TriCad.MathPolar(
   createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
   xyQuadrantAngle,
-  QuadrantAngle(..),
   createCornerPoint,
   Slope(..),
   Radius(..),
@@ -19,7 +18,9 @@ module TriCad.MathPolar(
   Scan(..),
   flatXSlope,
   flatYSlope,
-  
+  QuadrantAngle(..),
+  setYPolarityForQuadrant,
+  setXPolarityForQuadrant,
   ) where
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
@@ -106,35 +107,15 @@ Angle:
 This will be the replacement for all of the others. It is simply a wrapper around Double.
 Once the others are gone, should make it a newtype, for efficiency.
 -}
-data QuadrantAngle = Quadrant1Angle Double
-                   | Quadrant2Angle Double
-                   | Quadrant3Angle Double
-                   | Quadrant4Angle Double
-                   | Angle Double
+data QuadrantAngle = Quadrant1Angle  { quadAngle::Double}
+                   | Quadrant2Angle  { quadAngle::Double}
+                   | Quadrant3Angle  { quadAngle::Double}
+                   | Quadrant4Angle  { quadAngle::Double}
+                   | Angle           { quadAngle::Double}
                    
   deriving (Show, Eq)
 
-{-
-For trig xy calculations, the neg/pos aspect of x will depend upon the current quadrant of the xy plane.
-This is as per standard trig methods of calculating for obtuse angles.
 
--}
-setXPolarityForQuadrant :: QuadrantAngle -> Radius -> Radius
-setXPolarityForQuadrant angle (Radius val) = case getCurrentQuadrant angle of
-                                     Quadrant1 -> Radius val
-                                     Quadrant2 -> Radius val
-                                     Quadrant3 -> Radius (negate val)
-                                     Quadrant4 -> Radius (negate val)
-{-
-For trig xy calculations, the neg/pos aspect of y will depend upon the current quadrant of the xy plane
-
--}
-setYPolarityForQuadrant :: QuadrantAngle -> Radius -> Radius
-setYPolarityForQuadrant angle (Radius val) = case getCurrentQuadrant angle of
-                                     Quadrant1 -> Radius (negate val)
-                                     Quadrant2 -> Radius val
-                                     Quadrant3 -> Radius val
-                                     Quadrant4 -> Radius (negate val)
 {-
 What quadrant of the xy plane, is the angle in?
 
@@ -142,12 +123,12 @@ Used for:
 setYPolarityForQuadrant & setXPolarityForQuadrant use it to adjust the polarity of x/y for trig calculations
 -}
 getCurrentQuadrant :: QuadrantAngle -> Quadrant
-getCurrentQuadrant (Angle a) | a < 0 = getCurrentQuadrant $ Angle (360 + a)
-                             | a <= 90 = Quadrant1
-                             | a <= 180 = Quadrant2
-                             | a <= 270 = Quadrant3
-                             | a <= 360 = Quadrant4
-                             | a > 360 = getCurrentQuadrant $ Angle (a - 360)
+getCurrentQuadrant ang       | quadAngle ang  < 0 = getCurrentQuadrant $ Angle (360 + (quadAngle ang))
+                             | quadAngle ang <= 90 = Quadrant1
+                             | quadAngle ang <= 180 = Quadrant2
+                             | quadAngle ang <= 270 = Quadrant3
+                             | quadAngle ang <= 360 = Quadrant4
+                             | quadAngle ang > 360 = getCurrentQuadrant $ Angle ((quadAngle ang) - 360)
 
 {-
 Corresponds to the xy plane quadrants.
@@ -266,6 +247,39 @@ radiusAdjustedForZslope :: Radius -> Slope -> Radius
 radiusAdjustedForZslope (Radius radius) (PosXYSlope xySlope) = UpRadius $ radius * (cosDegrees (xySlope))
 radiusAdjustedForZslope (Radius radius) (NegXYSlope xySlope) = DownRadius $ radius * (cosDegrees (xySlope))
 
+
+{-
+For trig xy calculations, the neg/pos aspect of x will depend upon the current quadrant of the xy plane.
+This is as per standard trig methods of calculating for obtuse angles.
+
+-}
+setXPolarityForQuadrant :: QuadrantAngle -> Double -> Double
+setXPolarityForQuadrant angle val = case getCurrentQuadrant angle of
+                                     Quadrant1 -> val
+                                     Quadrant2 -> val
+                                     Quadrant3 -> negate val
+                                     Quadrant4 -> negate val
+{-
+Use this to keep createCornerPoint DRY for setting x axis.
+Wait till I get rid of all the pattern matching that setXPolarityForQuadrant is replacing.
+Do a simialar function setY
+-}
+setX :: Point -> QuadrantAngle -> Radius -> Double
+setX origin  (Quadrant1Angle xyAngle) (DownRadius radius) =
+   x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
+                                      radius * (sinDegrees  xyAngle))
+{-
+For trig xy calculations, the neg/pos aspect of y will depend upon the current quadrant of the xy plane
+
+-}
+setYPolarityForQuadrant :: QuadrantAngle -> Double -> Double
+setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of
+                                     Quadrant1 -> negate val
+                                     Quadrant2 -> val
+                                     Quadrant3 -> val
+                                     Quadrant4 -> negate val
+
+
 {-
 Change slope and xy angle into a single Slope value.
 Change radius into a Radius
@@ -287,32 +301,45 @@ orign: Point
 createCornerPoint :: (Point-> CornerPoints) -> Point -> Radius -> Radius ->  QuadrantAngle -> Slope -> CornerPoints
 createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Quadrant1Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
                                     (--x:
-                                     x_axis origin + adjustedRadius * (sinDegrees  xyAngle))--fails when -
+                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
+                                      adjustedRadius * (sinDegrees  xyAngle)))--tested good
+                                    
                                     
                                     (--y:
-                                     y_axis origin - adjustedRadius * (cosDegrees  xyAngle))-- fails when +
+                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
+                                       adjustedRadius * (cosDegrees  xyAngle)))-- tested good
                                     
                                     (--z:
                                      z_axis origin - horizRadius * (sinDegrees (slope)))
                                   )
 
 createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Quadrant1Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
+                                    
                                     (--x:
-                                     x_axis origin + adjustedRadius * (sinDegrees  xyAngle))--fails when -
+                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
+                                      adjustedRadius * (sinDegrees  xyAngle)))--tested good
+                                    
                                     
                                     (--y:
-                                     y_axis origin - adjustedRadius * (cosDegrees  xyAngle))--fails when +
+                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
+                                       adjustedRadius * (cosDegrees  xyAngle)))-- tested good
+                                                                                                                                      
                                     
                                     (--z:
                                      z_axis origin + horizRadius * (sinDegrees (slope)))
                                   )
 
 createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Quadrant2Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
+                                    
                                     (--x:
-                                     x_axis origin + adjustedRadius * (sinDegrees  xyAngle))--fails when -
+                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
+                                      adjustedRadius * (sinDegrees  xyAngle)))--tested good
+                                    
                                     
                                     (--y:
-                                     y_axis origin + adjustedRadius * (cosDegrees  xyAngle))--fails when -
+                                     y_axis origin + (setYPolarityForQuadrant (Quadrant2Angle xyAngle) $
+                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))-- tested good 
+
                                     
                                     (--z:
                                      z_axis origin + horizRadius * (sinDegrees (slope)))
@@ -322,10 +349,14 @@ createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  
 
 createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Quadrant2Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
                                     (--x:
-                                     x_axis origin + adjustedRadius * (sinDegrees  xyAngle))
+                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
+                                      adjustedRadius * (sinDegrees  xyAngle)))--tested good 
+                                    
                                     
                                     (--y:
-                                     y_axis origin + adjustedRadius * (cosDegrees  xyAngle))
+                                     y_axis origin + (setYPolarityForQuadrant (Quadrant2Angle xyAngle) $
+                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
+
                                     
                                     (--z:
                                      z_axis origin - horizRadius * (sinDegrees (slope)))
@@ -334,11 +365,17 @@ createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)
 
 
 createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Quadrant3Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
+                                    
+
                                     (--x:
-                                     x_axis origin - adjustedRadius * (sinDegrees  xyAngle))
+                                     x_axis origin + (setXPolarityForQuadrant (Quadrant3Angle xyAngle) $
+                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested good 
+                                    
                                     
                                     (--y:
-                                     y_axis origin + adjustedRadius * (cosDegrees  xyAngle))
+                                     y_axis origin + (setYPolarityForQuadrant (Quadrant3Angle xyAngle) $
+                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
+
                                     
                                     (--z:
                                      z_axis origin + horizRadius * (sinDegrees (slope)))
@@ -347,10 +384,15 @@ createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  
 
 createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Quadrant3Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
                                     (--x:
-                                     x_axis origin - adjustedRadius * (sinDegrees  xyAngle))
+                                     x_axis origin + (setXPolarityForQuadrant (Quadrant3Angle xyAngle) $
+                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested good 
+                                    
                                     
                                     (--y:
-                                     y_axis origin + adjustedRadius * (cosDegrees  xyAngle))
+                                     y_axis origin + (setYPolarityForQuadrant (Quadrant3Angle xyAngle) $
+                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
+
+                                    
                                     
                                     (--z:
                                      z_axis origin - horizRadius * (sinDegrees (slope)))
@@ -358,22 +400,38 @@ createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)
 
 createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Quadrant4Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
                                     (--x:
-                                     x_axis origin - adjustedRadius * (sinDegrees  xyAngle))
+                                     x_axis origin + (setXPolarityForQuadrant (Quadrant4Angle xyAngle) $
+                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested good
+                                    
                                     
                                     (--y:
-                                     y_axis origin - adjustedRadius * (cosDegrees  xyAngle))
+                                     y_axis origin + (setYPolarityForQuadrant (Quadrant4Angle xyAngle) $
+                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
+
                                     
                                     (--z:
                                      z_axis origin - horizRadius * (sinDegrees (slope)))
                                   )
 
---untested. 
+
 createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Quadrant4Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
-                                    (--x:
+--does not seem to have any test coverage. Need to cx it out.
+
+                                    {-(--x:
                                      x_axis origin - adjustedRadius * (sinDegrees  xyAngle))
                                     
                                     (--y:
-                                     y_axis origin - adjustedRadius * (cosDegrees  xyAngle))
+                                     y_axis origin - adjustedRadius * (cosDegrees  xyAngle))-}
+                                    (--x:
+                                     x_axis origin + (setXPolarityForQuadrant (Quadrant4Angle xyAngle) $
+                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested?
+                                    
+                                    
+                                    (--y:
+                                     y_axis origin + (setYPolarityForQuadrant (Quadrant4Angle xyAngle) $
+                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested?
+
+                                    
                                     
                                     (--z:
                                      z_axis origin + horizRadius * (sinDegrees (slope)))
