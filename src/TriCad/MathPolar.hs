@@ -328,119 +328,6 @@ createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  
                                     (--z:
                                      z_axis origin + horizRadius * (sinDegrees (slope)))
                                   )
-{-
-createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
-                                    
-                                    (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
-                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle  xyAngle))))--tested good
-                                    
-                                    
-                                    (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
-                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))-- tested good 
-
-                                    
-                                    (--z:
-                                     z_axis origin + horizRadius * (sinDegrees (slope)))
-                                  )
-
--}
-{-
-createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
-                                    (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
-                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle  xyAngle))))--tested good 
-                                    
-                                    
-                                    (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
-                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
-
-                                    
-                                    (--z:
-                                     z_axis origin - horizRadius * (sinDegrees (slope)))
-                                  )
-
--}
-{-
-createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
-                                    
-
-                                    (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
-                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested good 
-                                    
-                                    
-                                    (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
-                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
-
-                                    
-                                    (--z:
-                                     z_axis origin + horizRadius * (sinDegrees (slope)))
-                                  )
-
--}
-{-
-createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
-                                    (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
-                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested good 
-                                    
-                                    
-                                    (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
-                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
-
-                                    
-                                    
-                                    (--z:
-                                     z_axis origin - horizRadius * (sinDegrees (slope)))
-                                  )
--}
-{-
-createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
-                                    (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
-                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested good
-                                    
-                                    
-                                    (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
-                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
-
-                                    
-                                    (--z:
-                                     z_axis origin - horizRadius * (sinDegrees (slope)))
-                                  )
-
--}
-{-
-createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
---does not seem to have any test coverage. Need to cx it out.
-
-                                    {-(--x:
-                                     x_axis origin - adjustedRadius * (sinDegrees  xyAngle))
-                                    
-                                    (--y:
-                                     y_axis origin - adjustedRadius * (cosDegrees  xyAngle))-}
-                                    (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
-                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested?
-                                    
-                                    
-                                    (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
-                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested?
-
-                                    
-                                    
-                                    (--z:
-                                     z_axis origin + horizRadius * (sinDegrees (slope)))
-                                  )
-
--}
 {------------------------------------------------------------- createPerimeterBottomFaces--------------------------------------------
 
 -}
@@ -450,7 +337,7 @@ createBottomFaces inOrigin inRadius inAngles xSlope ySlope  =
       inOrigin
       (head inRadius) 
       (radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles))))
-      (xyQuadrantAngle (head inAngles))
+      (Angle (head inAngles))
       (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles)))
     ) 
     +++
@@ -461,7 +348,7 @@ createBottomFaces inOrigin inRadius inAngles xSlope ySlope  =
       inOrigin
       currRadius
       (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle)))
-      (xyQuadrantAngle angle)
+      (Angle angle)
       (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle))
      ) 
      +++
@@ -476,7 +363,7 @@ createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
       inOrigin
       (head inRadius) 
       (radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles))))
-      (xyQuadrantAngle (head inAngles))
+      (Angle (head inAngles))
       (slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles)))
     ) 
     +++
@@ -487,7 +374,7 @@ createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
       inOrigin
       currRadius
       (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle)))
-      (xyQuadrantAngle angle)
+      (Angle angle)
       (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle))
      ) 
      +++
@@ -507,7 +394,7 @@ createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
       inOrigin
       (head inRadius) 
       (radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles))))
-      (xyQuadrantAngle (head inAngles))
+      (Angle (head inAngles))
       (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles)))
     ) 
     +++
@@ -518,7 +405,7 @@ createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
       inOrigin
       currRadius
       (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle)))
-      (xyQuadrantAngle angle)
+      (Angle angle)
       (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle))
      ) 
      +++
@@ -533,7 +420,7 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
       inOrigin
       (head inRadius) 
       (radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles))))
-      (xyQuadrantAngle (head inAngles))
+      (Angle (head inAngles))
       (slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles)))
     ) 
     +++
@@ -544,7 +431,7 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
       inOrigin
       currRadius
       (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle)))
-      (xyQuadrantAngle angle)
+      (Angle angle)
       (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle))
      ) 
      +++
@@ -627,7 +514,7 @@ createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor topFrontCo
       topOrigin
       (head $ radii inDegree) 
       (radiusAdjustedForZslope (head $ radii inDegree) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree))))
-      (xyQuadrantAngle (degree inDegree))
+      (Angle (degree inDegree))
       (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree)))
     ) 
     +++
@@ -638,7 +525,7 @@ createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor topFrontCo
       (transposeZ (+(-currZVal)) topOrigin)  --topOrigin
       currRadius
       (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree))))
-      (xyQuadrantAngle (degree inDegree))
+      (Angle (degree inDegree))
       (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree)))
      ) 
      +++
