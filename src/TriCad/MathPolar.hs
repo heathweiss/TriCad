@@ -363,17 +363,17 @@ createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)
                                   )
 
 -}
-
-createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Quadrant3Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
+{-
+createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
                                     
 
                                     (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Quadrant3Angle xyAngle) $
+                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
                                       adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested good 
                                     
                                     
                                     (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Quadrant3Angle xyAngle) $
+                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
                                        adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
 
                                     
@@ -381,15 +381,16 @@ createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  
                                      z_axis origin + horizRadius * (sinDegrees (slope)))
                                   )
 
-
-createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Quadrant3Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
+-}
+{-
+createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
                                     (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Quadrant3Angle xyAngle) $
+                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
                                       adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested good 
                                     
                                     
                                     (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Quadrant3Angle xyAngle) $
+                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
                                        adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
 
                                     
@@ -397,15 +398,16 @@ createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)
                                     (--z:
                                      z_axis origin - horizRadius * (sinDegrees (slope)))
                                   )
-
-createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Quadrant4Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
+-}
+{-
+createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
                                     (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Quadrant4Angle xyAngle) $
+                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
                                       adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested good
                                     
                                     
                                     (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Quadrant4Angle xyAngle) $
+                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
                                        adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
 
                                     
@@ -413,8 +415,9 @@ createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)
                                      z_axis origin - horizRadius * (sinDegrees (slope)))
                                   )
 
-
-createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Quadrant4Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
+-}
+{-
+createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
 --does not seem to have any test coverage. Need to cx it out.
 
                                     {-(--x:
@@ -423,12 +426,12 @@ createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  
                                     (--y:
                                      y_axis origin - adjustedRadius * (cosDegrees  xyAngle))-}
                                     (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Quadrant4Angle xyAngle) $
+                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
                                       adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle)     )))--tested?
                                     
                                     
                                     (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Quadrant4Angle xyAngle) $
+                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
                                        adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested?
 
                                     
@@ -437,7 +440,7 @@ createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  
                                      z_axis origin + horizRadius * (sinDegrees (slope)))
                                   )
 
-
+-}
 {------------------------------------------------------------- createPerimeterBottomFaces--------------------------------------------
 
 -}

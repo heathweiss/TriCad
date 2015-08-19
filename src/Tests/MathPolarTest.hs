@@ -93,6 +93,7 @@ mathPolarTestDo = do
   runTestTT createCornerPointTestR10PosX10PosY1XY170
   runTestTT createCornerPointTestR10PosX1PosY10XY190 
   runTestTT createCornerPointTestR10PosX1PosY10XY260
+  --last round of patterns
   runTestTT createCornerPointTestR10PosX1PosY10XY280 
   runTestTT createCornerPointTestR10PosX1PosY10XY350
   runTestTT createCornerPointTestR10PosX1NegY10XY190
@@ -101,8 +102,8 @@ mathPolarTestDo = do
 
    --following 2 have not been calc'd/verified the output, though they look good in netfabb
   --Leave them till all createCornerPoints changes are done
-  --runTestTT createCornerPoint10DegTestSlopedMaleLegos
-  --runTestTT createCornerPointTest90DegSlopedMaleLegos
+  runTestTT createCornerPoint10DegTestSlopedMaleLegos
+  runTestTT createCornerPointTest90DegSlopedMaleLegos
 
   
   {-This will test all the layer A F1 corners-}
@@ -686,7 +687,7 @@ createCornerPointTestR10PosX1PosY10XY190  = TestCase $ assertEqual
     (Point{x_axis=0, y_axis=0, z_axis=0})
     (Radius 10)
     (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 190)))
-    (Quadrant3Angle 190)--(xyQuadrantAngle 190)
+    (Angle 190)--(xyQuadrantAngle 190)
     (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 190))
   ) 
 
@@ -718,7 +719,7 @@ createCornerPointTestR10PosX1NegY10XY190  = TestCase $ assertEqual
     (Point{x_axis=0, y_axis=0, z_axis=0})
     (Radius 10)
     (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 190)))
-    (Quadrant3Angle 190)--(xyQuadrantAngle 190)
+    (Angle 190)--(xyQuadrantAngle 190)
     (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 190))
   ) 
 
@@ -755,7 +756,7 @@ createCornerPointTestR10PosX1PosY10XY260  = TestCase $ assertEqual
     (Point{x_axis=0, y_axis=0, z_axis=0})
     (Radius 10)
     (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 260)))
-    (Quadrant3Angle 260)--(xyQuadrantAngle 260)
+    (Angle 260)--(xyQuadrantAngle 260)
     (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 260))
   )
 
@@ -787,7 +788,7 @@ createCornerPointTestR10PosX1PosY10XY280  = TestCase $ assertEqual
     (Point{x_axis=0, y_axis=0, z_axis=0})
     (Radius 10)
     (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 280)))
-    (Quadrant4Angle 280)--(xyQuadrantAngle 280)
+    (Angle 280)--(xyQuadrantAngle 280)
     (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 280))
   ) 
 
@@ -819,7 +820,7 @@ createCornerPointTestR10PosX1PosY10XY350  = TestCase $ assertEqual
     (Point{x_axis=0, y_axis=0, z_axis=0})
     (Radius 10)
     (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 350)))
-    (Quadrant4Angle 350)--(xyQuadrantAngle 350)
+    (Angle 350)--(xyQuadrantAngle 350)
     (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 350))
   ) 
 
@@ -866,7 +867,7 @@ createCornerPoint10DegTestSlopedMaleLegos  = TestCase $ assertEqual
       (Point{x_axis=0, y_axis=0, z_axis=0})
       (Radius 10)
       (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 0)))
-      (xyQuadrantAngle 0)
+      (Angle 0)
       (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 0)))
       +++
       B4 (Point{x_axis=0, y_axis=0, z_axis=0})
@@ -878,7 +879,7 @@ createCornerPoint10DegTestSlopedMaleLegos  = TestCase $ assertEqual
       (Point{x_axis=0, y_axis=0, z_axis=0})
       (Radius 10)
       (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 10)))
-      (xyQuadrantAngle 10)
+      (Angle 10)
       (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 10)))
       +++
       B1 (Point{x_axis=0, y_axis=0, z_axis=0})
@@ -892,7 +893,7 @@ createCornerPoint10DegTestSlopedMaleLegos  = TestCase $ assertEqual
       (Point{x_axis=0, y_axis=(-5), z_axis=9})
       (Radius 10)
       (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 10) (xyQuadrantAngle 0)))
-      (xyQuadrantAngle 0)
+      (Angle 0)
       (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 10) (xyQuadrantAngle 0)))
       +++
       B3 (Point{x_axis=0, y_axis=(-5), z_axis=9})
@@ -904,7 +905,7 @@ createCornerPoint10DegTestSlopedMaleLegos  = TestCase $ assertEqual
       (Point{x_axis=0, y_axis=(-5), z_axis=9})
       (Radius 10)
       (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 10) (xyQuadrantAngle 10)))
-      (xyQuadrantAngle 10)
+      (Angle 10)
       (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 10) (xyQuadrantAngle 10)))
       +++
       B2 (Point{x_axis=0, y_axis=(-5), z_axis=9})
@@ -925,7 +926,7 @@ createCornerPointTest90DegSlopedMaleLegos  = TestCase $ assertEqual
       (Point{x_axis=0, y_axis=0, z_axis=0})
       (Radius 10)
       (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 80)))
-      (xyQuadrantAngle 80)
+      (Angle 80)
       (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 80)))
       +++
       B4 (Point{x_axis=0, y_axis=0, z_axis=0})
@@ -937,7 +938,7 @@ createCornerPointTest90DegSlopedMaleLegos  = TestCase $ assertEqual
       (Point{x_axis=0, y_axis=0, z_axis=0})
       (Radius 10)
       (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 90)))
-      (xyQuadrantAngle 90)
+      (Angle 90)
       (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 90)))
       +++
       B1 (Point{x_axis=0, y_axis=0, z_axis=0})
@@ -951,7 +952,7 @@ createCornerPointTest90DegSlopedMaleLegos  = TestCase $ assertEqual
       (Point{x_axis=0, y_axis=(-5), z_axis=9})
       (Radius 10)
       (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 10) (xyQuadrantAngle 80)))
-      (xyQuadrantAngle 80)
+      (Angle 80)
       (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 10) (xyQuadrantAngle 80)))
       +++
       B3 (Point{x_axis=0, y_axis=(-5), z_axis=9})
@@ -963,7 +964,7 @@ createCornerPointTest90DegSlopedMaleLegos  = TestCase $ assertEqual
       (Point{x_axis=0, y_axis=(-5), z_axis=9})
       (Radius 10)
       (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 10) (xyQuadrantAngle 90)))
-      (xyQuadrantAngle 90)
+      (Angle 90)
       (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 10) (xyQuadrantAngle 90)))
       +++
       B2 (Point{x_axis=0, y_axis=(-5), z_axis=9})
