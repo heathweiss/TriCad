@@ -6,14 +6,13 @@ Do this by mapping transposeCornerPointsZ to a list of heights that will slope t
 Later, this could be better done by adding a height factor to the createCornerPoint.
 -}
 {-# LANGUAGE ParallelListComp #-}
-module HeelGenerators.BlackRunnerToe(blackRunnerToeStlFile, blackRunnerToeDebug) where
+module HeelGenerators.BlackRunnerToe(blackRunnerToeStlFile, blackRunnerToeDebug, treadRadius) where
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
   createBottomFaces,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
-  radiusAdjustedForZslope,
   xyQuadrantAngle,
   QuadrantAngle(..),
   createCornerPoint,

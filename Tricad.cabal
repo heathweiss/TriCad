@@ -25,7 +25,8 @@ library
                    Tests.MathTest, Tests.MathPolarTest, 
                    Tests.TransformTest, Tests.JsonTest, Tests.ParseAttoTest
                    -- HeelGenerators
-                   HeelGenerators.BlackRunnerHeel, HeelGenerators.SandalsToe
+                   HeelGenerators.BlackRunnerHeel,  HeelGenerators.BlackRunnerToe,
+                   HeelGenerators.SandalsToe, HeelGenerators.KeenToe
                    -- Sockets
                    Sockets.Bicycle
                    -- Misc Shapes
