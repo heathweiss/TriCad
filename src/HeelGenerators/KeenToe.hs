@@ -31,9 +31,24 @@ import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs
 Will attach directly to the sole of the keen shoe. It will be ~4mm bigger, so that it can go up around the shoe, with the shoe going in
 by grinding into the honeycomb fill. Give it 4 perimeter layers
 -}
-solePlateDebug = [CubeName "adaptorCubes" | x <- [1..]]
+
+writeSolePlateToStlFile :: IO()
+writeSolePlateToStlFile  =  writeFile "src/Data/temp.stl" $ stlShapeToText solePlateStlFile
+
+solePlateStlFile = newStlShape "KeenSolePlateAdaptor"  $  solePlateTriangles
+
+solePlateTriangles =
+   [FacesBackBottomFrontTop | x <- [1,2..36]]
+   +++^
+   solePlateCubes
+
+solePlateDebug = [CubeName "solePlateCube" | x <- [1..]]
    +++^?
-   solePlateBtmFaces
+   solePlateCubes
+
+solePlateCubes = solePlateTopFaces ++++ solePlateBtmFaces
+
+solePlateTopFaces = map ((transposeZ (+30)) .  upperFaceFromLowerFace) solePlateBtmFaces
 
 solePlateBtmFaces = map (lowerFaceFromUpperFace . extractTopFace) adaptorCubes
 ---------------------------------------------------------------------------- create the shoe sole to tread adaptor ----------------------------------
