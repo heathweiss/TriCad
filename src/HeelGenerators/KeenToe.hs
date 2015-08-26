@@ -20,17 +20,26 @@ import TriCad.StlCornerPoints((+++^))
 import TriCad.StlBase (StlShape(..), newStlShape, stlShapeToText)
 import TriCad.StlFileWriter(writeStlToFile)
 import TriCad.CornerPointsFaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace ) 
-import TriCad.CornerPointsFaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine)
+import TriCad.CornerPointsFaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace,
+                                          bottomFrontLineFromBackBottomLine, lowerFaceFromUpperFace)
 import TriCad.CornerPointsTranspose ( transposeZ, transposeX, transposeY)
 import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
 
 
 -------------------------------------------------------------------------- create the sole riser ------------------------------------------------
 {-
-Will be sloped on top
+Will attach directly to the sole of the keen shoe. It will be ~4mm bigger, so that it can go up around the shoe, with the shoe going in
+by grinding into the honeycomb fill. Give it 4 perimeter layers
 -}
+solePlateDebug = [CubeName "adaptorCubes" | x <- [1..]]
+   +++^?
+   solePlateBtmFaces
 
+solePlateBtmFaces = map (lowerFaceFromUpperFace . extractTopFace) adaptorCubes
 ---------------------------------------------------------------------------- create the shoe sole to tread adaptor ----------------------------------
+{-
+This will attach directly to the tread, then adapt up to the shape of the sole.
+-}
 adaptorTopOrigin = (Point{x_axis=0, y_axis=(0), z_axis=25})
 adaptorBtmOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
 
@@ -112,65 +121,107 @@ angles = [0,10..380]
 keyRadius = map (\(Radius x) -> (Radius (x * 0.5))) soleRadius 
 
 --radius of the tread of the original keen shoe
-soleRadius = --  map (\(Radius x) -> Radius (x * 0.9))
-    [Radius 54,--0
-     Radius 57,--1
-     Radius 58,--2
-     Radius 57,--3
-     Radius 54,--4
-     Radius 52, --5
-     Radius 49,--6
-     Radius 47,--7
-     Radius 45,--8
-     Radius 45,--9
-     Radius 46,--10
+soleRadius =   map (\(Radius x) -> Radius (x + 4))
+    [Radius 46,--0
+     Radius 47,--1
+     Radius 47,--2
+     Radius 47,--3
+     Radius 47,--4
+     Radius 46,--5
+     Radius 45,--6
+     Radius 44,--7
+     Radius 44,--8
+     Radius 44,--9
+     Radius 47,--10
+     Radius 49,--11
+     Radius 52,--12
+     Radius 41,--13
+     Radius 35,--14
+     Radius 32,--15
+     Radius 30,--16
+     Radius 30,--17
+     Radius 30, --18 180 degrees
+     Radius 31, --17
+     Radius 33, --16
+     Radius 37,--15
+     Radius 43,--14
+     Radius 56,--13
+     Radius 52,--12
      Radius 47,--11
-     Radius 49,--12
-     Radius 52, --13
-     Radius 59,--14
-     Radius 68,--15
-     Radius 81,--16
-     Radius 77,--17
-     Radius 75, --18 180 degrees
-     Radius 77, --17
-     Radius 81, --16
-     Radius 67,--15
-     Radius 60,--14
-     Radius 55,--13
-     Radius 50,--12
-     Radius 45,--11
-     Radius 42,--10
-     Radius 41,--9
-     Radius 40,--8
+     Radius 44,--10
+     Radius 42,--9
+     Radius 41,--8
      Radius 40,--7
      Radius 40,--6
-     Radius 41,--5
-     Radius 43,--4
-     Radius 46,--3
-     Radius 49,--2
-     Radius 52,--1
-     Radius 54--0
+     Radius 40,--5
+     Radius 41,--4
+     Radius 42,--3
+     Radius 43,--2
+     Radius 45,--1
+     Radius 46--0
     ] 
 
-
-
+{-
+This was measured with cardboard cutouts, to fit inside the tread.
+-}
+treadRadius = 
+    [
+     Radius 45,--0
+     Radius 46,--1
+     Radius 47,--2
+     Radius 45,--3
+     Radius 43,--4
+     Radius 41, --5
+     Radius 40,--6
+     Radius 39,--7
+     Radius 39,--8
+     Radius 39,--9
+     Radius 40,--10
+     Radius 43,--11
+     Radius 47,--12
+     Radius 52, --13
+     Radius 62,--14
+     Radius 76,--15
+     Radius 79,--16
+     Radius 77,--17
+     Radius 73, --18 180 degrees
+     Radius 78, --17
+     Radius 84, --16
+     Radius 64,--15
+     Radius 54,--14
+     Radius 46,--13
+     Radius 42,--12
+     Radius 38,--11
+     Radius 36,--10
+     Radius 34,--9
+     Radius 34,--8
+     Radius 34,--7
+     Radius 35,--6
+     Radius 37,--5
+     Radius 39,--4
+     Radius 42,--3
+     Radius 45,--2
+     Radius 45,--1
+     Radius 45--0
+    ]
 --the center val is the 180 deg val, which does not get mirrored.
 --Create the full 360 deg radius set, by mirroring the first half, and adding in the 180 degree va..
-treadRadius = concat [treadHalfRadius, [Radius (76 * 1 )], reverse treadHalfRadius]
+--treadRadius = concat [treadHalfRadius, [Radius (76 * 1 )], reverse treadHalfRadius]
 
 
 --the final radii, after adustments
-treadHalfRadius = zipWith (adjustRadius)  treadAdjFactors treadHalfRadiusAsMeasured
+--treadHalfRadius = zipWith (adjustRadius)  treadAdjFactors treadRadiusAsMeasured
 
-adjustRadius ::  (Double -> Double) -> Radius -> Radius
-adjustRadius f (Radius rad)  = Radius (f rad)  
+--adjustRadius ::  (Double -> Double) -> Radius -> Radius
+--adjustRadius f (Radius rad)  = Radius (f rad)  
 
 --the amount that most of the radii will be adjusted by.
-treadRadiusAdjustmentFactor = 0.85
+--treadRadiusAdjustmentFactor = 0.85
 
 --as measured on the bottom of the tread, to the very outside of the grips.
 --It is symmetrical, so only measure half. 180 degrees is put in separate so it does not get mirrored.
-treadHalfRadiusAsMeasured = --map (\(Radius x) -> Radius (x * treadRadiusAdjustmentFactor))
+{-
+treadRadiusAsMeasured = --map (\(Radius x) -> Radius (x * treadRadiusAdjustmentFactor))
  [
   Radius 56,--0
   Radius 57,--1
@@ -191,8 +242,9 @@ treadHalfRadiusAsMeasured = --map (\(Radius x) -> Radius (x * treadRadiusAdjustm
   Radius 81,--16
   Radius 77--17
  ]
-
+-}
 --create an array of adjustment factors, to the radii can be fine tuned.
+{-
 treadAdjFactors =
   [
   (*1.05),--0
@@ -214,5 +266,5 @@ treadAdjFactors =
   (*1),--16
   (*1)--17
   ]
-
+-}
 
