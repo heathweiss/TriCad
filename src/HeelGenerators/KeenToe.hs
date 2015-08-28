@@ -55,7 +55,7 @@ solePlateBtmFaces = map (lowerFaceFromUpperFace . extractTopFace) adaptorCubes
 {-
 This will attach directly to the tread, then adapt up to the shape of the sole.
 -}
-adaptorTopOrigin = (Point{x_axis=0, y_axis=(0), z_axis=25})
+adaptorTopOrigin = (Point{x_axis=0, y_axis=(0), z_axis=35})
 adaptorBtmOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
 
 writeAdaptorToStlFile :: IO()

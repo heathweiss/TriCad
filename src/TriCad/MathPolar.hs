@@ -279,6 +279,22 @@ setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of
                                      Quadrant3 -> val
                                      Quadrant4 -> negate val
 
+--  ==========================================================================================================================================================================================
+setZPolarityForQuadrant :: QuadrantAngle -> Slope -> Double -> Double
+setZPolarityForQuadrant angle slope val =
+  case getCurrentQuadrant angle of
+         Quadrant1 -> case slope of
+           (PosXYSlope _) ->  val
+           otherwise  -> negate val
+         Quadrant2 -> case slope of
+           (PosXYSlope _) -> negate val
+           otherwise  -> val
+         Quadrant3 ->  case slope of
+           (PosXYSlope _) -> val
+           otherwise  -> negate val
+         Quadrant4 ->  case slope of
+           (PosXYSlope _) -> negate val
+           otherwise  -> val
 
 {-
 Change slope and xy angle into a single Slope value.
@@ -310,7 +326,12 @@ createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)
                                        adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle  xyAngle))))-- tested good
                                     
                                     (--z:
-                                     z_axis origin - horizRadius * (sinDegrees (slope)))
+                                     --z_axis origin - horizRadius * (sinDegrees (slope)))
+                                     {-
+                                      setZPolarityForQuadrant :: QuadrantAngle -> Slope -> Double -> Double
+                                      setZPolarityForQuadrant angle slope val =
+                                      -}
+                                     z_axis origin + (setZPolarityForQuadrant (Angle xyAngle) (NegXYSlope slope) (horizRadius * (sinDegrees (slope)))))
                                   )
 
 createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
@@ -326,7 +347,8 @@ createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  
                                                                                                                                       
                                     
                                     (--z:
-                                     z_axis origin + horizRadius * (sinDegrees (slope)))
+                                     --z_axis origin + horizRadius * (sinDegrees (slope)))
+                                      z_axis origin + (setZPolarityForQuadrant (Angle xyAngle) (PosXYSlope slope) (horizRadius * (sinDegrees (slope)))))
                                   )
 {------------------------------------------------------------- createPerimeterBottomFaces--------------------------------------------
 
