@@ -15,7 +15,7 @@ import TriCad.MathPolar(
   flatYSlope,
   )
 import TriCad.Points(Point(..))
-import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..),(+++>>))
 import TriCad.StlCornerPoints((+++^))
 import TriCad.StlBase (StlShape(..), newStlShape, stlShapeToText)
 import TriCad.StlFileWriter(writeStlToFile)
@@ -25,6 +25,65 @@ import TriCad.CornerPointsFaceConversions(lowerFaceFromUpperFace, backBottomLine
 import TriCad.CornerPointsTranspose ( transposeZ, transposeX, transposeY)
 import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
 
+
+-------------------------------------------------------------------------- tread attachment and adaptor ----------------------------------------
+{-
+Attaches to the tread.
+Keep the shape of the tread for 1 horizontal cm then convert to the shape of the sole attachment.
+-}
+
+writeTreadToStlFile :: IO()
+writeTreadToStlFile  =  writeFile "src/Data/temp.stl" $ stlShapeToText treadStlFile
+
+treadStlFile = newStlShape "KeenHeelTread"  $  treadTriangles
+
+treadTriangles =
+   (
+   [FacesBackFrontTop | x <- [1,2..36]]
+   +++^
+   treadTopCubes
+  )
+  ++
+  (
+   [FacesBackBottomFront | x <- [1,2..36]]
+   +++^
+   treadBtmCubes
+  )
+
+treadTopCubes =
+  --front line
+    (
+      map (extractFrontTopLine) (createTopFaces treadTopOrigin soleRadius angles flatXSlope flatYSlope)
+      ++++
+      --back line
+      map (backTopLineFromFrontTopLine . extractFrontTopLine) (createTopFaces treadTopOrigin keyRadius angles flatXSlope flatYSlope))
+      ++++
+     --the top faces of the btm cubes
+    (
+      map (lowerFaceFromUpperFace .  extractTopFace) treadBtmCubes
+    )
+  
+
+treadBtmCubes  =
+  map ((transposeZ (+ 10)) . upperFaceFromLowerFace  ) treadBtmFaces
+  ++++
+  treadBtmFaces
+
+
+treadBtmFaces = 
+  --front line
+  map (extractBottomFrontLine) (createBottomFaces treadBtmOrigin treadRadius angles flatXSlope flatYSlope)
+  ++++
+  --back line
+  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces treadBtmOrigin keyRadius angles flatXSlope flatYSlope)
+
+treadDebug = 
+   [CubeName "treadCubes" | x <- [1..]]
+   +++^?
+   treadTopCubes
+
+treadTopOrigin = (Point{x_axis=0, y_axis=0, z_axis=30})
+treadBtmOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
 -------------------------------------------------------------------------  sole attachment -------------------------------------------------------
 {-
 
@@ -60,14 +119,7 @@ adaptorTopFaces =
     ++++
     --back line
     map (backTopLineFromFrontTopLine . extractFrontTopLine) (createTopFaces adaptorTopOrigin keyRadius angles flatXSlope adaptorSlope)
-  {-
-shoeSlopeTopFaces =
-    --front line
-    map (extractFrontTopLine) (createTopFaces shoeSlopeOrigin braceRadius angles flatXSlope (NegYSlope 20))
-    ++++
-    --back line
-    map (backTopLineFromFrontTopLine . extractFrontTopLine) (createTopFaces shoeSlopeOrigin treadInnerRadius angles flatXSlope (NegYSlope 20))
--}
+
 
 adaptorBtmFaces = 
   --front line
@@ -76,11 +128,20 @@ adaptorBtmFaces =
   --back line
   map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces adaptorBtmOrigin keyRadius angles flatXSlope flatYSlope)
 
-adaptorTopOrigin = (Point{x_axis=0, y_axis=0, z_axis=50})
+adaptorTopOrigin = (Point{x_axis=0, y_axis=0, z_axis=30})
 adaptorBtmOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
 
+--25 degrees is the original value on oversized print
 adaptorSlope = NegYSlope (-25)
 --------------------------------------------------------------------------- create the keyway ---------------------------------------------------------
+{-
+Only extend it 1 cm into each piece, to minimize weight.
+
+The top needs to be sloped the same as the sole, as this causes the key to slope the same as the keyway in the sole. Use adaptorSlope.
+
+Will need to use the same height for the sloped section, as the sole had, so the slope is the same. Will stop the print when I have the
+desired 1 cm of top section.
+-}
 writeKeyToStlFile :: IO()
 writeKeyToStlFile  =  writeFile "src/Data/temp.stl" $ stlShapeToText keyStlFile
 
@@ -111,7 +172,8 @@ keyRadius = map (\(Radius x) -> (Radius (x * 0.5))) soleRadius
 
 --radius of the tread of the original keen shoe.
 --Increase it by 4 so that it will go up around the sides of the shoe for better attachment.
-soleRadius =   map (\(Radius x) -> Radius (x + 4))
+  
+soleRadius =  -- map (\(Radius x) -> Radius (x + 4))
     [Radius 38,--0
      Radius 38,--1
      Radius 38,--2
@@ -190,5 +252,5 @@ treadRadius =   map (\(Radius x) -> Radius (x + 4))
      Radius 37,--3
      Radius 37,--2
      Radius 38,--1
-     Radius 38--0
+     Radius 38  --0
     ] 
