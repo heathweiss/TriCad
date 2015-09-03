@@ -2,7 +2,7 @@
 For creating hexahedrons such as cubes, rectangular cubes, etc.
 -}
 
-module TriCad.Shapes.Cubical(hello, rectangularCube) where
+module TriCad.Shapes.Cubical(rectangularCube) where
 import TriCad.CornerPoints(CornerPoints(..),(+++),(+++$),(+++>>))
 import TriCad.Points (Point(..))
 import  TriCad.CornerPointsTranspose (transposeZ,transposeX,transposeY)
@@ -16,6 +16,8 @@ import  TriCad.CornerPointsFaceConversions(
   backBottomLineFromBottomFrontLine,
   frontTopLineFromBackTopLine,
   bottomFrontLineFromBackBottomLine)
+import  TriCad.Math(atanDegrees)
+
 
 type ZHeight = Double
 type XWidth = Double
@@ -44,6 +46,17 @@ rectangularCube height width length =
     (\btmFace -> (upperFaceFromLowerFace  ( transposeZ (+ height) btmFace)))
   
    
+---------------------------------------------------------------- polar rectanlge -------------------------------------------------------------------
+{-
+Create a rectangular cube, using the polar coordinate system used by TriCad.MathPolar module.
+This will allow the recangle to be created from a center point, thus allowing for nested rectangles, as would be used
+when a perimeter is desired.
 
-hello = do
-  putStrLn "hello from cubical"
+Known use:
+Create a rectangle with an outer wall, and inner wall, so that the center could be drilled out and tapped for a bolt.
+
+
+polarRectangularCube
+-}
+
+quad1Angle length width = atan (length/2) (width /s) 

@@ -31,6 +31,8 @@ library
                    Sockets.Bicycle
                    -- Misc Shapes
                    MiscShapes.RvVentCaps, MiscShapes.ScanRaw
+                   --adaptors
+                   Adaptors.HockeyStick
                    --Shapes
                    TriCad.Shapes.Cylindrical, TriCad.Shapes.Cubical
                    --Scanning
