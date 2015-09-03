@@ -286,7 +286,7 @@ setZPolarityForQuadrant slope val =
            (PosXYSlope _) ->  val
            otherwise  -> negate val
         
--}
+
 {-
 Change slope and xy angle into a single Slope value.
 Change radius into a Radius
@@ -297,6 +297,9 @@ cPoint : (Point-> CornerPoints)
 
 adjustedRadius: Radius: 
 -The radius, after being adjusted for slope
+-Should get rid of this, and do the calculations inside createCornerPoint.
+ This would simplify calling this function.
+ It was used before for pattern matching, but that is no longer done.
 
 slope: Slope:
 The slope, having already been adjusted for x/y slopes and xy quadrant
@@ -306,34 +309,23 @@ orign: Point
 
 -}
 createCornerPoint :: (Point-> CornerPoints) -> Point -> Radius -> Radius ->  QuadrantAngle -> Slope -> CornerPoints
-createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
+createCornerPoint cPoint origin (Radius horizRadius) (adjustedRadius)  (Angle xyAngle) (slope) = cPoint (Point 
                                     (--x:
                                      x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
-                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
+                                      (radius adjustedRadius) * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
                                     
                                     
                                     (--y:
                                      y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
-                                       adjustedRadius * (cosDegrees  (quadAngle $ xyQuadrantAngle  xyAngle))))-- tested good
+                                       (radius adjustedRadius) * (cosDegrees  (quadAngle $ xyQuadrantAngle  xyAngle))))-- tested good
                                     
                                     (--z:
-                                      z_axis origin + (setZPolarityForQuadrant (NegXYSlope slope) (horizRadius * (sinDegrees (slope)))))
+                                      case slope of
+                                        NegXYSlope slope' -> z_axis origin + (setZPolarityForQuadrant (NegXYSlope slope') (horizRadius * (sinDegrees (slope'))))
+                                        PosXYSlope slope' -> z_axis origin + (setZPolarityForQuadrant (PosXYSlope slope') (horizRadius * (sinDegrees (slope'))))
+                                    )
                                   )
 
-createCornerPoint cPoint origin (Radius horizRadius) (UpRadius adjustedRadius)  (Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
-                                    
-                                    (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
-                                      adjustedRadius * (sinDegrees  (quadAngle $ xyQuadrantAngle  xyAngle))))--tested good
-                                    
-                                    
-                                    (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
-                                       adjustedRadius * (cosDegrees  ( quadAngle $ xyQuadrantAngle   xyAngle) )))-- tested good
-                                                                                                                                      
-                                    
-                                    ( z_axis origin + (setZPolarityForQuadrant (PosXYSlope slope) (horizRadius * (sinDegrees (slope)))))
-                                  )
 {------------------------------------------------------------- createPerimeterBottomFaces--------------------------------------------
 
 -}
