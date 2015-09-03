@@ -59,4 +59,4 @@ Create a rectangle with an outer wall, and inner wall, so that the center could 
 polarRectangularCube
 -}
 
-quad1Angle length width = atan (length/2) (width /s) 
+--quad1Angle length width = atan (length/2) (width /s) 

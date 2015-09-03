@@ -59,6 +59,7 @@ mathPolarTestDo = do
   runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY350
   runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY350
   runTestTT slopeForXYAngleAndYslopeTestNeedMoreTesting
+  runTestTT slopeForXYAngleAndYslopeTestXPos0YNeg10XY100
  
   
   runTestTT radiusAdjustedForZslopeTestRad10PosX10PosY0XY10
@@ -246,6 +247,9 @@ slopeForXYAngleAndYslopeTestXPos1YPos10XY100 = TestCase $ assertEqual
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY100 = TestCase $ assertEqual 
   "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 100)  )
+-- ==================================================================================================================================================================================================
+slopeForXYAngleAndYslopeTestXPos0YNeg10XY100 = TestCase $ assertEqual 
+  "slopeForXYAngleAndYslopeTestXPos0YNeg10XY100" (NegXYSlope {angle = 1.7364817766693041}) (slopeAdjustedForVerticalAngle (PosXSlope 0) (NegYSlope 10) (xyQuadrantAngle 100)  )
 
 {-
 x1 = sin(100) * 1 = 0.984807753012 pos

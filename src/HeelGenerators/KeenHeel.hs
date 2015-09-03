@@ -132,7 +132,7 @@ adaptorTopOrigin = (Point{x_axis=0, y_axis=0, z_axis=30})
 adaptorBtmOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
 
 --25 degrees is the original value on oversized print
-adaptorSlope = NegYSlope (-25)
+adaptorSlope = NegYSlope (25)
 --------------------------------------------------------------------------- create the keyway ---------------------------------------------------------
 {-
 Only extend it 1 cm into each piece, to minimize weight.

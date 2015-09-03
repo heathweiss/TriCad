@@ -13,12 +13,12 @@ It will have the center tapped out for a thread that connects to hose.
 --get outer faces of innerWall, and turn into inner faces
 
 outerWall =
-  [rectangularCube height width length]
+  [rectangularCube height_ width_ length_]
 
 innerWall =
-  [rectangularCube height 2 2]
+  [rectangularCube height_ 2 2]
   
 --height width length
-height = 30
-width = 12
-length = 14
+height_ = 30
+width_ = 12
+length_ = 14
