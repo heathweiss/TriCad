@@ -300,6 +300,7 @@ adjustedRadius: Radius:
 -Should get rid of this, and do the calculations inside createCornerPoint.
  This would simplify calling this function.
  It was used before for pattern matching, but that is no longer done.
+ However, will need to pass in xSlope and ySlope, instead of just the xySlope
 
 slope: Slope:
 The slope, having already been adjusted for x/y slopes and xy quadrant
