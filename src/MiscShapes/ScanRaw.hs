@@ -30,7 +30,7 @@ import Data.Aeson
 --import Control.Monad
 --import Data.Text as T
 import Scan.Json()
-import Scan.ParseAtto( getRawMultiDegreeScan, rawScanToScan, RawScan(..))
+import Scan.ParseAtto( getRawMultiDegreeScan, rawScanToScan, PixelValueScan(..))
 import Data.Attoparsec.Char8
 
 --create a [Word8] for: Right(B.pack $ strToWord8s)

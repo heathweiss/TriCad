@@ -1,7 +1,7 @@
 module Tests.ParseAttoTest(parseAttoTestDo) where
 import Test.HUnit
-import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan, RawSingleDegreeScan(..),
-                      getRawMultiDegreeScan, RawScan(..), rawScanToScan)
+import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan, PixelValueSingleDegreeScan(..),
+                      getRawMultiDegreeScan, PixelValueScan(..), rawScanToScan)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import Control.Applicative
@@ -84,13 +84,13 @@ getADegree = TestCase $ assertEqual
  
 getADegreeThenARowOfInts = TestCase $ assertEqual
   "get a degree, then a row of ints"
-  (Right (RawSingleDegreeScan {rawDegree=1, rawRadii= [[10.0,20.0],[10.0,20.0]]}) )
+  (Right (PixelValueSingleDegreeScan {rawDegree=1, rawRadii= [[10.0,20.0],[10.0,20.0]]}) )
   (Right (B.pack $strToWord8s "1 10 20;10 20")  >>=  parseOnly  getRawDegreeScan)
 
 getACompleteRawScan = TestCase $ assertEqual
   "get a complete scan"
-  (Right(RawScan {rawDegrees=[(RawSingleDegreeScan {rawDegree=1, rawRadii= [[10.0,20.0],[10.0,20.0]]}),
-                              (RawSingleDegreeScan {rawDegree=2, rawRadii= [[1.0,2.0],[3.0,4.0]]})
+  (Right(PixelValueScan {rawDegrees=[(PixelValueSingleDegreeScan {rawDegree=1, rawRadii= [[10.0,20.0],[10.0,20.0]]}),
+                              (PixelValueSingleDegreeScan {rawDegree=2, rawRadii= [[1.0,2.0],[3.0,4.0]]})
                              ]}))
   (Right (B.pack $strToWord8s "1 10 20;10 20$2 1 2;3 4")  >>=  parseOnly  getRawMultiDegreeScan)
 
