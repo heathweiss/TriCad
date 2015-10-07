@@ -6,7 +6,7 @@ import TriCad.MathPolar(
   createLeftFaces ,
   Slope(..),
   Radius(..),
-  Scan(..),
+  MultiDegreeRadii(..),
   SingleDegreeRadii(..),
   flatXSlope,
   flatYSlope,
@@ -47,7 +47,7 @@ parseRawDataToScanAndSaveToJson  = do
        scan = rawScanToScan "myScan" (average . minValueIndices 75) scanRaw  >>= reduceScanRows 10
    case (scan) of
     Left msg -> putStrLn msg
-    Right (Scan name degrees_) -> BL.writeFile "src/Data/scanFullData.json" $ encode $ Scan name degrees_
+    Right (MultiDegreeRadii name degrees_) -> BL.writeFile "src/Data/scanFullData.json" $ encode $ MultiDegreeRadii name degrees_
 
    putStrLn "done" 
 
@@ -64,7 +64,7 @@ parseRawDataToScanWriteStlFileWithParseAtto =   do
        scan = rawScanToScan "myScan" (average . minValueIndices 75) scanRaw  >>= reduceScanRows 10
    case (scan) of
     Left msg -> putStrLn msg
-    Right (Scan name degrees_) -> writeStlFileFromScan $ Scan name degrees_
+    Right (MultiDegreeRadii name degrees_) -> writeStlFileFromScan $ MultiDegreeRadii name degrees_
 
    putStrLn "done"
 
@@ -79,7 +79,7 @@ parseCannedRawDataToScanWriteStlFileWithParseAtto = do
 
    case (scan) of
     Left msg -> putStrLn msg
-    Right (Scan name degrees_) -> writeStlFileFromScan $ Scan name degrees_
+    Right (MultiDegreeRadii name degrees_) -> writeStlFileFromScan $ MultiDegreeRadii name degrees_
 
    putStrLn "done"
   
@@ -87,7 +87,7 @@ parseCannedRawDataToScanWriteStlFileWithParseAtto = do
 readTrianglesFromJsonFileAndWriteToStlFile = do
   contents <- BL.readFile "src/Data/scanFullData.json"
   case (decode contents) of 
-      Just (Scan name degrees) -> writeStlFileFromScan (Scan name degrees)
+      Just (MultiDegreeRadii name degrees) -> writeStlFileFromScan (MultiDegreeRadii name degrees)
       Nothing                  -> putStrLn "Nothing"
 
 

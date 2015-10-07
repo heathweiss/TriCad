@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Scan.Json() where
-import TriCad.MathPolar(Radius(..),SingleDegreeRadii(..), Scan(..))
+import TriCad.MathPolar(Radius(..),SingleDegreeRadii(..), MultiDegreeRadii(..))
 import Data.Aeson
 import Control.Applicative
 import Control.Monad
@@ -22,12 +22,12 @@ Could come in handy later on, if I want to store in Mongo.
 If not for mongo, why not just use the file name.
 The stlBuilder could use it for naming the stl object, which is required by the stl format.
 -} 
-instance ToJSON Scan where
-  toJSON (Scan name degrees) = object ["name" .= name, "degrees" .= degrees]
+instance ToJSON MultiDegreeRadii where
+  toJSON (MultiDegreeRadii name degrees) = object ["name" .= name, "degrees" .= degrees]
 
  
-instance FromJSON Scan where
-  parseJSON (Object v) = Scan <$>
+instance FromJSON MultiDegreeRadii where
+  parseJSON (Object v) = MultiDegreeRadii <$>
                          v .: "name" <*>
                          v .: "degrees"
   parseJSON _          = mzero
@@ -68,7 +68,7 @@ create/overwrites the file haskell_project/TriCad/scan.json
 -}
 writeToFileScan = do
   BL.writeFile "src/Data/scan.json" 
-     (encode (Scan
+     (encode (MultiDegreeRadii
                { name = "myScan",
                  degrees =
                   [
@@ -85,7 +85,7 @@ depends on the file  written with writeToFileScan
 readFromFileScan = do
   contents <- BL.readFile "src/Data/scan.json"
   case (decode contents) of
-      Just (Scan name degrees) -> print $ show $  (Scan name degrees)
-      Nothing                  -> putStrLn "Nothing"
+      Just (MultiDegreeRadii name degrees) -> print $ show $  (MultiDegreeRadii name degrees)
+      Nothing                              -> putStrLn "Nothing"
   
   

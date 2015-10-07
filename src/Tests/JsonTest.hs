@@ -5,7 +5,7 @@ import TriCad.MathPolar(Radius())
 import Scan.Json
 import Data.Aeson
 import qualified Data.ByteString.Lazy as BS
-import TriCad.MathPolar(Radius(..),SingleDegreeRadii(..),Scan(..))
+import TriCad.MathPolar(Radius(..),SingleDegreeRadii(..),MultiDegreeRadii(..))
 
 
 jsonTestDo = do
@@ -21,7 +21,7 @@ scanEncodeTest = TestCase $ assertEqual
   "encode scan"
   ( "{\"degrees\":[{\"radii\":[{\"radius\":12},{\"radius\":120}],\"degree\":0.0},{\"radii\":[{\"radius\":120},{\"radius\":1200}],\"degree\":10}],\"name\":\"myScan\"}" )
 
-  (encode (Scan
+  (encode (MultiDegreeRadii
                { name = "myScan",
                  degrees =
                   [
@@ -37,7 +37,7 @@ scanEncodeTest = TestCase $ assertEqual
 scanDecodeTest = TestCase $ assertEqual
   "decode scan"
   (Just
-       (Scan
+       (MultiDegreeRadii
                { name = "myScan",
                  degrees =
                   [
@@ -47,7 +47,7 @@ scanDecodeTest = TestCase $ assertEqual
                }
           )
   )
-  ((decode  "{\"degrees\":[{\"radii\":[{\"radius\":12},{\"radius\":120}],\"degree\":0},{\"radii\":[{\"radius\":120},{\"radius\":1200}],\"degree\":10}],\"name\":\"myScan\"}"     ) :: Maybe Scan)
+  ((decode  "{\"degrees\":[{\"radii\":[{\"radius\":12},{\"radius\":120}],\"degree\":0},{\"radii\":[{\"radius\":120},{\"radius\":1200}],\"degree\":10}],\"name\":\"myScan\"}"     ) :: Maybe MultiDegreeRadii)
 
 ------------------------- degree -------------------------------------------------
 degreeEncodeTest = TestCase $ assertEqual

@@ -24,12 +24,8 @@ the use of TriCad.MathPolar module.
 
 module Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows, RowReductionFactor(..)) where
 import qualified Data.List as L
-import TriCad.MathPolar( Radius(..), Scan(..), SingleDegreeRadii(..))
+import TriCad.MathPolar( Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
 import TriCad.Types(PixelIndice, PixelValue)
-
-
-
-
 
 --type ThreshholdValue = Double
 {- |Returns  [PixelIndice] of all values <= PixelValue threshold value.
@@ -62,7 +58,7 @@ Will return a Left msg if:
 
 id: 1
 -}
-reduceScanRows :: Int -> Scan -> Either String Scan
+reduceScanRows :: Int -> MultiDegreeRadii -> Either String MultiDegreeRadii
 reduceScanRows 0 _ = Left "Can't use 0 for row reduction"
 reduceScanRows reduceFactor scan
   | reduceFactor > (length $ radii $ head $ degrees scan)  = Left "reduction factor > number of rows"

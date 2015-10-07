@@ -23,7 +23,7 @@ import Control.Applicative
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BS
 import Scan.Transform(minValueIndices, average)
-import TriCad.MathPolar(Scan(..),SingleDegreeRadii(..), Radius(..), Degree)
+import TriCad.MathPolar(MultiDegreeRadii(..),SingleDegreeRadii(..), Radius(..), Degree)
 import TriCad.Types(PixelValue(..))
 
 
@@ -60,17 +60,22 @@ that  Either String Scan monad can be used for further work on the data.
 -}
 
 
-{-Take the reduced raw pixel data from 'reduceRadii', add the current degree val, and put into a TriCad.MathPolar.RawSingleDegreeScan.
+{- |Take the reduced raw pixel data from 'reduceRadii', add the current degree val, and put into a TriCad.MathPolar.RawSingleDegreeScan.
 Doing the to every RawSingleDegreeScan will result in the final TriCad.MathPolar.Scan datatype, along with the name.-}
+pixelValuesToRadii :: ([PixelValue] -> Radius) -> PixelValueSingleDegreeScan -> SingleDegreeRadii
+pixelValuesToRadii f inRawDegree = SingleDegreeRadii {degree=(rawDegree inRawDegree), radii=[ f x   | x  <-  rawRadii inRawDegree]}
+{-
 reduceDegreeScan :: ([PixelValue] -> Radius) -> PixelValueSingleDegreeScan -> SingleDegreeRadii
 reduceDegreeScan f inRawDegree = SingleDegreeRadii {degree=(rawDegree inRawDegree), radii=[ f x   | x  <-  rawRadii inRawDegree]}
+
+-}
 {-
 Convert an Either String Scan.ParseAtto.RawScan.  to a Either String TriCad.MathPolar.Scan datatype, so that
 further transformations can be done to it.
 -}
-rawScanToScan :: String -> ([PixelValue] -> Radius) -> Either String PixelValueScan -> Either String Scan
+rawScanToScan :: String -> ([PixelValue] -> Radius) -> Either String PixelValueScan -> Either String MultiDegreeRadii
 rawScanToScan _ _ (Left msg) = Left msg
-rawScanToScan scanName f (Right (PixelValueScan inRawDegrees)) = Right (Scan {name=scanName, degrees=(map (reduceDegreeScan f) inRawDegrees)})
+rawScanToScan scanName f (Right (PixelValueScan inRawDegrees)) = Right (MultiDegreeRadii {name=scanName, degrees=(map (pixelValuesToRadii f) inRawDegrees)})
 
 --------------------------------------------- end: convert RawScan to Scan---------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------
