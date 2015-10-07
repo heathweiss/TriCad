@@ -1,6 +1,7 @@
 module Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows) where
 import qualified Data.List as L
 import TriCad.MathPolar( Radius(..), Scan(..), SingleDegreeScan(..))
+import TriCad.Types(PixelIndice, PixelValue)
 
 {-------------------------------------- overview-----------------------------------------------
 Takes a Scan.ParseAtto.RawScan datatype, and does reductions/tranformations on it, resulting in
@@ -24,28 +25,23 @@ the use of TriCad.MathPolar module.
 
 
 
-{-
-Gets a [Int] of indices of all values <= threshold value.
-
-Used for
-Reduce a row of raw image data, to a [Double] that represents the pixel location for all values <= a threshold value.
-This can be smoothed out further, perhaps with average. 
-
+{- |Returns  [PixelIndice] of all values <= threshold value.
+The [PixelIndice] represents the postion of all pixels with values <= target value.
+This list will still need to be reduced down to a single value, at a later stage.
 -}
-
-
-
-minValueIndices :: Double -> [Double] -> [Int]
+minValueIndices :: Double -> [PixelValue] -> [PixelIndice]
 minValueIndices threshold rawData  = ( L.findIndices) (<=threshold) rawData
 
-{-
-Gets the average of a list of doubles.
+{-|
+Gets the average of a list of PixelIndices.
 Used for:
 Take a list of indices, such as minValueIndices, and give the average indice.
 Pixel indice * mm/indice  == Radius
 -}
-average :: [Int] -> Double
-average list = (fromIntegral $ L.sum list)  / (fromIntegral $ length list)
+average :: [PixelIndice] -> Radius
+average list = let temp = (fromIntegral $ L.sum list)  / (fromIntegral $ length list)
+               in
+                   Radius {radius=temp}
 
 {-Take every xth element from a list.
 Used for: reduce rows from the raw source data, as the usual 480 rows from an

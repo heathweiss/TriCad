@@ -21,6 +21,7 @@ module TriCad.MathPolar(
   QuadrantAngle(..),
   setYPolarityForQuadrant,
   setXPolarityForQuadrant,
+  Degree(..),
   ) where
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
@@ -46,20 +47,22 @@ Functions for calculating the current x and y values adjusted for xy degrees
 
 -}
 
---many shapes, if not most, do not have sloped tops, therefore it is handy
---to have these easily callable.
+-- |Many shapes, if not most, do not have sloped tops, therefore it is handy
+-- to have easily callable no-slope values.
 flatXSlope = PosXSlope 0 
 flatYSlope = PosYSlope 0
 
+-- |Degree of a circle.
+type Degree = Double
+ 
 
+{-|
+Represents a radius, which is what all shapes in math polar, are creates from.
 
-
-{-
-Represents a radius, which is what all shapes in math polar, are create from.
-This is, a set of degrees, each with an associated radius.
 
 Known uses:
 -Everywhere that a CornerPoints is made via MathPolar.
+
 
 -Scan.Parse.Raw uses it for parsing raw image data into json.
 
@@ -69,7 +72,7 @@ Known uses:
 
 -}
 data Radius = Radius {radius :: Double}
-             | DownRadius {radius :: Double}
+             | DownRadius {radius :: Double} -- | Radius slopes down from origin z-axis. 
              | UpRadius {radius :: Double}
    deriving (Show, Eq)
 
@@ -84,7 +87,7 @@ processed into cubes.
 
 Store the processed raw data as json, so the processing only has to be done once.
 -}
-data SingleDegreeScan = SingleDegreeScan {degree::Double, radii::[Radius]}
+data SingleDegreeScan = SingleDegreeScan {degree::Degree, radii::[Radius]}
      deriving (Show, Eq)
 
 {-

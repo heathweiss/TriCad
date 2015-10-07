@@ -48,7 +48,7 @@ readMultiRowsOfInts = TestCase $ assertEqual
 
 readRowOfIntsAndReducetoAverageMinVals = TestCase $ assertEqual
   "read a single row of Ints, and reduce them down to average index of min vals"
-  (1.0)
+  (Radius 1.0)--(1.0)
   ( let parseResults =  (Right(B.pack $ strToWord8s "10 20 30 40")  >>=  parseOnly  getPixelRow)
     in 
         case parseResults of
@@ -58,7 +58,7 @@ readRowOfIntsAndReducetoAverageMinVals = TestCase $ assertEqual
 
 readMultiRowsOfIntsAndReduceToAverageMinVals = TestCase $ assertEqual
  "read multi rows of ints, and reduce them down to average index of min values."
- ([0.5,0.5])
+ ([(Radius 0.5),(Radius 0.5)])
  ( let parseResults = (Right (B.pack $strToWord8s "10 20 30 40;10 20 30 50")  >>=  parseOnly  getPixelRowMulti)
        
    in  case parseResults of
@@ -68,7 +68,7 @@ readMultiRowsOfIntsAndReduceToAverageMinVals = TestCase $ assertEqual
 
 readMultiRowsOfIntsReduceRowsAndReduceToAverageMinVals = TestCase $ assertEqual
  "read multi rows of ints, reduce the # of rows, and then reduce them down to average index of min values."
- ([0.5])
+ ([Radius 0.5])
  ( let parseResults = (Right (B.pack $strToWord8s "10 20 30 40;10 20 30 50")  >>=  parseOnly  getPixelRowMulti)
        
    in  case parseResults of

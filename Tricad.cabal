@@ -19,7 +19,7 @@ library
   exposed-modules: TriCad.Points, TriCad.CornerPoints, TriCad.CornerPointsDebug,
                    TriCad.Math, TriCad.MathPolar, TriCad.CornerPointsFaceConversions,
                    TriCad.CornerPointsFaceExtraction, TriCad.StlBase, TriCad.StlCornerPoints,
-                   TriCad.StlFileWriter, TriCad.CornerPointsTranspose
+                   TriCad.StlFileWriter, TriCad.CornerPointsTranspose, TriCad.Types
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, 

@@ -38,7 +38,7 @@ getArrayOfMinValuePositions = TestCase $ assertEqual
 
 getArrayOfAvgMinValuePositions = TestCase $ assertEqual
  "Get the average min value positions"
- (4.0)
+ (Radius 4.0)
  (let arrayOfInt :: [Double]
       arrayOfInt = [9, 9, 2, 4, 5, 7, 9, 2]
   in  average $ minValueIndices 4 arrayOfInt

@@ -5,7 +5,6 @@ radiansToDegrees,
 sinDegrees,
 cosDegrees,
 atanDegrees) where
-import qualified Data.Decimal as D
 
 
 {-
