@@ -15,7 +15,7 @@ MathPolar.Scan datatype, of the reduced/transformed data.
 -}
 
 module Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan,
-                      getRawMultiDegreeScan, PixelValueScan(..), PixelValueSingleDegreeScan(..), rawScanToScan,
+                      getRawMultiDegreeScan, PixelValueScan(..), SingleDegreePixelValues(..), rawScanToScan,
                       ) where
 import Data.Word
 import Data.Attoparsec.Char8
@@ -38,12 +38,12 @@ spaceSkip = many $ satisfy $ inClass [ ' ' , '\t' ]
 {- |
 All the pixel values captured in all the camera images, for complete scan
 -}
-data PixelValueScan = PixelValueScan {rawDegrees::[PixelValueSingleDegreeScan]}
+data PixelValueScan = PixelValueScan {rawDegrees::[SingleDegreePixelValues]}
           deriving (Show, Eq)
 
 
 -- |All the pixel values as captured by camera, for a single image, which represents a single degree.
-data PixelValueSingleDegreeScan = PixelValueSingleDegreeScan {rawDegree::Degree, rawRadii::[[PixelValue]]}
+data SingleDegreePixelValues = SingleDegreePixelValues {rawDegree::Degree, rawRadii::[[PixelValue]]}
      deriving (Show, Eq)
 
               
@@ -62,7 +62,7 @@ that  Either String Scan monad can be used for further work on the data.
 
 {- |Take the reduced raw pixel data from 'reduceRadii', add the current degree val, and put into a TriCad.MathPolar.RawSingleDegreeScan.
 Doing the to every RawSingleDegreeScan will result in the final TriCad.MathPolar.Scan datatype, along with the name.-}
-pixelValuesToRadii :: ([PixelValue] -> Radius) -> PixelValueSingleDegreeScan -> SingleDegreeRadii
+pixelValuesToRadii :: ([PixelValue] -> Radius) -> SingleDegreePixelValues -> SingleDegreeRadii
 pixelValuesToRadii f inRawDegree = SingleDegreeRadii {degree=(rawDegree inRawDegree), radii=[ f x   | x  <-  rawRadii inRawDegree]}
 {-
 reduceDegreeScan :: ([PixelValue] -> Radius) -> PixelValueSingleDegreeScan -> SingleDegreeRadii
@@ -117,11 +117,11 @@ Process an entire 'Single' degree scan.
 The 1st double of 1st row will be the degree.
 All subsequent values will be image pixel values.
 -}
-getRawDegreeScan :: Parser PixelValueSingleDegreeScan
+getRawDegreeScan :: Parser SingleDegreePixelValues
 getRawDegreeScan = do
   degree <- getDegree
   radii <- getPixelRowMulti
-  return $ PixelValueSingleDegreeScan degree radii
+  return $ SingleDegreePixelValues degree radii
 
 
 {-

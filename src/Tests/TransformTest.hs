@@ -8,7 +8,7 @@ import qualified  Data.ByteString.Char8 as BC (pack)
 import GHC.Word (Word8)
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import Data.Attoparsec.Char8
-import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan, PixelValueSingleDegreeScan(..),
+import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan, SingleDegreePixelValues(..),
                       getRawMultiDegreeScan, PixelValueScan(..), rawScanToScan, )
 
 
