@@ -1,10 +1,10 @@
-module Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows, RowReductionFactor(..)) where
-import qualified Data.List as L
-import TriCad.MathPolar( Radius(..), Scan(..), SingleDegreeScan(..))
-import TriCad.Types(PixelIndice, PixelValue)
+{-|
 
-{-------------------------------------- overview-----------------------------------------------
-Takes a Scan.ParseAtto.RawScan datatype, and does reductions/tranformations on it, resulting in
+Module          : Scan.ParseAtto
+Description     : Transform PixelValues to Radius
+
+
+Takes a Scan.ParseAtto.PixelValueScan datatype, and does reductions/tranformations on it, resulting in
 a TriCad.MathPolar.Scan datatype, which is the datatype used for all further processing.
 
 Reductions:
@@ -12,7 +12,7 @@ A scan image will likely have 480 rows of data, though this could vary with came
 This vertical resolution is not needed for a 3D printer, so reduce the number of rows.
 
 Transformations:
-Each row from an image needs some sort of edge detection, to see the shape.
+Each row starts as pixel values, which need some sort of edge detection, to see the shape.
 
 An image has to be calibrated horizontally, which is about relating edge location in the image,
 to a Radius. 
@@ -20,6 +20,13 @@ to a Radius.
 Vertical calibration is left to a later stage in processing, as creating the z_axis values(vertical) is tightly coupled with
 the use of TriCad.MathPolar module.
 -}
+
+
+module Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows, RowReductionFactor(..)) where
+import qualified Data.List as L
+import TriCad.MathPolar( Radius(..), Scan(..), SingleDegreeRadii(..))
+import TriCad.Types(PixelIndice, PixelValue)
+
 
 
 
@@ -60,7 +67,7 @@ reduceScanRows 0 _ = Left "Can't use 0 for row reduction"
 reduceScanRows reduceFactor scan
   | reduceFactor > (length $ radii $ head $ degrees scan)  = Left "reduction factor > number of rows"
   | otherwise =
-     let degreesReduced = [ SingleDegreeScan {degree=(degree x),  radii = (reduceRows reduceFactor $ radii x)} | x <- degrees scan]
+     let degreesReduced = [ SingleDegreeRadii {degree=(degree x),  radii = (reduceRows reduceFactor $ radii x)} | x <- degrees scan]
      in  Right $  scan {degrees=degreesReduced}
         
 {- Take every xth element from a list.

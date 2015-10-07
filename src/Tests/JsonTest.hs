@@ -5,7 +5,7 @@ import TriCad.MathPolar(Radius())
 import Scan.Json
 import Data.Aeson
 import qualified Data.ByteString.Lazy as BS
-import TriCad.MathPolar(Radius(..),SingleDegreeScan(..),Scan(..))
+import TriCad.MathPolar(Radius(..),SingleDegreeRadii(..),Scan(..))
 
 
 jsonTestDo = do
@@ -25,8 +25,8 @@ scanEncodeTest = TestCase $ assertEqual
                { name = "myScan",
                  degrees =
                   [
-                   SingleDegreeScan {degree=0, radii=[Radius {radius=12}, Radius {radius=120}]},
-                   SingleDegreeScan {degree=10, radii=[Radius {radius=120}, Radius {radius=1200}]}
+                   SingleDegreeRadii {degree=0, radii=[Radius {radius=12}, Radius {radius=120}]},
+                   SingleDegreeRadii {degree=10, radii=[Radius {radius=120}, Radius {radius=1200}]}
                   ]
                }
           )
@@ -41,8 +41,8 @@ scanDecodeTest = TestCase $ assertEqual
                { name = "myScan",
                  degrees =
                   [
-                   SingleDegreeScan {degree=0, radii=[Radius {radius=12}, Radius {radius=120}]},
-                   SingleDegreeScan {degree=10, radii=[Radius {radius=120}, Radius {radius=1200}]}
+                   SingleDegreeRadii {degree=0, radii=[Radius {radius=12}, Radius {radius=120}]},
+                   SingleDegreeRadii {degree=10, radii=[Radius {radius=120}, Radius {radius=1200}]}
                   ]
                }
           )
@@ -53,12 +53,12 @@ scanDecodeTest = TestCase $ assertEqual
 degreeEncodeTest = TestCase $ assertEqual
   "encode radius"
   ("{\"radii\":[{\"radius\":12},{\"radius\":120}],\"degree\":0.0}")
-  (encode (SingleDegreeScan {degree=0, radii=[Radius {radius=12}, Radius {radius=120}]}))
+  (encode (SingleDegreeRadii {degree=0, radii=[Radius {radius=12}, Radius {radius=120}]}))
 
 degreeDecodeTest = TestCase $ assertEqual
   "decode degree"
-  (Just (SingleDegreeScan 0 [Radius 12, Radius 120]))
-  ((decode  "{\"radii\":[{\"radius\":12},{\"radius\":120}],\"degree\":0}") :: Maybe SingleDegreeScan)
+  (Just (SingleDegreeRadii 0 [Radius 12, Radius 120]))
+  ((decode  "{\"radii\":[{\"radius\":12},{\"radius\":120}],\"degree\":0}") :: Maybe SingleDegreeRadii)
 
 
 

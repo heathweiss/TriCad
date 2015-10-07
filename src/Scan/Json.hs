@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Scan.Json() where
-import TriCad.MathPolar(Radius(..),SingleDegreeScan(..), Scan(..))
+import TriCad.MathPolar(Radius(..),SingleDegreeRadii(..), Scan(..))
 import Data.Aeson
 import Control.Applicative
 import Control.Monad
@@ -33,11 +33,11 @@ instance FromJSON Scan where
   parseJSON _          = mzero
 
 --------------------------- Degree ------------------------------------------------
-instance ToJSON SingleDegreeScan where
-  toJSON (SingleDegreeScan degree radii) = object ["degree" .= degree, "radii" .=radii]
+instance ToJSON SingleDegreeRadii where
+  toJSON (SingleDegreeRadii degree radii) = object ["degree" .= degree, "radii" .=radii]
 
-instance FromJSON SingleDegreeScan where
-  parseJSON (Object v) = SingleDegreeScan <$>
+instance FromJSON SingleDegreeRadii where
+  parseJSON (Object v) = SingleDegreeRadii <$>
                          v .: "degree" <*>
                          v .: "radii"
   parseJSON _          = mzero
@@ -72,8 +72,8 @@ writeToFileScan = do
                { name = "myScan",
                  degrees =
                   [
-                   SingleDegreeScan {degree=0, radii=[Radius {radius=12}, Radius {radius=120}]},
-                   SingleDegreeScan {degree=10, radii=[Radius {radius=120}, Radius {radius=1200}]}
+                   SingleDegreeRadii {degree=0, radii=[Radius {radius=12}, Radius {radius=120}]},
+                   SingleDegreeRadii {degree=10, radii=[Radius {radius=120}, Radius {radius=1200}]}
                   ]
                }
           )

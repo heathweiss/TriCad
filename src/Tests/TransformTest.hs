@@ -1,7 +1,7 @@
 module Tests.TransformTest() where
 import Test.HUnit
 import Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows)
-import TriCad.MathPolar( Radius(..), Scan(..), SingleDegreeScan(..))
+import TriCad.MathPolar( Radius(..), Scan(..), SingleDegreeRadii(..))
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString as B
 import qualified  Data.ByteString.Char8 as BC (pack) 
@@ -54,8 +54,8 @@ reduceRowsSimpleTest = TestCase $ assertEqual
 
 reduceScanRowsTest = TestCase $ assertEqual
   "get a Scan from a RawScan"
-  (Right(Scan {name = "myScan", degrees = [SingleDegreeScan {degree = 1.0, radii = [Radius {radius = 0.5}]},
-                                     SingleDegreeScan {degree = 2.0, radii = [Radius {radius = 0.0}]}]}))
+  (Right(Scan {name = "myScan", degrees = [SingleDegreeRadii {degree = 1.0, radii = [Radius {radius = 0.5}]},
+                                     SingleDegreeRadii {degree = 2.0, radii = [Radius {radius = 0.0}]}]}))
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
         scan = rawScanToScan  "myScan" (average . minValueIndices 2) rawScan
     in  scan >>= reduceScanRows 2 

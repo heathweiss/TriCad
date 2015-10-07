@@ -7,7 +7,7 @@ import TriCad.MathPolar(
   Slope(..),
   Radius(..),
   Scan(..),
-  SingleDegreeScan(..),
+  SingleDegreeRadii(..),
   flatXSlope,
   flatYSlope,
   createLeftFacesMultiColumns,
