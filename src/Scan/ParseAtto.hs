@@ -71,9 +71,10 @@ reduceDegreeScan f inRawDegree = SingleDegreeScan {degree=(rawDegree inRawDegree
 Convert an Either String Scan.ParseAtto.RawScan.  to a Either String TriCad.MathPolar.Scan datatype, so that
 further transformations can be done to it.
 -}
-rawScanToScan :: String -> ([Double] -> Radius) -> Either String RawScan -> Either String Scan
+rawScanToScan :: String -> ([PixelValue] -> Radius) -> Either String RawScan -> Either String Scan
 rawScanToScan _ _ (Left msg) = Left msg
 rawScanToScan scanName f (Right (RawScan inRawDegrees)) = Right (Scan {name=scanName, degrees=(map (reduceDegreeScan f) inRawDegrees)})
+
 --------------------------------------------- end: convert RawScan to Scan---------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------
 
