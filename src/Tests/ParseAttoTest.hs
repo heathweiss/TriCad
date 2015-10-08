@@ -1,7 +1,7 @@
 module Tests.ParseAttoTest(parseAttoTestDo) where
 import Test.HUnit
 import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan, SingleDegreePixelValues(..),
-                      getRawMultiDegreeScan, PixelValueScan(..), rawScanToScan)
+                      getRawMultiDegreeScan, MultiDegreePixelValues(..), multiDegreePixelValuesToMultiDegreeRadii)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import Control.Applicative
@@ -89,7 +89,7 @@ getADegreeThenARowOfInts = TestCase $ assertEqual
 
 getACompleteRawScan = TestCase $ assertEqual
   "get a complete scan"
-  (Right(PixelValueScan {rawDegrees=[(SingleDegreePixelValues {rawDegree=1, rawRadii= [[10.0,20.0],[10.0,20.0]]}),
+  (Right(MultiDegreePixelValues {rawDegrees=[(SingleDegreePixelValues {rawDegree=1, rawRadii= [[10.0,20.0],[10.0,20.0]]}),
                               (SingleDegreePixelValues {rawDegree=2, rawRadii= [[1.0,2.0],[3.0,4.0]]})
                              ]}))
   (Right (B.pack $strToWord8s "1 10 20;10 20$2 1 2;3 4")  >>=  parseOnly  getRawMultiDegreeScan)
@@ -101,7 +101,7 @@ getAScanFromARawScan = TestCase $ assertEqual
                             (SingleDegreeRadii {degree=2, radii= [Radius 0.5,Radius 0.0]})
                              ]}))
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
-    in  rawScanToScan  "myScan" (average . minValueIndices 2) rawScan
+    in  multiDegreePixelValuesToMultiDegreeRadii  "myScan" (average . minValueIndices 2) rawScan
   )
 
 
@@ -114,6 +114,6 @@ reduceScanRowsTest = TestCase $ assertEqual
   (Right (MultiDegreeRadii {name = "myScan", degrees = [SingleDegreeRadii {degree = 0.0, radii = [Radius {radius = 0.5}]},SingleDegreeRadii {degree = 90.0, radii = [Radius {radius = 0.5}]},SingleDegreeRadii {degree = 180.0, radii = [Radius {radius = 0.5}]},SingleDegreeRadii {degree = 270.0, radii = [Radius {radius = 0.5}]},SingleDegreeRadii {degree = 360.0, radii = [Radius {radius = 0.5}]}]}))
   
   ( let rawScan = (Right (B.pack $strToWord8s "0 1 2 3;1 2 3;1 2 3$90 1 2 3;1 2 3;1 2 3$180 1 2 3;1 2 3;1 2 3$270 1 2 3;1 2 3;1 2 3$360 1 2 3;1 2 3;1 2 3")  >>=  parseOnly  getRawMultiDegreeScan)
-    in  rawScanToScan "myScan" (average . minValueIndices 2) rawScan  >>= reduceScanRows 2
+    in  multiDegreePixelValuesToMultiDegreeRadii "myScan" (average . minValueIndices 2) rawScan  >>= reduceScanRows 2
     
   )

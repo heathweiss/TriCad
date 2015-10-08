@@ -5,17 +5,13 @@
 Module            : Scan.ParseAtto
 Description       : Uses Attoparsec to parse raw image data
 
-Uses Attorparsec to parse the raw csv data, into ADT, which can then be parsed.
+Uses Attorparsec to parse the raw csv data, into ADT's, which can then be processed into MathPolar.CornerPoints.
+This raw data file,  is a camera image processed by the opencv scanning code.
 
-Parse a raw data file, from the opencv scanning code.
-It only gets the existing values from the raw data.
-It does not do any trasformations, such as reducing image row values down to a single measurement, reduce the number of
-rows, or anything else. That is left up to the Scan.Transform module, which will use ths RawScan datatype, to create a
-MathPolar.Scan datatype, of the reduced/transformed data.
 -}
 
 module Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan,
-                      getRawMultiDegreeScan, PixelValueScan(..), SingleDegreePixelValues(..), rawScanToScan,
+                      getRawMultiDegreeScan, MultiDegreePixelValues(..), SingleDegreePixelValues(..), multiDegreePixelValuesToMultiDegreeRadii,
                       ) where
 import Data.Word
 import Data.Attoparsec.Char8
@@ -24,59 +20,43 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BS
 import Scan.Transform(minValueIndices, average)
 import TriCad.MathPolar(MultiDegreeRadii(..),SingleDegreeRadii(..), Radius(..), Degree)
-import TriCad.Types(PixelValue(..))
+import TriCad.Types(PixelValue(..), Name(..))
 
-
-{-
-Parse a raw file to an Either String Scan.ParseAtto.RawScan.
--}
 
 --used to remvove leading/trailing spaces.
 --need testing in place, then see if '\t' can be removed.
 spaceSkip = many $ satisfy $ inClass [ ' ' , '\t' ]
 
 {- |
-All the pixel values captured in all the camera images, for complete scan
+All the pixel values captured in all the camera images, for complete scan.
 -}
-data PixelValueScan = PixelValueScan {rawDegrees::[SingleDegreePixelValues]}
+data MultiDegreePixelValues = MultiDegreePixelValues {rawDegrees::[SingleDegreePixelValues]}
           deriving (Show, Eq)
 
 
--- |All the pixel values as captured by camera, for a single image, which represents a single degree.
+-- |All the pixel values as captured by camera, for a single image, which represents a single degree of a scan.
 data SingleDegreePixelValues = SingleDegreePixelValues {rawDegree::Degree, rawRadii::[[PixelValue]]}
      deriving (Show, Eq)
 
               
-{-----------------------------------------------------------------------------------------
-Convert a Either String RawScan to an Either String Scan
-
-Why:
-A raw scan is just a copy of the raw image data, parsed by attoparsec and put into a datatype.
-It needs the image row data filtered down to a single value (Radius) for each row of each image.
-It needs this reduced row info, along with a name, put into a TriCad.MathPolar.Scan to be used by TriCad.
-
-If there is an error by attoparsec, during parsing, this will be passed on as a Left Scan, so
-that  Either String Scan monad can be used for further work on the data.
--}
-
-
 {- |Take the reduced raw pixel data from 'reduceRadii', add the current degree val, and put into a TriCad.MathPolar.RawSingleDegreeScan.
 Doing the to every RawSingleDegreeScan will result in the final TriCad.MathPolar.Scan datatype, along with the name.-}
 pixelValuesToRadii :: ([PixelValue] -> Radius) -> SingleDegreePixelValues -> SingleDegreeRadii
 pixelValuesToRadii f inRawDegree = SingleDegreeRadii {degree=(rawDegree inRawDegree), radii=[ f x   | x  <-  rawRadii inRawDegree]}
-{-
-reduceDegreeScan :: ([PixelValue] -> Radius) -> PixelValueSingleDegreeScan -> SingleDegreeRadii
-reduceDegreeScan f inRawDegree = SingleDegreeRadii {degree=(rawDegree inRawDegree), radii=[ f x   | x  <-  rawRadii inRawDegree]}
 
--}
-{-
+{- |
 Convert an Either String Scan.ParseAtto.RawScan.  to a Either String TriCad.MathPolar.Scan datatype, so that
 further transformations can be done to it.
 -}
-rawScanToScan :: String -> ([PixelValue] -> Radius) -> Either String PixelValueScan -> Either String MultiDegreeRadii
-rawScanToScan _ _ (Left msg) = Left msg
-rawScanToScan scanName f (Right (PixelValueScan inRawDegrees)) = Right (MultiDegreeRadii {name=scanName, degrees=(map (pixelValuesToRadii f) inRawDegrees)})
 
+multiDegreePixelValuesToMultiDegreeRadii :: Name -> ([PixelValue] -> Radius) -> Either String MultiDegreePixelValues -> Either String MultiDegreeRadii
+multiDegreePixelValuesToMultiDegreeRadii _ _ (Left msg) = Left msg
+multiDegreePixelValuesToMultiDegreeRadii scanName f (Right (MultiDegreePixelValues inRawDegrees)) = Right (MultiDegreeRadii {name=scanName, degrees=(map (pixelValuesToRadii f) inRawDegrees)})
+{-
+rawScanToScan :: String -> ([PixelValue] -> Radius) -> Either String MultiDegreePixelValues -> Either String MultiDegreeRadii
+rawScanToScan _ _ (Left msg) = Left msg
+rawScanToScan scanName f (Right (MultiDegreePixelValues inRawDegrees)) = Right (MultiDegreeRadii {name=scanName, degrees=(map (pixelValuesToRadii f) inRawDegrees)})
+-}
 --------------------------------------------- end: convert RawScan to Scan---------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------
 
@@ -131,10 +111,10 @@ This is the final big function, that processes the entire raw data file into a R
 This in turn, will be transformed into a TriCad.MathPolar.Scan datatype using Scan.Transform, during
 the process of reducing each pixel data row, down to a single Radius, as well as possibly reducing the number of rows.
 -}
-getRawMultiDegreeScan :: Parser PixelValueScan
+getRawMultiDegreeScan :: Parser MultiDegreePixelValues
 getRawMultiDegreeScan = do
   degreeScans <- sepBy  getRawDegreeScan (char '$')
-  return PixelValueScan {rawDegrees=degreeScans}
+  return MultiDegreePixelValues {rawDegrees=degreeScans}
 
 
 

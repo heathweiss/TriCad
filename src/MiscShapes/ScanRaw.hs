@@ -19,7 +19,6 @@ import TriCad.StlCornerPoints((+++^))
 import TriCad.StlBase (StlShape(..), newStlShape)
 import TriCad.StlFileWriter(writeStlToFile)
 import Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows)
-import Scan.Transform(minValueIndices, average)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString as B
 import qualified  Data.ByteString.Char8 as BC (pack)
@@ -30,7 +29,7 @@ import Data.Aeson
 --import Control.Monad
 --import Data.Text as T
 import Scan.Json()
-import Scan.ParseAtto( getRawMultiDegreeScan, rawScanToScan, PixelValueScan(..))
+import Scan.ParseAtto( getRawMultiDegreeScan, multiDegreePixelValuesToMultiDegreeRadii, MultiDegreePixelValues(..))
 import Data.Attoparsec.Char8
 
 --create a [Word8] for: Right(B.pack $ strToWord8s)
@@ -44,7 +43,7 @@ strToWord8s = BI.unpackBytes . BC.pack
 parseRawDataToScanAndSaveToJson  = do
    contents <- B.readFile "src/Data/scanRawDataWitDegrees.raww"
    let scanRaw = parseOnly  getRawMultiDegreeScan  contents
-       scan = rawScanToScan "myScan" (average . minValueIndices 75) scanRaw  >>= reduceScanRows 10
+       scan = multiDegreePixelValuesToMultiDegreeRadii "myScan" (average . minValueIndices 75) scanRaw  >>= reduceScanRows 10
    case (scan) of
     Left msg -> putStrLn msg
     Right (MultiDegreeRadii name degrees_) -> BL.writeFile "src/Data/scanFullData.json" $ encode $ MultiDegreeRadii name degrees_
@@ -61,7 +60,7 @@ For some reason the shape is not write in netfabb.
 parseRawDataToScanWriteStlFileWithParseAtto =   do
    contents <- B.readFile "src/Data/scanRawDataWitDegrees.raww"
    let scanRaw = parseOnly  getRawMultiDegreeScan  contents
-       scan = rawScanToScan "myScan" (average . minValueIndices 75) scanRaw  >>= reduceScanRows 10
+       scan = multiDegreePixelValuesToMultiDegreeRadii "myScan" (average . minValueIndices 75) scanRaw  >>= reduceScanRows 10
    case (scan) of
     Left msg -> putStrLn msg
     Right (MultiDegreeRadii name degrees_) -> writeStlFileFromScan $ MultiDegreeRadii name degrees_
@@ -75,7 +74,7 @@ Use some canned data with ParseAtto to create an stl file.
 -} 
 parseCannedRawDataToScanWriteStlFileWithParseAtto = do  
    let rawScan = (Right(B.pack $strToWord8s "0 1 2 3;1 2 3;1 2 3$90 1 2 3;1 2 3;1 2 3$180 1 2 3;1 2 3;1 2 3$270 1 2 3;1 2 3;1 2 3$360 1 2 3;1 2 3;1 2 3")  >>=  parseOnly  getRawMultiDegreeScan)
-       scan = rawScanToScan "myScan" (average . minValueIndices 2) rawScan  >>= reduceScanRows 1
+       scan = multiDegreePixelValuesToMultiDegreeRadii "myScan" (average . minValueIndices 2) rawScan  >>= reduceScanRows 1
 
    case (scan) of
     Left msg -> putStrLn msg

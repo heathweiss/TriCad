@@ -9,7 +9,7 @@ import GHC.Word (Word8)
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import Data.Attoparsec.Char8
 import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan, SingleDegreePixelValues(..),
-                      getRawMultiDegreeScan, PixelValueScan(..), rawScanToScan, )
+                      getRawMultiDegreeScan, MultiDegreePixelValues(..), multiDegreePixelValuesToMultiDegreeRadii, )
 
 
 transformTest = do
@@ -57,7 +57,7 @@ reduceScanRowsTest = TestCase $ assertEqual
   (Right(MultiDegreeRadii {name = "myScan", degrees = [SingleDegreeRadii {degree = 1.0, radii = [Radius {radius = 0.5}]},
                                      SingleDegreeRadii {degree = 2.0, radii = [Radius {radius = 0.0}]}]}))
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
-        scan = rawScanToScan  "myScan" (average . minValueIndices 2) rawScan
+        scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (average . minValueIndices 2) rawScan
     in  scan >>= reduceScanRows 2 
   )
 
@@ -66,7 +66,7 @@ reduceScanRowsBy0Factor = TestCase $ assertEqual
   "get a Scan from a RawScan"
   (Left "Can't use 0 for row reduction")
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
-        scan = rawScanToScan  "myScan" (average . minValueIndices 2) rawScan
+        scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (average . minValueIndices 2) rawScan
     in  scan >>= reduceScanRows 0
   )
 
@@ -75,6 +75,6 @@ reduceScanRowsByToLargeAFactor = TestCase $ assertEqual
   --(Right (Scan {name = "myScan", degrees = [SingleDegreeScan {degree = 1.0, radii = []},SingleDegreeScan {degree = 2.0, radii = []}]}))
   (Left  "reduction factor > number of rows")
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
-        scan = rawScanToScan  "myScan" (average . minValueIndices 2) rawScan
+        scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (average . minValueIndices 2) rawScan
     in  scan >>= reduceScanRows 3
   )
