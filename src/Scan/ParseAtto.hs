@@ -5,7 +5,7 @@
 Module            : Scan.ParseAtto
 Description       : Uses Attoparsec to parse raw image data
 
-Uses Attorparsec to parse the raw csv data, into ADT's, which can then be processed into MathPolar.CornerPoints.
+Parse the raw csv data, into a datatype.
 This raw data file,  is a camera image processed by the opencv scanning code.
 
 -}
@@ -19,7 +19,7 @@ import Control.Applicative
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BS
 import Scan.Transform(minValueIndices, average)
-import TriCad.MathPolar(MultiDegreeRadii(..),SingleDegreeRadii(..), Radius(..), Degree)
+import qualified TriCad.MathPolar as MP (MultiDegreeRadii(..),SingleDegreeRadii(..), Radius(..), Degree) 
 import TriCad.Types(PixelValue(..), Name(..))
 
 
@@ -30,32 +30,36 @@ spaceSkip = many $ satisfy $ inClass [ ' ' , '\t' ]
 {- |
 All the pixel values captured in all the camera images, for complete scan.
 -}
-data MultiDegreePixelValues = MultiDegreePixelValues {rawDegrees::[SingleDegreePixelValues]}
+data MultiDegreePixelValues = MultiDegreePixelValues {degrees::[SingleDegreePixelValues]}
           deriving (Show, Eq)
 
 
 -- |All the pixel values as captured by camera, for a single image, which represents a single degree of a scan.
-data SingleDegreePixelValues = SingleDegreePixelValues {rawDegree::Degree, rawRadii::[[PixelValue]]}
+data SingleDegreePixelValues = SingleDegreePixelValues {degree::MP.Degree, radii::[[PixelValue]]}
      deriving (Show, Eq)
 
+
               
-{- |Take the reduced raw pixel data from 'reduceRadii', add the current degree val, and put into a TriCad.MathPolar.RawSingleDegreeScan.
-Doing the to every RawSingleDegreeScan will result in the final TriCad.MathPolar.Scan datatype, along with the name.-}
-pixelValuesToRadii :: ([PixelValue] -> Radius) -> SingleDegreePixelValues -> SingleDegreeRadii
-pixelValuesToRadii f inRawDegree = SingleDegreeRadii {degree=(rawDegree inRawDegree), radii=[ f x   | x  <-  rawRadii inRawDegree]}
+{- Convert a SingleDegreePixelValues to a SingleDegreeRadii. Pass in a function to reduce the [PixelValue] to a Radii.-}
+--pixelValuesToRadii :: ([PixelValue] -> Radius) -> SingleDegreePixelValues -> SingleDegreeRadii
+--pixelValuesToRadii f inRawDegree = SingleDegreeRadii {degree=(rawDegree inRawDegree), radii=[ f x   | x  <-  rawRadii inRawDegree]}
 
 {- |
-Convert an Either String Scan.ParseAtto.RawScan.  to a Either String TriCad.MathPolar.Scan datatype, so that
-further transformations can be done to it.
+Convert an Either String MultiDegreePixelValues  to an Either String TriCad.MathPolar.MultiDegreeRadii.
+Pass in a function, to do the edge detection.
 -}
 
+multiDegreePixelValuesToMultiDegreeRadii :: Name -> ([PixelValue] -> MP.Radius) -> Either String MultiDegreePixelValues -> Either String MP.MultiDegreeRadii
+multiDegreePixelValuesToMultiDegreeRadii _ _ (Left msg) = Left msg
+multiDegreePixelValuesToMultiDegreeRadii scanName edgeDetector (Right (MultiDegreePixelValues pixelValues)) =
+  let pixelValuesToRadii singleDegreePixelValues = MP.SingleDegreeRadii {MP.degree=(degree singleDegreePixelValues), MP.radii=[ edgeDetector x   | x  <-  radii singleDegreePixelValues]}
+  in  Right (MP.MultiDegreeRadii {MP.name=scanName, MP.degrees=(map (pixelValuesToRadii ) pixelValues)})
+{-
 multiDegreePixelValuesToMultiDegreeRadii :: Name -> ([PixelValue] -> Radius) -> Either String MultiDegreePixelValues -> Either String MultiDegreeRadii
 multiDegreePixelValuesToMultiDegreeRadii _ _ (Left msg) = Left msg
-multiDegreePixelValuesToMultiDegreeRadii scanName f (Right (MultiDegreePixelValues inRawDegrees)) = Right (MultiDegreeRadii {name=scanName, degrees=(map (pixelValuesToRadii f) inRawDegrees)})
-{-
-rawScanToScan :: String -> ([PixelValue] -> Radius) -> Either String MultiDegreePixelValues -> Either String MultiDegreeRadii
-rawScanToScan _ _ (Left msg) = Left msg
-rawScanToScan scanName f (Right (MultiDegreePixelValues inRawDegrees)) = Right (MultiDegreeRadii {name=scanName, degrees=(map (pixelValuesToRadii f) inRawDegrees)})
+multiDegreePixelValuesToMultiDegreeRadii scanName edgeDetector (Right (MultiDegreePixelValues pixelValues)) =
+  let pixelValuesToRadii f inRawDegree = SingleDegreeRadii {degree=(rawDegree inRawDegree), radii=[ f x   | x  <-  rawRadii inRawDegree]}
+  in  Right (MultiDegreeRadii {name=scanName, degrees=(map (pixelValuesToRadii edgeDetector) pixelValues)})
 -}
 --------------------------------------------- end: convert RawScan to Scan---------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------
@@ -105,8 +109,6 @@ getRawDegreeScan = do
 
 
 {-
-Need to remove name.
-
 This is the final big function, that processes the entire raw data file into a RawScan datatype.
 This in turn, will be transformed into a TriCad.MathPolar.Scan datatype using Scan.Transform, during
 the process of reducing each pixel data row, down to a single Radius, as well as possibly reducing the number of rows.
@@ -114,7 +116,7 @@ the process of reducing each pixel data row, down to a single Radius, as well as
 getRawMultiDegreeScan :: Parser MultiDegreePixelValues
 getRawMultiDegreeScan = do
   degreeScans <- sepBy  getRawDegreeScan (char '$')
-  return MultiDegreePixelValues {rawDegrees=degreeScans}
+  return MultiDegreePixelValues {degrees=degreeScans}
 
 
 

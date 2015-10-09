@@ -1,7 +1,7 @@
 module Tests.TransformTest() where
 import Test.HUnit
 import Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows)
-import TriCad.MathPolar( Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
+import qualified TriCad.MathPolar as MP ( Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString as B
 import qualified  Data.ByteString.Char8 as BC (pack) 
@@ -38,7 +38,7 @@ getArrayOfMinValuePositions = TestCase $ assertEqual
 
 getArrayOfAvgMinValuePositions = TestCase $ assertEqual
  "Get the average min value positions"
- (Radius 4.0)
+ (MP.Radius 4.0)
  (let arrayOfInt :: [Double]
       arrayOfInt = [9, 9, 2, 4, 5, 7, 9, 2]
   in  average $ minValueIndices 4 arrayOfInt
@@ -54,8 +54,8 @@ reduceRowsSimpleTest = TestCase $ assertEqual
 
 reduceScanRowsTest = TestCase $ assertEqual
   "get a Scan from a RawScan"
-  (Right(MultiDegreeRadii {name = "myScan", degrees = [SingleDegreeRadii {degree = 1.0, radii = [Radius {radius = 0.5}]},
-                                     SingleDegreeRadii {degree = 2.0, radii = [Radius {radius = 0.0}]}]}))
+  (Right(MP.MultiDegreeRadii {MP.name = "myScan", MP.degrees = [MP.SingleDegreeRadii {MP.degree = 1.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},
+                                     MP.SingleDegreeRadii {MP.degree = 2.0, MP.radii = [MP.Radius {MP.radius = 0.0}]}]}))
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
         scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (average . minValueIndices 2) rawScan
     in  scan >>= reduceScanRows 2 
