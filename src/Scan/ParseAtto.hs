@@ -18,10 +18,9 @@ import Data.Attoparsec.Char8
 import Control.Applicative
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BS
-import Scan.Transform(minValueIndices, average)
+import Scan.Transform(minValueIndices, average, PixelValue(..))
 import qualified TriCad.MathPolar as MP (MultiDegreeRadii(..),SingleDegreeRadii(..), Radius(..), Degree) 
-import TriCad.Types(PixelValue(..), Name(..))
-
+--import TriCad.Types( Name(..))
 
 --used to remvove leading/trailing spaces.
 --need testing in place, then see if '\t' can be removed.
@@ -38,12 +37,11 @@ data MultiDegreePixelValues = MultiDegreePixelValues {degrees::[SingleDegreePixe
 data SingleDegreePixelValues = SingleDegreePixelValues {degree::MP.Degree, radii::[[PixelValue]]}
      deriving (Show, Eq)
 
+-- |Name of the scan.
+type Name = String
+
 
               
-{- Convert a SingleDegreePixelValues to a SingleDegreeRadii. Pass in a function to reduce the [PixelValue] to a Radii.-}
---pixelValuesToRadii :: ([PixelValue] -> Radius) -> SingleDegreePixelValues -> SingleDegreeRadii
---pixelValuesToRadii f inRawDegree = SingleDegreeRadii {degree=(rawDegree inRawDegree), radii=[ f x   | x  <-  rawRadii inRawDegree]}
-
 {- |
 Convert an Either String MultiDegreePixelValues  to an Either String TriCad.MathPolar.MultiDegreeRadii.
 Pass in a function, to do the edge detection.
@@ -54,13 +52,7 @@ multiDegreePixelValuesToMultiDegreeRadii _ _ (Left msg) = Left msg
 multiDegreePixelValuesToMultiDegreeRadii scanName edgeDetector (Right (MultiDegreePixelValues pixelValues)) =
   let pixelValuesToRadii singleDegreePixelValues = MP.SingleDegreeRadii {MP.degree=(degree singleDegreePixelValues), MP.radii=[ edgeDetector x   | x  <-  radii singleDegreePixelValues]}
   in  Right (MP.MultiDegreeRadii {MP.name=scanName, MP.degrees=(map (pixelValuesToRadii ) pixelValues)})
-{-
-multiDegreePixelValuesToMultiDegreeRadii :: Name -> ([PixelValue] -> Radius) -> Either String MultiDegreePixelValues -> Either String MultiDegreeRadii
-multiDegreePixelValuesToMultiDegreeRadii _ _ (Left msg) = Left msg
-multiDegreePixelValuesToMultiDegreeRadii scanName edgeDetector (Right (MultiDegreePixelValues pixelValues)) =
-  let pixelValuesToRadii f inRawDegree = SingleDegreeRadii {degree=(rawDegree inRawDegree), radii=[ f x   | x  <-  rawRadii inRawDegree]}
-  in  Right (MultiDegreeRadii {name=scanName, degrees=(map (pixelValuesToRadii edgeDetector) pixelValues)})
--}
+
 --------------------------------------------- end: convert RawScan to Scan---------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------
 

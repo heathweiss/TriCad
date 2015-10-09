@@ -22,10 +22,17 @@ the use of TriCad.MathPolar module.
 -}
 
 
-module Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows, RowReductionFactor(..)) where
+module Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows, RowReductionFactor(..), PixelValue(..)) where
 import qualified Data.List as L
 import TriCad.MathPolar( Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
-import TriCad.Types(PixelIndice, PixelValue)
+
+
+-- |The indice(position) of a pixel in a the image taken for a scan.
+--The indice is the radius, though it will still need to be converted to a distance.
+type PixelIndice = Int
+
+-- |Actual pixel value, as captured by the scanner/camera.
+type PixelValue = Double
 
 --type ThreshholdValue = Double
 {- |Returns  [PixelIndice] of all values <= PixelValue threshold value.
