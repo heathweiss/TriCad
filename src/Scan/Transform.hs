@@ -22,7 +22,7 @@ the use of TriCad.MathPolar module.
 -}
 
 
-module Scan.Transform(minValueIndices, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, RowReductionFactor(..), multiDegreePixelValuesToMultiDegreeRadii ) where
+module Scan.Transform(pixelIndicesOfPixelValuesLTE, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, RowReductionFactor(..), multiDegreePixelValuesToMultiDegreeRadii ) where
 import qualified Data.List as L
 import TriCad.MathPolar( Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
 import qualified  Scan.ParseAtto as PA  (MultiDegreePixelValues(..), PixelValue(..),SingleDegreePixelValues(..))
@@ -43,8 +43,8 @@ type Name = String
 The [PixelIndice] represents the postion of all pixels with values <= target value.
 This list will still need to be reduced down to a single value, at a later stage.
 -}
-minValueIndices :: PA.PixelValue -> [PA.PixelValue] -> [PixelIndice]
-minValueIndices thresholdValue rawData  = ( L.findIndices) (<=thresholdValue) rawData
+pixelIndicesOfPixelValuesLTE :: PA.PixelValue -> [PA.PixelValue] -> [PixelIndice]
+pixelIndicesOfPixelValuesLTE thresholdValue rawData  = ( L.findIndices) (<=thresholdValue) rawData
 
 {-|
 Gets the average of a list of PixelIndices.

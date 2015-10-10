@@ -13,7 +13,7 @@ import qualified TriCad.MathPolar as MP (Radius(..), MultiDegreeRadii(..), Singl
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import qualified  Data.ByteString.Char8 as BC (pack) 
 import GHC.Word (Word8)
-import Scan.Transform(minValueIndices, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
+import Scan.Transform(pixelIndicesOfPixelValuesLTE, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
 
 --create a [Word8] for: Right(B.pack $ strToWord8s)
 --which gets a bytstring of word8
@@ -52,7 +52,7 @@ readRowOfIntsAndReducetoAverageMinVals = TestCase $ assertEqual
   ( let parseResults =  (Right(B.pack $ strToWord8s "10 20 30 40")  >>=  parseOnly  getPixelRow)
     in 
         case parseResults of
-         Right ints -> pixelIndicesAverageToRadius $ minValueIndices 30 ints
+         Right ints -> pixelIndicesAverageToRadius $ pixelIndicesOfPixelValuesLTE 30 ints
         
   )
 
@@ -62,7 +62,7 @@ readMultiRowsOfIntsAndReduceToAverageMinVals = TestCase $ assertEqual
  ( let parseResults = (Right (B.pack $strToWord8s "10 20 30 40;10 20 30 50")  >>=  parseOnly  getPixelRowMulti)
        
    in  case parseResults of
-        Right rowsOfInts -> map (pixelIndicesAverageToRadius . minValueIndices 20 ) rowsOfInts
+        Right rowsOfInts -> map (pixelIndicesAverageToRadius . pixelIndicesOfPixelValuesLTE 20 ) rowsOfInts
  )
 
 
@@ -72,7 +72,7 @@ readMultiRowsOfIntsReduceRowsAndReduceToAverageMinVals = TestCase $ assertEqual
  ( let parseResults = (Right (B.pack $strToWord8s "10 20 30 40;10 20 30 50")  >>=  parseOnly  getPixelRowMulti)
        
    in  case parseResults of
-        Right rowsOfInts -> map (pixelIndicesAverageToRadius . minValueIndices 20 ) $ reduceRows 2 rowsOfInts
+        Right rowsOfInts -> map (pixelIndicesAverageToRadius . pixelIndicesOfPixelValuesLTE 20 ) $ reduceRows 2 rowsOfInts
  )
 
  
@@ -101,7 +101,7 @@ getAScanFromARawScan = TestCase $ assertEqual
                             (MP.SingleDegreeRadii {MP.degree=2, MP.radii= [MP.Radius 0.5,MP.Radius 0.0]})
                              ]}))
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
-    in  multiDegreePixelValuesToMultiDegreeRadii  "myScan" (pixelIndicesAverageToRadius . minValueIndices 2) rawScan
+    in  multiDegreePixelValuesToMultiDegreeRadii  "myScan" (pixelIndicesAverageToRadius . pixelIndicesOfPixelValuesLTE 2) rawScan
   )
 
 
@@ -114,6 +114,6 @@ reduceScanRowsTest = TestCase $ assertEqual
   (Right (MP.MultiDegreeRadii {MP.name = "myScan", MP.degrees = [MP.SingleDegreeRadii {MP.degree = 0.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 90.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 180.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 270.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 360.0, MP.radii = [MP.Radius {MP.radius = 0.5}]}]}))
   
   ( let rawScan = (Right (B.pack $strToWord8s "0 1 2 3;1 2 3;1 2 3$90 1 2 3;1 2 3;1 2 3$180 1 2 3;1 2 3;1 2 3$270 1 2 3;1 2 3;1 2 3$360 1 2 3;1 2 3;1 2 3")  >>=  parseOnly  getRawMultiDegreeScan)
-    in  multiDegreePixelValuesToMultiDegreeRadii "myScan" (pixelIndicesAverageToRadius . minValueIndices 2) rawScan  >>= reduceScanRows 2
+    in  multiDegreePixelValuesToMultiDegreeRadii "myScan" (pixelIndicesAverageToRadius . pixelIndicesOfPixelValuesLTE 2) rawScan  >>= reduceScanRows 2
     
   )
