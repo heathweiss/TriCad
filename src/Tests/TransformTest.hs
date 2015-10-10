@@ -1,6 +1,6 @@
 module Tests.TransformTest() where
 import Test.HUnit
-import Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
+import Scan.Transform(minValueIndices, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
 import qualified TriCad.MathPolar as MP ( Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString as B
@@ -41,7 +41,7 @@ getArrayOfAvgMinValuePositions = TestCase $ assertEqual
  (MP.Radius 4.0)
  (let arrayOfInt :: [Double]
       arrayOfInt = [9, 9, 2, 4, 5, 7, 9, 2]
-  in  average $ minValueIndices 4 arrayOfInt
+  in  pixelIndicesAverageToRadius $ minValueIndices 4 arrayOfInt
  )
 
 
@@ -57,7 +57,7 @@ reduceScanRowsTest = TestCase $ assertEqual
   (Right(MP.MultiDegreeRadii {MP.name = "myScan", MP.degrees = [MP.SingleDegreeRadii {MP.degree = 1.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},
                                      MP.SingleDegreeRadii {MP.degree = 2.0, MP.radii = [MP.Radius {MP.radius = 0.0}]}]}))
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
-        scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (average . minValueIndices 2) rawScan
+        scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (pixelIndicesAverageToRadius . minValueIndices 2) rawScan
     in  scan >>= reduceScanRows 2 
   )
 
@@ -66,7 +66,7 @@ reduceScanRowsBy0Factor = TestCase $ assertEqual
   "get a Scan from a RawScan"
   (Left "Can't use 0 for row reduction")
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
-        scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (average . minValueIndices 2) rawScan
+        scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (pixelIndicesAverageToRadius . minValueIndices 2) rawScan
     in  scan >>= reduceScanRows 0
   )
 
@@ -75,6 +75,6 @@ reduceScanRowsByToLargeAFactor = TestCase $ assertEqual
   --(Right (Scan {name = "myScan", degrees = [SingleDegreeScan {degree = 1.0, radii = []},SingleDegreeScan {degree = 2.0, radii = []}]}))
   (Left  "reduction factor > number of rows")
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
-        scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (average . minValueIndices 2) rawScan
+        scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (pixelIndicesAverageToRadius . minValueIndices 2) rawScan
     in  scan >>= reduceScanRows 3
   )

@@ -22,7 +22,7 @@ the use of TriCad.MathPolar module.
 -}
 
 
-module Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows, RowReductionFactor(..), multiDegreePixelValuesToMultiDegreeRadii ) where
+module Scan.Transform(minValueIndices, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, RowReductionFactor(..), multiDegreePixelValuesToMultiDegreeRadii ) where
 import qualified Data.List as L
 import TriCad.MathPolar( Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
 import qualified  Scan.ParseAtto as PA  (MultiDegreePixelValues(..), PixelValue(..),SingleDegreePixelValues(..))
@@ -52,8 +52,8 @@ Used for:
 Take a list of indices, such as minValueIndices, and give the average indice.
 Pixel indice * mm/indice  == Radius
 -}
-average :: [PixelIndice] -> Radius
-average list = let temp = (fromIntegral $ L.sum list)  / (fromIntegral $ length list)
+pixelIndicesAverageToRadius :: [PixelIndice] -> Radius
+pixelIndicesAverageToRadius list = let temp = (fromIntegral $ L.sum list)  / (fromIntegral $ length list)
                in
                    Radius {radius=temp}
 
