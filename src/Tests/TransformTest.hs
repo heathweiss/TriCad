@@ -1,6 +1,6 @@
 module Tests.TransformTest() where
 import Test.HUnit
-import Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows)
+import Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
 import qualified TriCad.MathPolar as MP ( Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString as B
@@ -9,7 +9,7 @@ import GHC.Word (Word8)
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import Data.Attoparsec.Char8
 import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan, SingleDegreePixelValues(..),
-                      getRawMultiDegreeScan, MultiDegreePixelValues(..), multiDegreePixelValuesToMultiDegreeRadii, )
+                      getRawMultiDegreeScan, MultiDegreePixelValues(..),  )
 
 
 transformTest = do

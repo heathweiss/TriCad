@@ -11,14 +11,13 @@ This raw data file,  is a camera image processed by the opencv scanning code.
 -}
 
 module Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan,
-                      getRawMultiDegreeScan, MultiDegreePixelValues(..), SingleDegreePixelValues(..), multiDegreePixelValuesToMultiDegreeRadii,
-                      ) where
+                      getRawMultiDegreeScan, MultiDegreePixelValues(..), SingleDegreePixelValues(..), PixelValue(..)) where
 import Data.Word
 import Data.Attoparsec.Char8
 import Control.Applicative
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BS
-import Scan.Transform(minValueIndices, average, PixelValue(..))
+--import Scan.Transform(minValueIndices, average, PixelValue(..))
 import qualified TriCad.MathPolar as MP (MultiDegreeRadii(..),SingleDegreeRadii(..), Radius(..), Degree) 
 --import TriCad.Types( Name(..))
 
@@ -37,21 +36,11 @@ data MultiDegreePixelValues = MultiDegreePixelValues {degrees::[SingleDegreePixe
 data SingleDegreePixelValues = SingleDegreePixelValues {degree::MP.Degree, radii::[[PixelValue]]}
      deriving (Show, Eq)
 
--- |Name of the scan.
-type Name = String
 
+-- |Actual pixel value, as captured by the scanner/camera.
+type PixelValue = Double
 
               
-{- |
-Convert an Either String MultiDegreePixelValues  to an Either String TriCad.MathPolar.MultiDegreeRadii.
-Pass in a function, to do the edge detection.
--}
-
-multiDegreePixelValuesToMultiDegreeRadii :: Name -> ([PixelValue] -> MP.Radius) -> Either String MultiDegreePixelValues -> Either String MP.MultiDegreeRadii
-multiDegreePixelValuesToMultiDegreeRadii _ _ (Left msg) = Left msg
-multiDegreePixelValuesToMultiDegreeRadii scanName edgeDetector (Right (MultiDegreePixelValues pixelValues)) =
-  let pixelValuesToRadii singleDegreePixelValues = MP.SingleDegreeRadii {MP.degree=(degree singleDegreePixelValues), MP.radii=[ edgeDetector x   | x  <-  radii singleDegreePixelValues]}
-  in  Right (MP.MultiDegreeRadii {MP.name=scanName, MP.degrees=(map (pixelValuesToRadii ) pixelValues)})
 
 --------------------------------------------- end: convert RawScan to Scan---------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------------

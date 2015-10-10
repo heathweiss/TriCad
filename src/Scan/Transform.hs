@@ -22,24 +22,28 @@ the use of TriCad.MathPolar module.
 -}
 
 
-module Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows, RowReductionFactor(..), PixelValue(..)) where
+module Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows, RowReductionFactor(..), multiDegreePixelValuesToMultiDegreeRadii ) where
 import qualified Data.List as L
 import TriCad.MathPolar( Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
+import qualified  Scan.ParseAtto as PA  (MultiDegreePixelValues(..), PixelValue(..),SingleDegreePixelValues(..))
 
 
 -- |The indice(position) of a pixel in a the image taken for a scan.
 --The indice is the radius, though it will still need to be converted to a distance.
 type PixelIndice = Int
 
--- |Actual pixel value, as captured by the scanner/camera.
-type PixelValue = Double
+
+
+-- |Name of the scan.
+type Name = String
+
 
 --type ThreshholdValue = Double
 {- |Returns  [PixelIndice] of all values <= PixelValue threshold value.
 The [PixelIndice] represents the postion of all pixels with values <= target value.
 This list will still need to be reduced down to a single value, at a later stage.
 -}
-minValueIndices :: PixelValue -> [PixelValue] -> [PixelIndice]
+minValueIndices :: PA.PixelValue -> [PA.PixelValue] -> [PixelIndice]
 minValueIndices thresholdValue rawData  = ( L.findIndices) (<=thresholdValue) rawData
 
 {-|
@@ -97,6 +101,16 @@ reduceRows' factor counter (x:xs)
 -- |Factor by which to reduce rows.
 type RowReductionFactor = Int
         
+{- |
+Convert an Either String MultiDegreePixelValues  to an Either String TriCad.MathPolar.MultiDegreeRadii.
+Pass in a function, to do the edge detection.
+-}
+
+multiDegreePixelValuesToMultiDegreeRadii :: Name -> ([PA.PixelValue] -> Radius) -> Either String PA.MultiDegreePixelValues -> Either String MultiDegreeRadii
+multiDegreePixelValuesToMultiDegreeRadii _ _ (Left msg) = Left msg
+multiDegreePixelValuesToMultiDegreeRadii scanName edgeDetector (Right (PA.MultiDegreePixelValues pixelValues)) =
+  let pixelValuesToRadii singleDegreePixelValues = SingleDegreeRadii {degree=(PA.degree singleDegreePixelValues), radii=[ edgeDetector x   | x  <-  PA.radii singleDegreePixelValues]}
+  in  Right (MultiDegreeRadii {name=scanName, degrees=(map (pixelValuesToRadii ) pixelValues)})
 
 
 

@@ -1,7 +1,7 @@
 module Tests.ParseAttoTest(parseAttoTestDo) where
 import Test.HUnit
 import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan, SingleDegreePixelValues(..),
-                      getRawMultiDegreeScan, MultiDegreePixelValues(..), multiDegreePixelValuesToMultiDegreeRadii)
+                      getRawMultiDegreeScan, MultiDegreePixelValues(..))
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import Control.Applicative
@@ -13,7 +13,7 @@ import qualified TriCad.MathPolar as MP (Radius(..), MultiDegreeRadii(..), Singl
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import qualified  Data.ByteString.Char8 as BC (pack) 
 import GHC.Word (Word8)
-import Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows)
+import Scan.Transform(minValueIndices, average, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
 
 --create a [Word8] for: Right(B.pack $ strToWord8s)
 --which gets a bytstring of word8
