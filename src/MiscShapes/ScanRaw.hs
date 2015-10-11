@@ -26,7 +26,7 @@ import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import GHC.Word (Word8)
 import Data.Aeson
 import Scan.Json()
-import qualified Scan.ParseAtto as PA  ( MultiDegreePixelValues(..), parseCSVPixelValues)
+import qualified Scan.Parse as PA  ( MultiDegreePixelValues(..), parseCSVPixelValues)
 
 --create a [Word8] for: Right(B.pack $ strToWord8s)
 --which gets a bytstring of word8

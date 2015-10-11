@@ -23,7 +23,7 @@ library
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, 
-                   Tests.TransformTest, Tests.JsonTest, Tests.ParseAttoTest
+                   Tests.TransformTest, Tests.JsonTest, Tests.ParseTest
                    -- HeelGenerators
                    HeelGenerators.BlackRunnerHeel,  HeelGenerators.BlackRunnerToe,
                    HeelGenerators.SandalsToe, HeelGenerators.KeenToe, HeelGenerators.KeenHeel
@@ -37,7 +37,7 @@ library
                    TriCad.Shapes.Cylindrical, TriCad.Shapes.Cubical
                    --Scanning
                    Scan.Transform,
-                   Scan.Json, Scan.ParseAtto
+                   Scan.Json, Scan.Parse
   -- other-modules:       
   -- other-extensions:    
   build-depends:       HUnit >=1.2.5.2

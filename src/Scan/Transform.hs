@@ -25,7 +25,7 @@ the use of TriCad.MathPolar module.
 module Scan.Transform(pixelIndicesOfPixelValuesLTE, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, RowReductionFactor(..), multiDegreePixelValuesToMultiDegreeRadii ) where
 import qualified Data.List as L
 import TriCad.MathPolar( Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
-import qualified  Scan.ParseAtto as PA  (MultiDegreePixelValues(..), PixelValue(..),SingleDegreePixelValues(..))
+import qualified  Scan.Parse as PA  (MultiDegreePixelValues(..), PixelValue(..),SingleDegreePixelValues(..))
 
 
 -- |The indice(position) of a pixel in a the image taken for a scan.
