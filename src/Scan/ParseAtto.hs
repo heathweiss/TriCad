@@ -10,8 +10,7 @@ This raw data file,  is a camera image processed by the opencv scanning code.
 
 -}
 
-module Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan, getRawMultiDegreeScan, MultiDegreePixelValues(..),
-                      SingleDegreePixelValues(..), PixelValue(..), parseCSVPixelValues) where
+module Scan.ParseAtto(MultiDegreePixelValues(..), SingleDegreePixelValues(..), PixelValue(..), parseCSVPixelValues) where
 import Data.Word
 import Data.Attoparsec.Char8
 import Control.Applicative
@@ -47,7 +46,7 @@ type PixelValue = Double
 
 
 ---------------------------------------------- attoparsec --------------------------------------------------------------------
--- | same as attoparsec parseOnly
+-- | Uses attoparsec parseOnly parse the raw image data from the scan, using internal parse function based on attoparsec
 parseCSVPixelValues = parseOnly getRawMultiDegreeScan
 
 {-The row data come in the form of Double,space,Double...

@@ -8,8 +8,8 @@ import qualified  Data.ByteString.Char8 as BC (pack)
 import GHC.Word (Word8)
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import Data.Attoparsec.Char8
-import Scan.ParseAtto(getPixelRow, getPixelRowMulti, getDegree, getRawDegreeScan, SingleDegreePixelValues(..),
-                      getRawMultiDegreeScan, MultiDegreePixelValues(..),  )
+import Scan.ParseAtto(SingleDegreePixelValues(..), parseCSVPixelValues,
+                      MultiDegreePixelValues(..),  )
 
 
 transformTest = do
@@ -56,7 +56,7 @@ reduceScanRowsTest = TestCase $ assertEqual
   "get a Scan from a RawScan"
   (Right(MP.MultiDegreeRadii {MP.name = "myScan", MP.degrees = [MP.SingleDegreeRadii {MP.degree = 1.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},
                                      MP.SingleDegreeRadii {MP.degree = 2.0, MP.radii = [MP.Radius {MP.radius = 0.0}]}]}))
-  ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
+  ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseCSVPixelValues)
         scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (pixelIndicesAverageToRadius . pixelIndicesOfPixelValuesLTE 2) rawScan
     in  scan >>= reduceScanRows 2 
   )
@@ -65,7 +65,7 @@ reduceScanRowsTest = TestCase $ assertEqual
 reduceScanRowsBy0Factor = TestCase $ assertEqual
   "get a Scan from a RawScan"
   (Left "Can't use 0 for row reduction")
-  ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
+  ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseCSVPixelValues)
         scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (pixelIndicesAverageToRadius . pixelIndicesOfPixelValuesLTE 2) rawScan
     in  scan >>= reduceScanRows 0
   )
@@ -74,7 +74,7 @@ reduceScanRowsByToLargeAFactor = TestCase $ assertEqual
   "get a Scan from a RawScan"
   --(Right (Scan {name = "myScan", degrees = [SingleDegreeScan {degree = 1.0, radii = []},SingleDegreeScan {degree = 2.0, radii = []}]}))
   (Left  "reduction factor > number of rows")
-  ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseOnly  getRawMultiDegreeScan)
+  ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseCSVPixelValues)
         scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (pixelIndicesAverageToRadius . pixelIndicesOfPixelValuesLTE 2) rawScan
     in  scan >>= reduceScanRows 3
   )
