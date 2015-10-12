@@ -9,10 +9,11 @@ import TriCad.MathPolar(
   Radius(..),
   xyQuadrantAngle,
   createCornerPoint,
+  createCornerPointSimplified,
   Slope(..),
   QuadrantAngle(..),
-  setYPolarityForQuadrant,
-  setXPolarityForQuadrant,
+  --setYPolarityForQuadrant,
+  --setXPolarityForQuadrant,
   )
 import TriCad.Math(sinDegrees,cosDegrees)
 
@@ -85,7 +86,7 @@ mathPolarTestDo = do
 
   {-Have a look at the bottom front right corner first, as this is the first corner gen'd.-}
   putStrLn "\n\n"
-  putStrLn "bottomFrontRightCorner"
+  putStrLn "createCornerPoint tests"
   runTestTT createCornerPointTestR10PosX0PosY0XY10
   runTestTT createCornerPointTestR10PosX0PosY10XY10
   runTestTT createCornerPointTestR10PosX0PosY10XY80
@@ -105,18 +106,25 @@ mathPolarTestDo = do
   --Leave them till all createCornerPoints changes are done
   runTestTT createCornerPoint10DegTestSlopedMaleLegos
   runTestTT createCornerPointTest90DegSlopedMaleLegos
-
   
-  {-This will test all the layer A F1 corners-}
+  
+  {-Run the createCornerPointsSimplified tests-}
   putStrLn "\n\n" 
-  putStrLn "bottomFrontLeftCorners"
-  -- runTestTT listOfF1PointsTest
+  putStrLn "createCornerPointSimplified tests"
+  runTestTT createFrontCornerSimplifiedTest
+  runTestTT createCornerPointSimplifiedTestR10PosX0PosY0XY10
+  runTestTT createCornerPointSimplifiedTestR10PosX0PosY10XY10
+  runTestTT createCornerPointSimplifiedTestR10PosX0PosY10XY80
+  runTestTT createCornerPointSimplifiedTestR10PosX1PosY10XY100
+  runTestTT createCornerPointSimplifiedTestR10PosX1PosY10XY170
+  runTestTT createCornerPointSimplifiedTestR10PosX10PosY1XY170
 
   ---------------- set xy quadrant tests==============================
-  runTestTT setQuadrant1YvalTest
-  runTestTT setQuadrant2YvalTest
-  runTestTT setQuadrant2Yval170Test
-  runTestTT setQuadrant3Xval190Test
+  --leave for now, in case more testing is needed
+  --runTestTT setQuadrant1YvalTest
+  --runTestTT setQuadrant2YvalTest
+  --runTestTT setQuadrant2Yval170Test
+  --runTestTT setQuadrant3Xval190Test
 
 
 fail1 = TestCase $ assertEqual
@@ -132,6 +140,7 @@ setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of
                                      Quadrant3 -> val
                                      Quadrant4 -> negate val
 -}
+{-Moved setX/YPolarityForQuadrant into createCornerPoint. Leave these here for now, in case further testing is required.
 setQuadrant1YvalTest = TestCase $ assertEqual
   "set yval for quadrant1"
   (-1)
@@ -151,7 +160,7 @@ setQuadrant3Xval190Test = TestCase $ assertEqual
   "set xval for quadrant3 at 190"
   (-1)
   (setXPolarityForQuadrant (Quadrant3Angle 190) 1   )
- 
+-}
 {----------------------------------- Try the quadrant angles -------------------------------------------------------------------
 xyQuadrantAngle currAngle 
 -}
@@ -534,7 +543,25 @@ createFrontCornerTest = TestCase $ assertEqual
     (radiusAdjustedForZslope (Radius 1) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 90)))
     (Angle 90)--(xyQuadrantAngle 90)
     (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 90))
-  ) 
+  )
+
+createFrontCornerSimplifiedTest = TestCase $ assertEqual
+  "recreate the front corner to see what is wrong with my vertical faces"
+  (F3 (Point 1 (-6.123233995736766e-17) 50))
+  (createCornerPointSimplified
+    (F3)
+    (Point{x_axis=0, y_axis=0, z_axis=50})
+    (Radius 1)
+    --(radiusAdjustedForZslope (Radius 1) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 90)))
+    (Angle 90)--(xyQuadrantAngle 90)
+    (PosXSlope 0)
+    (PosYSlope 0)
+    --(slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 90))
+  )
+
+
+
+  
 createCornerPointTestR10PosX0PosY0XY10  = TestCase $ assertEqual 
   "createCornerPointTestR10PosX0PosY0XY10 this is the first non-exhaust failure"
   ( F4  ( Point 1.7364817766693033 (-9.84807753012208) 0 ))
@@ -546,6 +573,21 @@ createCornerPointTestR10PosX0PosY0XY10  = TestCase $ assertEqual
     (Angle 10)--(xyQuadrantAngle 10)
     (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 10))
   ) 
+
+createCornerPointSimplifiedTestR10PosX0PosY0XY10  = TestCase $ assertEqual 
+  "createCornerPointSimplifiedTestR10PosX0PosY0XY10 this is the first non-exhaust failure"
+  ( F4  ( Point 1.7364817766693033 (-9.84807753012208) 0 ))
+  (createCornerPointSimplified
+    (F4)
+    (Point{x_axis=0, y_axis=0, z_axis=0})
+    (Radius 10)
+    --(radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 10)))
+    (Angle 10)--(xyQuadrantAngle 10)
+    (PosXSlope 0)
+    (PosYSlope 0)
+    --(slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 10))
+  ) 
+
 
 {-
 z = radius * sin(xySlope)
@@ -563,6 +605,19 @@ createCornerPointTestR10PosX0PosY10XY10  = TestCase $ assertEqual
     (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 10))
   ) 
 
+createCornerPointSimplifiedTestR10PosX0PosY10XY10  = TestCase $ assertEqual 
+  "createCornerPointSimplifiedTestR10PosX0PosY10XY10"
+  ( F4  ( Point 1.7117865163545964 (-9.708023749268555) (-1.6804945123576784) ))
+  (createCornerPointSimplified
+    (F4)
+    (Point{x_axis=0, y_axis=0, z_axis=0})
+    (Radius 10)
+    (Angle 10)--(xyQuadrantAngle 10)
+    (PosXSlope 1)
+    (PosYSlope 10)
+  )
+
+
 {-
 z = radius * sin(xySlope)
   = 10 * sin(9.67442935245515) = -0.13118810287215432
@@ -578,7 +633,22 @@ createCornerPointTestR10PosX0PosY10XY80  = TestCase $ assertEqual
     (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 80)))
     (Angle 80)--(xyQuadrantAngle 80)
     (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 80))
-  ) 
+  )
+
+
+createCornerPointSimplifiedTestR10PosX0PosY10XY80  = TestCase $ assertEqual 
+  "createCornerPointSimplifiedTestR10PosX0PosY10XY80"
+  ( F4  ( Point 9.847230050910628 (-1.7363323432187356) (-0.13118810287215432) ))
+  (createCornerPointSimplified
+    (F4)
+    (Point{x_axis=0, y_axis=0, z_axis=0})
+    (Radius 10)
+    (Angle 80)--(xyQuadrantAngle 80)
+    (PosXSlope 1)
+    (PosYSlope 10)
+  )
+
+  
 {-
 z = radius * sin(xySlope)
   = 10 * sin( 2.721289529681512) =  0.47477607347
@@ -594,22 +664,22 @@ createCornerPointTestR10PosX1PosY10XY100  = TestCase $ assertEqual
     (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 100)))
     (Angle 100)--(Quadrant2Angle 100)--(xyQuadrantAngle 100)
     (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 100))
+  )
+
+
+createCornerPointSimplifiedTestR10PosX1PosY10XY100  = TestCase $ assertEqual 
+  "createCornerPointSimplifiedTestR10PosX1PosY10XY100"
+  ( F4  ( Point 9.83697187819957 (1.734523550597009) (0.47477607346532197) ))
+  (createCornerPointSimplified
+    (F4)
+    (Point{x_axis=0, y_axis=0, z_axis=0})
+    (Radius 10)
+    (Angle 100)--(Quadrant2Angle 100)--(xyQuadrantAngle 100)
+    (PosXSlope 1)
+    (PosYSlope 10)
   ) 
 
---createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Quadrant2Angle xyAngle) (NegXYSlope slope)
-{-
-createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Quadrant2Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
-                                    (--x:
-                                     x_axis origin + adjustedRadius * (sinDegrees  xyAngle))
-                                    0 +               9.857785663826117 * sin(10) = 1.7117865163552831
-                                    (--y:
-                                     y_axis origin + adjustedRadius * (cosDegrees  xyAngle))
-                                     0 +              9.857785663826117 * cos(10) = 9.708023749266505093
-                                    (--z:
-                                     z_axis origin + horizRadius * (sinDegrees (slope)))
-                                             0 -     10 * sin(9.67442935245515) = -1.68049451236
-                                  )
--}
+
 createCornerPointTestR10PosX1NegY10XY170  = TestCase $ assertEqual 
   "createCornerPointTestR10PosX1NegY10XY170 and now this one is failing"
   ( F4  ( Point  1.7117865163545964 (9.708023749268555) (-1.6804945123576784) ))
@@ -622,19 +692,6 @@ createCornerPointTestR10PosX1NegY10XY170  = TestCase $ assertEqual
     (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 170))
   ) 
 
-{-
-createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Quadrant2Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
-                                    (--x:
-                                     x_axis origin + adjustedRadius * (sinDegrees  xyAngle))
-                                    
-                                    (--y:
-                                     y_axis origin + adjustedRadius * (cosDegrees  xyAngle))
-                                    
-                                    (--z:
-                                     z_axis origin + horizRadius * (sinDegrees (slope)))
-                                  )
-
--}
 createCornerPointTestR10PosX1PosY10XY170  = TestCase $ assertEqual 
   "createCornerPointTestR10PosX1PosY10XY170"
   ( F4  ( Point 1.7099862553826626 (9.69781396194786) 1.740215896333419 ))
@@ -646,6 +703,20 @@ createCornerPointTestR10PosX1PosY10XY170  = TestCase $ assertEqual
     (Angle 170)--(xyQuadrantAngle 170)
     (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 170))
   ) 
+
+
+createCornerPointSimplifiedTestR10PosX1PosY10XY170  = TestCase $ assertEqual 
+  "createCornerPointSimplifiedTestR10PosX1PosY10XY170"
+  ( F4  ( Point 1.7099862553826626 (9.69781396194786) 1.740215896333419 ))
+  (createCornerPointSimplified
+    (F4)
+    (Point{x_axis=0, y_axis=0, z_axis=0})
+    (Radius 10)
+    (Angle 170)--(xyQuadrantAngle 170)
+    (PosXSlope 1)
+    (PosYSlope 10)
+  ) 
+
 
 {-
 z = radius * sin(xySlope)
@@ -661,171 +732,97 @@ createCornerPointTestR10PosX10PosY1XY170  = TestCase $ assertEqual
     (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 170)))
     (Angle 170)--(xyQuadrantAngle 170)
     (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 170))
-  ) 
+  )
 
-{-
-radiusAdjustedForZslope: UpRadius 9.857785663826117
-xyQuadrantAngle 190: Quadrant3Angle 10
 
-(slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 190)): PosXYSlope 9.67442935245515
-
-createCornerPoint cPoint origin (UpRadius adjustedRadius)  (Quadrant3Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
-                                    (--x:
-                                     x_axis origin - adjustedRadius * (sinDegrees  xyAngle))
-                                     0 - 9.857785663826117 * sin(10) = - 1.7117865163552831
-                                    
-                                    (--y:
-                                     y_axis origin + adjustedRadius * (cosDegrees  xyAngle))
-                                     0 + 9.857785663826117 * cos(10) = 9.708023749266505093
-                                    
-                                    (--z:
-                                     z_axis origin + adjustedRadius * (sinDegrees (slope)))
-                                     0 + 10 * sin(9.67442935245515) = 1.68049451236
-                                  )
--}
-createCornerPointTestR10PosX1PosY10XY190  = TestCase $ assertEqual 
-  "createCornerPointTestR10PosX1PosY10XY190"
-  ( F4  ( Point (-1.7117865163545964) 9.708023749268555 1.6804945123576784 ))
-  (createCornerPoint
+createCornerPointSimplifiedTestR10PosX10PosY1XY170  = TestCase $ assertEqual 
+  "createCornerPointSimplifiedTestR10PosX1PosY10XY170"
+  ( F4  ( Point 1.734523550597008 (9.83697187819957) 0.47477607346532175 ))
+  (createCornerPointSimplified
     (F4)
     (Point{x_axis=0, y_axis=0, z_axis=0})
     (Radius 10)
-    (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 190)))
+    (Angle 170)--(xyQuadrantAngle 170)
+    (PosXSlope 10)
+    (PosYSlope 1)
+  )
+
+
+createCornerPointTestR10PosX1PosY10XY190  = TestCase $ assertEqual 
+  "createCornerPointTestR10PosX1PosY10XY190"
+  ( F4  ( Point (-1.7117865163545964) 9.708023749268555 1.6804945123576784 ))
+  (createCornerPointSimplified
+    (F4)
+    (Point{x_axis=0, y_axis=0, z_axis=0})
+    (Radius 10)
+    --(radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 190)))
     (Angle 190)--(xyQuadrantAngle 190)
-    (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 190))
+    --(slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 190))
+    (PosXSlope 1)
+    (PosYSlope 10)
   ) 
 
 
-
-{-                                                                                    
-                                                        
-                                        10              9.84741837407899                        10          10.02172570778901
-createCornerPoint cPoint origin (Radius horizRadius) (DownRadius adjustedRadius)  (Quadrant3Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
-                                    (--x:
-                                     x_axis origin - adjustedRadius * (sinDegrees  xyAngle))
-                                            0      - 9.84741837407899 * sin(10)  = -1.70998625538334872
-                                    
-                                    (--y:
-                                     y_axis origin + adjustedRadius * (cosDegrees  xyAngle))
-                                    0 +             9.84741837407899  * cos(10) = 9.69781396194581261
-                                    (--z:
-                                     z_axis origin - horizRadius * (sinDegrees (slope)))
-                                             0     -   10  * sin(10.02172570778901) = -1.74021589633
-                                  )
--}
 
 
 createCornerPointTestR10PosX1NegY10XY190  = TestCase $ assertEqual 
   "createCornerPointTestR10PosX1NegY10XY190 fail 0"
   ( F4  ( Point (-1.7099862553826626) 9.69781396194786 (-1.740215896333419) ))
-  (createCornerPoint
+  (createCornerPointSimplified
     (F4)
     (Point{x_axis=0, y_axis=0, z_axis=0})
     (Radius 10)
-    (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 190)))
+    --(radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 190)))
     (Angle 190)--(xyQuadrantAngle 190)
-    (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 190))
+    --(slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 190))
+    (PosXSlope 1)
+    (NegYSlope 10)
   ) 
 
 
 
 
-
-{- has not been verified thought it looks good in netfabb
-radiusAdjustedForZslope: UpRadius 9.999139447055672
-xyQuadrantAngle 260: Quadrant3Angle 80
-
-(slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 260)): PosXYSlope 0.7516740236570961
-
-createCornerPoint cPoint origin (UpRadius adjustedRadius)  (Quadrant3Angle xyAngle) (PosXYSlope slope) = cPoint (Point 
-                                    (--x:
-                                     x_axis origin - adjustedRadius * (sinDegrees  xyAngle))
-                                     0 - 9.999139447055672 * sin(80) = - 9.847230050908548482
-                                    
-                                    (--y:
-                                     y_axis origin + adjustedRadius * (cosDegrees  xyAngle))
-                                     0 + 9.999139447055672 * cos(80) = 1.736332343219431471
-                                    
-                                    (--z:
-                                     z_axis origin + adjustedRadius * (sinDegrees (slope)))
-                                     0 + 10 * sin(0.7516740236570961) = 0.13118810287
-                                  )
-
--}
 createCornerPointTestR10PosX1PosY10XY260  = TestCase $ assertEqual 
   "createCornerPointTestR10PosX1PosY10XY260"
   ( F4  ( Point (-9.847230050910628) (1.7363323432187356) (0.13118810287215432) ))
-  (createCornerPoint
+  (createCornerPointSimplified
     (F4)
     (Point{x_axis=0, y_axis=0, z_axis=0})
     (Radius 10)
-    (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 260)))
+    --(radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 260)))
     (Angle 260)--(xyQuadrantAngle 260)
-    (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 260))
+    --(slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 260))
+    (PosXSlope 1)
+    (PosYSlope 10)
   )
 
-{- has not been verified though it looks good in netfabb
-radiusAdjustedForZslope: DownRadius 9.988723025495544
-xyQuadrantAngle 280: Quadrant4Angle 80
 
-(slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 280)): NegXYSlope 2.721289529681512
-
-createCornerPoint cPoint origin (DownRadius adjustedRadius)  (Quadrant4Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
-                                    (--x:
-                                     x_axis origin - adjustedRadius * (sinDegrees  xyAngle))
-                                     0 - 9.988723025495544 * sin(80) = - 9.836971878197493074
-                                    (--y:
-                                     y_axis origin - adjustedRadius * (cosDegrees  xyAngle))
-                                     0 - 9.988723025495544 * cos(80) = - 1.734523550597703995
-                                    (--z:
-                                     z_axis origin - adjustedRadius * (sinDegrees (slope)))
-                                     0 - 10 * sin(2.721289529681512) = - 0.47477607347
-                                  )
-
-
--}
 createCornerPointTestR10PosX1PosY10XY280  = TestCase $ assertEqual 
   "createCornerPointTestR10PosX1PosY10XY280 fail 280"
   ( F4  ( Point (-9.83697187819957) (-1.734523550597009) (-0.47477607346532197) ))
-  (createCornerPoint
+  (createCornerPointSimplified
     (F4)
     (Point{x_axis=0, y_axis=0, z_axis=0})
     (Radius 10)
-    (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 280)))
+    --(radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 280)))
     (Angle 280)--(xyQuadrantAngle 280)
-    (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 280))
+    --(slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 280))
+    (PosXSlope 1)
+    (PosYSlope 10)
   ) 
 
-{-
-radiusAdjustedForZslope: DownRadius 9.84741837407899
-xyQuadrantAngle 350: Quadrant4Angle 10
-
-(slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 350)): NegXYSlope 10.02172570778901
-
-createCornerPoint cPoint origin (DownRadius adjustedRadius)  (Quadrant4Angle xyAngle) (NegXYSlope slope) = cPoint (Point 
-                                    (--x:
-                                     x_axis origin - adjustedRadius * (sinDegrees  xyAngle))
-                                     0 - 9.84741837407899 * sin(10) = - 1.70998625538334872
-                                    (--y:
-                                     y_axis origin - adjustedRadius * (cosDegrees  xyAngle))
-                                     0 - 9.84741837407899 * cos(10) = - 9.69781396194581261
-                                    (--z:
-                                     z_axis origin - adjustedRadius * (sinDegrees (slope)))
-                                     0 - 10 * sin(10.02172570778901) = - 1.74021589633
-                                  )
-
-
--}
 createCornerPointTestR10PosX1PosY10XY350  = TestCase $ assertEqual 
   "createCornerPointTestR10PosX1PosY10XY350 fail 350"
   ( F4  ( Point (-1.7099862553826626) (-9.69781396194786) (-1.740215896333419) ))
-  (createCornerPoint
+  (createCornerPointSimplified
     (F4)
     (Point{x_axis=0, y_axis=0, z_axis=0})
     (Radius 10)
-    (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 350)))
+    --(radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 350)))
     (Angle 350)--(xyQuadrantAngle 350)
-    (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 350))
+    --(slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 350))
+    (PosXSlope 1)
+    (PosYSlope 10)
   ) 
 
 {----------------------------------------------------------------------------------------------------------------------

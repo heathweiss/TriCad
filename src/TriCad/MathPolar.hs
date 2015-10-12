@@ -12,6 +12,7 @@ module TriCad.MathPolar(
   radiusAdjustedForZslope,
   xyQuadrantAngle,
   createCornerPoint,
+  createCornerPointSimplified,
   Slope(..),
   Radius(..),
   SingleDegreeRadii(..),
@@ -19,8 +20,8 @@ module TriCad.MathPolar(
   flatXSlope,
   flatYSlope,
   QuadrantAngle(..),
-  setYPolarityForQuadrant,
-  setXPolarityForQuadrant,
+  --setYPolarityForQuadrant,
+  --setXPolarityForQuadrant,
   Degree(..),
   ) where
 import TriCad.Points(Point(..))
@@ -122,7 +123,7 @@ What quadrant of the xy plane, is the angle in?
 
 Used for:
 setYPolarityForQuadrant & setXPolarityForQuadrant use it to adjust the polarity of x/y for trig calculations
--}
+
 getCurrentQuadrant :: QuadrantAngle -> Quadrant
 getCurrentQuadrant ang       | quadAngle ang  < 0 = getCurrentQuadrant $ Angle (360 + (quadAngle ang))
                              | quadAngle ang <= 90 = Quadrant1
@@ -130,7 +131,7 @@ getCurrentQuadrant ang       | quadAngle ang  < 0 = getCurrentQuadrant $ Angle (
                              | quadAngle ang <= 270 = Quadrant3
                              | quadAngle ang <= 360 = Quadrant4
                              | quadAngle ang > 360 = getCurrentQuadrant $ Angle ((quadAngle ang) - 360)
-
+-}
 {-
 Corresponds to the xy plane quadrants.
 
@@ -249,43 +250,18 @@ radiusAdjustedForZslope (Radius radius) (PosXYSlope xySlope) = UpRadius $ radius
 radiusAdjustedForZslope (Radius radius) (NegXYSlope xySlope) = DownRadius $ radius * (cosDegrees (xySlope))
 
 
-{-
-For trig xy calculations, the neg/pos aspect of x will depend upon the current quadrant of the xy plane.
-This is as per standard trig methods of calculating for obtuse angles.
-
--}
-setXPolarityForQuadrant :: QuadrantAngle -> Double -> Double
-setXPolarityForQuadrant angle val = case getCurrentQuadrant angle of
-                                     Quadrant1 -> val
-                                     Quadrant2 -> val
-                                     Quadrant3 -> negate val
-                                     Quadrant4 -> negate val
-{-
-Use this to keep createCornerPoint DRY for setting x axis.
-Wait till I get rid of all the pattern matching that setXPolarityForQuadrant is replacing.
-Do a simialar function setY
--}
-setX :: Point -> QuadrantAngle -> Radius -> Double
-setX origin  (Quadrant1Angle xyAngle) (DownRadius radius) =
-   x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
-                                      radius * (sinDegrees  xyAngle))
+  
 {-
 For trig xy calculations, the neg/pos aspect of y will depend upon the current quadrant of the xy plane
 
--}
+
 setYPolarityForQuadrant :: QuadrantAngle -> Double -> Double
 setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of
                                      Quadrant1 -> negate val
                                      Quadrant2 -> val
                                      Quadrant3 -> val
                                      Quadrant4 -> negate val
-
-setZPolarityForQuadrant :: Slope -> Double -> Double
---all math polar tests pass, but the keen heel sole adaptor slopes are nfg.
-setZPolarityForQuadrant slope val =
-         case slope of
-           (PosXYSlope _) ->  val
-           otherwise  -> negate val
+-}
         
 
 {-
@@ -311,7 +287,41 @@ orign: Point
 
 -}
 createCornerPoint :: (Point-> CornerPoints) -> Point -> Radius -> Radius ->  QuadrantAngle -> Slope -> CornerPoints
-createCornerPoint cPoint origin (Radius horizRadius) (adjustedRadius)  (Angle xyAngle) (slope) = cPoint (Point 
+createCornerPoint cPoint origin (Radius horizRadius) (adjustedRadius)  (Angle xyAngle) (slope) =
+                             let setXPolarityForQuadrant :: QuadrantAngle -> Double -> Double
+                                 setXPolarityForQuadrant angle val = case getCurrentQuadrant angle of
+                                     Quadrant1 -> val
+                                     Quadrant2 -> val
+                                     Quadrant3 -> negate val
+                                     Quadrant4 -> negate val
+                                     
+                                 setYPolarityForQuadrant :: QuadrantAngle -> Double -> Double
+                                 setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of
+                                     Quadrant1 -> negate val
+                                     Quadrant2 -> val
+                                     Quadrant3 -> val
+                                     Quadrant4 -> negate val
+
+                                 setZPolarityForQuadrant :: Slope -> Double -> Double
+                                 --all math polar tests pass, but the keen heel sole adaptor slopes are nfg.
+                                 setZPolarityForQuadrant slope val =
+                                   case slope of
+                                     (PosXYSlope _) ->  val
+                                     otherwise  -> negate val
+
+
+                                 
+                                 --What quadrant of the xy plane, is the angle in?
+                                 getCurrentQuadrant :: QuadrantAngle -> Quadrant
+                                 getCurrentQuadrant ang       | quadAngle ang  < 0 = getCurrentQuadrant $ Angle (360 + (quadAngle ang))
+                                                              | quadAngle ang <= 90 = Quadrant1
+                                                              | quadAngle ang <= 180 = Quadrant2
+                                                              | quadAngle ang <= 270 = Quadrant3
+                                                              | quadAngle ang <= 360 = Quadrant4
+                                                              | quadAngle ang > 360 = getCurrentQuadrant $ Angle ((quadAngle ang) - 360)
+                                     
+                             in       
+                                 cPoint (Point 
                                     (--x:
                                      x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
                                       (radius adjustedRadius) * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
@@ -328,6 +338,65 @@ createCornerPoint cPoint origin (Radius horizRadius) (adjustedRadius)  (Angle xy
                                     )
                                   )
 
+
+createCornerPointSimplified :: (Point-> CornerPoints) -> Point -> Radius ->  QuadrantAngle -> Slope -> Slope -> CornerPoints
+createCornerPointSimplified cPoint origin horizRadius xyAngle xSlope ySlope  =
+                             let setXPolarityForQuadrant :: QuadrantAngle -> Double -> Double
+                                 setXPolarityForQuadrant angle val = case getCurrentQuadrant angle of
+                                     Quadrant1 -> val
+                                     Quadrant2 -> val
+                                     Quadrant3 -> negate val
+                                     Quadrant4 -> negate val
+                                     
+                                 setYPolarityForQuadrant :: QuadrantAngle -> Double -> Double
+                                 setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of
+                                     Quadrant1 -> negate val
+                                     Quadrant2 -> val
+                                     Quadrant3 -> val
+                                     Quadrant4 -> negate val
+
+                                 setZPolarityForQuadrant :: Slope -> Double -> Double
+                                 --all math polar tests pass, but the keen heel sole adaptor slopes are nfg.
+                                 setZPolarityForQuadrant slope val =
+                                   case slope of
+                                     (PosXYSlope _) ->  val
+                                     otherwise  -> negate val
+
+
+                                 
+                                 --What quadrant of the xy plane, is the angle in?
+                                 getCurrentQuadrant :: QuadrantAngle -> Quadrant
+                                 getCurrentQuadrant ang       | quadAngle ang  < 0 = getCurrentQuadrant $ Angle (360 + (quadAngle ang))
+                                                              | quadAngle ang <= 90 = Quadrant1
+                                                              | quadAngle ang <= 180 = Quadrant2
+                                                              | quadAngle ang <= 270 = Quadrant3
+                                                              | quadAngle ang <= 360 = Quadrant4
+                                                              | quadAngle ang > 360 = getCurrentQuadrant $ Angle ((quadAngle ang) - 360)
+
+
+
+                                 adjustedSlope = slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (quadAngle xyAngle))
+                                                                                      
+                                 adjustedRadius = (radiusAdjustedForZslope horizRadius adjustedSlope)
+                                 
+                             in       
+                                 cPoint (Point 
+                                    (--x:
+                                     x_axis origin + (setXPolarityForQuadrant xyAngle $
+                                      (radius adjustedRadius) * (sinDegrees  (quadAngle $ xyQuadrantAngle (quadAngle xyAngle)))))--tested good
+                                    
+                                    
+                                    (--y:
+                                     y_axis origin + (setYPolarityForQuadrant xyAngle $
+                                       (radius adjustedRadius) * (cosDegrees  (quadAngle $ xyQuadrantAngle  (quadAngle xyAngle)))))-- tested good
+
+                                    (--z:
+                                       case  (adjustedSlope) of
+                                        NegXYSlope slope' -> z_axis origin + (setZPolarityForQuadrant (NegXYSlope slope') ((radius horizRadius) * (sinDegrees (slope'))))
+                                        PosXYSlope slope' -> z_axis origin + (setZPolarityForQuadrant (PosXYSlope slope') ((radius horizRadius) * (sinDegrees (slope'))))
+                                    )
+                                  )
+ 
 {------------------------------------------------------------- createPerimeterBottomFaces--------------------------------------------
 
 -}
