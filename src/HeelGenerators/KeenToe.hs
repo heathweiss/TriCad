@@ -3,13 +3,14 @@ module HeelGenerators.KeenToe where
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
-  createBottomFaces,
+  createBottomFacesSimplified,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
   xyQuadrantAngle,
   createCornerPoint,
   Slope(..),
   Radius(..),
+  Angle(..),
   flatXSlope,
   flatYSlope,
   )
@@ -97,10 +98,12 @@ adaptorBtmFacesDebug =
 
 adaptorBtmFaces = 
   --front line
-  map (extractBottomFrontLine) (createBottomFaces adaptorBtmOrigin treadRadius angles flatXSlope flatYSlope)
+  map (extractBottomFrontLine)
+      (createBottomFacesSimplified adaptorBtmOrigin treadRadius (map (Angle) angles) flatXSlope flatYSlope)
   ++++
   --back line
-  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces adaptorBtmOrigin keyRadius angles flatXSlope flatYSlope)
+  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+      (createBottomFacesSimplified adaptorBtmOrigin keyRadius (map (Angle) angles) flatXSlope flatYSlope)
 
 --------------------------------------------------------------------------- create the keyway ---------------------------------------------------------
 writeKeyToStlFile :: IO()
@@ -120,7 +123,7 @@ keyDebug =
 keyCubes =
  createTopFaces topKeyOrigin keyRadius angles flatXSlope flatYSlope
  ++++
- createBottomFaces btmKeyOrigin keyRadius angles flatXSlope flatYSlope
+ createBottomFacesSimplified btmKeyOrigin keyRadius (map (Angle) angles) flatXSlope flatYSlope
 
 topKeyOrigin = (Point{x_axis=0, y_axis=(0), z_axis=25})
 btmKeyOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})

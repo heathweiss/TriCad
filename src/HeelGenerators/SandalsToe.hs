@@ -2,12 +2,13 @@ module  HeelGenerators.SandalsToe(sandalToeDebugToFile, sandalToeStlToFile ) whe
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
-  createBottomFaces,
+  createBottomFacesSimplified,
   radiusAdjustedForZslope,
   xyQuadrantAngle,
   createCornerPoint,
   Slope(..),
   Radius(..),
+  Angle(..),
   flatXSlope,
   flatYSlope,
   )
@@ -141,10 +142,12 @@ shoeBtmFacesDebug =
     shoeBtmFaces
 shoeBtmFaces =
       --front line
-    map (extractBottomFrontLine) (createBottomFaces shoeBtmOrigin shoeRadius angles flatXSlope (PosYSlope 0))
+    map (extractBottomFrontLine)
+        (createBottomFacesSimplified shoeBtmOrigin shoeRadius (map (Angle) angles) flatXSlope (PosYSlope 0))
     ++++
     --back line. Note that treadInnerRadius is used so that the keyway is kept consistent.
-    map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces shoeBtmOrigin treadInnerRadius angles flatXSlope (PosYSlope 0))
+    map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+        (createBottomFacesSimplified shoeBtmOrigin treadInnerRadius (map (Angle) angles) flatXSlope (PosYSlope 0))
 {------------------------------------ the riser layer -----------------------------------------------
 This riser has the tread radius on the bottom and shoe radius on the top, which means it adapts between the 2, as well as providing extra height.
 
@@ -250,7 +253,9 @@ treadBtmFacesDebug =
 
 treadBtmFaces = 
   --front line
-  map (extractBottomFrontLine) (createBottomFaces btmTreadOrigin treadRadius angles flatXSlope flatYSlope)
+  map (extractBottomFrontLine)
+      (createBottomFacesSimplified btmTreadOrigin treadRadius (map (Angle) angles) flatXSlope flatYSlope)
   ++++
   --back line
-  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces btmTreadOrigin treadInnerRadius angles flatXSlope flatYSlope)
+  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+      (createBottomFacesSimplified btmTreadOrigin treadInnerRadius (map (Angle) angles) flatXSlope flatYSlope)

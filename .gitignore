@@ -22,3 +22,4 @@ cabal.sandbox.config
 temp.stl
 .cabal-sandbox/x86_64-linux-ghc-7.8.3-packages.conf.d/package.cache
 workingNotes.txt
+workingNotes.txt~

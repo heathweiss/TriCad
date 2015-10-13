@@ -3,12 +3,12 @@ module HeelGenerators.BlackRunnerHeel(blackRunnerHeelStlFile, blackRunnerHeelDeb
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
-  createBottomFaces,
+  createBottomFacesSimplified,
   radiusAdjustedForZslope,
   xyQuadrantAngle,
-  createCornerPoint,
   Slope(..),
   Radius(..),
+  Angle(..),
   )
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
@@ -193,10 +193,12 @@ braceV1BtmFacesDebug =
 
 braceV1BtmFaces = 
   --front line
-  map (extractBottomFrontLine) (createBottomFaces braceV1BtmOrigin braceRadius angles flatXSlope flatYSlope)
+  map (extractBottomFrontLine)
+      (createBottomFacesSimplified braceV1BtmOrigin braceRadius (map (Angle) angles) flatXSlope flatYSlope)
   ++++
   --back line
-  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces braceV1BtmOrigin shoeRadius angles flatXSlope flatYSlope)
+  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+      (createBottomFacesSimplified braceV1BtmOrigin shoeRadius (map (Angle) angles) flatXSlope flatYSlope)
 
 
 {---------------------------------sloped adaptor-----------------------------------------------------------------
@@ -300,10 +302,12 @@ adaptorV1BtmFacesDebug =
  
 adaptorV1BtmFaces = 
   --front line
-  map (extractBottomFrontLine) (createBottomFaces adaptorV1BtmOrigin shoeRadius angles flatXSlope flatYSlope)
+  map (extractBottomFrontLine)
+      (createBottomFacesSimplified adaptorV1BtmOrigin shoeRadius (map (Angle) angles) flatXSlope flatYSlope)
   ++++
   --back line
-  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces adaptorV1BtmOrigin keywayRadius angles flatXSlope flatYSlope)
+  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+      (createBottomFacesSimplified adaptorV1BtmOrigin keywayRadius (map (Angle) angles) flatXSlope flatYSlope)
 
 {------------------------------ riser -----------------------------------------
 riser between tread and adpator.
@@ -348,10 +352,12 @@ riserBtmFacesDebug =
 
 riserBtmFaces = 
   --front line
-  map (extractBottomFrontLine) (createBottomFaces riserBtmOrigin shoeRadius angles flatXSlope flatYSlope)
+  map (extractBottomFrontLine)
+      (createBottomFacesSimplified riserBtmOrigin shoeRadius (map (Angle) angles) flatXSlope flatYSlope)
   ++++
   --back line
-  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces riserBtmOrigin keywayRadius angles flatXSlope flatYSlope)
+  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+      (createBottomFacesSimplified riserBtmOrigin keywayRadius (map (Angle) angles) flatXSlope flatYSlope)
 
 {-----------------------------the tread with keyway.----------------------- 
 Has the shape of the tread on bottom and shape of shoe on top.
@@ -400,10 +406,12 @@ treadKeywayBtmFacesDebug =
 
 treadKeywayBtmFaces = 
   --front line
-  map (extractBottomFrontLine) (createBottomFaces btmTreadOrigin treadRadius angles flatXSlope flatYSlope)
+  map (extractBottomFrontLine) (createBottomFacesSimplified btmTreadOrigin treadRadius (map (Angle) angles) flatXSlope flatYSlope)
   ++++
   --back line
-  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces btmTreadOrigin keywayRadius angles flatXSlope flatYSlope)
+  --map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces btmTreadOrigin keywayRadius angles flatXSlope flatYSlope)
+  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+      (createBottomFacesSimplified btmTreadOrigin keywayRadius (map (Angle) angles) flatXSlope flatYSlope)
 
 
 -------------------------------------------------- create the inner key ----------------------------------
@@ -470,4 +478,4 @@ keyTriangles = [FacesBottomFrontTop | x <- [1,2..36]]
 keyCubes =
  createTopFaces topKeyOrigin keyRadius angles flatXSlope flatYSlope
  ++++
- createBottomFaces btmKeyOrigin keyRadius angles flatXSlope flatYSlope
+ createBottomFacesSimplified btmKeyOrigin keyRadius (map (Angle) angles) flatXSlope flatYSlope
