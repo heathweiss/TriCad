@@ -3,13 +3,12 @@ module HeelGenerators.KeenHeel where
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
-  createBottomFaces,
+  createBottomFacesSimplified,
   createTopFacesWithVariableSlope,
-  createBottomFacesWithVariableSlope,
   xyQuadrantAngle,
-  createCornerPoint,
   Slope(..),
   Radius(..),
+  Angle(..),
   flatXSlope,
   flatYSlope,
   )
@@ -71,10 +70,12 @@ treadBtmCubes  =
 
 treadBtmFaces = 
   --front line
-  map (extractBottomFrontLine) (createBottomFaces treadBtmOrigin treadRadius angles flatXSlope flatYSlope)
+  map (extractBottomFrontLine)
+      (createBottomFacesSimplified treadBtmOrigin treadRadius (map (Angle) angles) flatXSlope flatYSlope)
   ++++
   --back line
-  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces treadBtmOrigin keyWayRadius angles flatXSlope flatYSlope)
+  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+      (createBottomFacesSimplified treadBtmOrigin keyWayRadius (map (Angle) angles) flatXSlope flatYSlope)
 
 treadDebug = 
    [CubeName "treadCubes" | x <- [1..]]
@@ -122,10 +123,12 @@ adaptorTopFaces =
 
 adaptorBtmFaces = 
   --front line
-  map (extractBottomFrontLine) (createBottomFaces adaptorBtmOrigin soleRadius angles flatXSlope flatYSlope)
+  map (extractBottomFrontLine)
+      (createBottomFacesSimplified adaptorBtmOrigin soleRadius (map (Angle) angles) flatXSlope flatYSlope)
   ++++
   --back line
-  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces adaptorBtmOrigin keyWayRadius angles flatXSlope flatYSlope)
+  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+      (createBottomFacesSimplified adaptorBtmOrigin keyWayRadius (map (Angle) angles) flatXSlope flatYSlope)
 
 adaptorTopOrigin = (Point{x_axis=0, y_axis=0, z_axis=30})
 adaptorBtmOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
@@ -160,7 +163,7 @@ keyDebug =
 keyCubes =
  createTopFaces topKeyOrigin keyRadius angles flatXSlope flatYSlope
  ++++
- createBottomFaces btmKeyOrigin keyRadius angles flatXSlope flatYSlope
+ createBottomFacesSimplified btmKeyOrigin keyRadius (map (Angle) angles) flatXSlope flatYSlope
 
 topKeyOrigin = (Point{x_axis=0, y_axis=(0), z_axis=20})
 btmKeyOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})

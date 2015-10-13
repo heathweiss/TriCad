@@ -461,9 +461,9 @@ createBottomFacesSimplified inOrigin radii angles xSlope ySlope  =
     ]
 
 
-
-
-createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
+{-
+createBottomFacesWithVariableSlopeOrig :: Point -> [Radius] -> [Double] -> [Slope] -> [Slope] -> [CornerPoints]
+createBottomFacesWithVariableSlopeOrig inOrigin inRadius inAngles xSlope ySlope  =
     (createCornerPoint
       (F4)
       inOrigin
@@ -482,6 +482,36 @@ createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
       (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle)))
       (Angle angle)
       (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle))
+     ) 
+     +++
+     B1 inOrigin
+       | angle <- tail inAngles
+       | currRadius <- tail inRadius
+       | currXSlope <- tail xSlope
+       | currYSlope <- tail ySlope
+    ]
+
+-}
+--the new simplfied
+createBottomFacesWithVariableSlope :: Point -> [Radius] -> [Angle] -> [Slope] -> [Slope] -> [CornerPoints]
+createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
+    (createCornerPointSimplified
+      (F4)
+      inOrigin
+      (head inRadius) 
+      (head inAngles)
+      (head xSlope)
+      (head ySlope)
+    ) 
+    +++
+    B4 inOrigin
+    ++>
+    [(createCornerPointSimplified
+      (F1)
+      inOrigin
+      currRadius
+      angle
+      currXSlope currYSlope
      ) 
      +++
      B1 inOrigin

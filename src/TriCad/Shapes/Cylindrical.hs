@@ -10,14 +10,13 @@ module TriCad.Shapes.Cylindrical(hello, cylinderHollow, cylinderSolid) where
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
-  createBottomFaces,
+  createBottomFacesSimplified,
   createTopFacesWithVariableSlope,
-  createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
   xyQuadrantAngle,
-  createCornerPoint,
   Slope(..),
   Radius(..),
+  Angle(..),
   flatXSlope,
   flatYSlope,
   )
@@ -57,11 +56,10 @@ ringBase btmOrigin btmInnerRadius btmOuterRadius topOrigin topInnerRadius topOut
      
      btmFaces =
        (map (extractBottomFrontLine)
-        (createBottomFaces btmOrigin btmOuterRadius angles flatXSlope flatYSlope))
+            (createBottomFacesSimplified btmOrigin btmOuterRadius (map (Angle) angles) flatXSlope flatYSlope))
        ++++
-       (map
-        (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
-        (createBottomFaces btmOrigin btmInnerRadius angles flatXSlope flatYSlope)
+       (map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+            (createBottomFacesSimplified btmOrigin btmInnerRadius (map (Angle) angles) flatXSlope flatYSlope)
        )
   
 {------------ cylinders ----------------------------

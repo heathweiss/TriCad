@@ -2,14 +2,14 @@ module Sockets.Bicycle (bicycleSocketDebug, bicycleSocketStlFile ) where
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
-  createBottomFaces,
+  createBottomFacesSimplified,
   createTopFacesWithVariableSlope,
-  createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
   xyQuadrantAngle,
   createCornerPoint,
   Slope(..),
   Radius(..),
+  Angle(..),
   flatXSlope,
   flatYSlope,
   )
@@ -515,10 +515,12 @@ v0BtmFacesDebug =
 
 v0BtmFaces = 
   --front line
-  map (extractBottomFrontLine) (createBottomFaces v0BtmOrigin v0OuterRadius angles flatXSlope flatYSlope)
+  map (extractBottomFrontLine)
+      (createBottomFacesSimplified v0BtmOrigin v0OuterRadius (map (Angle) angles) flatXSlope flatYSlope)
   ++++
   --back line
-  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces v0BtmOrigin v0InnerRadius angles flatXSlope flatYSlope)
+  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+      (createBottomFacesSimplified v0BtmOrigin v0InnerRadius (map (Angle) angles) flatXSlope flatYSlope)
 
 {------------------------------------------------------- adpt ----------------------------------------
 adapt from the 12.56 od mm bolt to v0 of the sockect
@@ -557,10 +559,12 @@ adaptorBtmFacesDebug =
     
 adaptorBtmFaces = 
   --front line
-  map (extractBottomFrontLine) (createBottomFaces origin adaptorOuterRadius angles flatXSlope flatYSlope)
+  map (extractBottomFrontLine)
+      (createBottomFacesSimplified origin adaptorOuterRadius (map (Angle) angles) flatXSlope flatYSlope)
   ++++
   --back line
-  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces origin adaptorInnerRadius angles flatXSlope flatYSlope)
+  map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
+      (createBottomFacesSimplified origin adaptorInnerRadius (map (Angle) angles) flatXSlope flatYSlope)
 
 {-
 v0InnerRadius = map (\(Radius x) -> Radius (x * 0.9))

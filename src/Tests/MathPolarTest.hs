@@ -12,8 +12,9 @@ import TriCad.MathPolar(
   createCornerPointSimplified,
   Slope(..),
   Angle(..),
-  --createBottomFaces,
+  createBottomFaces,
   createBottomFacesSimplified,
+  createBottomFacesWithVariableSlope,
   flatXSlope,
   flatYSlope,
   )
@@ -124,8 +125,9 @@ mathPolarTestDo = do
   --------------------bottom faces------------------
   putStrLn "\n\n" 
   putStrLn "createBottomFaces tests"
-  --runTestTT createBottomFacesTest
+  runTestTT createBottomFacesTest
   runTestTT createBottomFacesSimpliedTest
+  runTestTT createBottomFacesWithVariableSlopeTest
   ---------------- set xy quadrant tests==============================
   --leave for now, in case more testing is needed
   --runTestTT setQuadrant1YvalTest
@@ -141,19 +143,31 @@ fail2 = TestCase $ assertEqual
  "fail 2============================================" (True) (False)
 
 -- ==================================================createBottomFaces======================================
-{-
+
 createBottomFacesTest = TestCase $ assertEqual 
   "createBottomFaces"
   ([BottomFace {b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, f1 = Point {x_axis = 0.34904812874567026, y_axis = -19.996953903127825, z_axis = 0.0}, b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, f4 = Point {x_axis = 0.0, y_axis = -10.0, z_axis = 0.0}},BottomFace {b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, f1 = Point {x_axis = 1.0469849010750292, y_axis = -29.981724810572874, z_axis = 0.0}, b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, f4 = Point {x_axis = 0.34904812874567026, y_axis = -19.996953903127825, z_axis = 0.0}}])
   (createBottomFaces (Point 0 0 0) (map (Radius) [10, 20, 30]) [0, 1, 2]   flatXSlope flatYSlope)
--}
+
 createBottomFacesSimpliedTest = TestCase $ assertEqual 
   "createBottomFacesSimplified"
   ([BottomFace {b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, f1 = Point {x_axis = 0.34904812874567026, y_axis = -19.996953903127825, z_axis = 0.0}, b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, f4 = Point {x_axis = 0.0, y_axis = -10.0, z_axis = 0.0}},BottomFace {b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, f1 = Point {x_axis = 1.0469849010750292, y_axis = -29.981724810572874, z_axis = 0.0}, b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, f4 = Point {x_axis = 0.34904812874567026, y_axis = -19.996953903127825, z_axis = 0.0}}])
   (createBottomFacesSimplified (Point 0 0 0) (map (Radius) [10, 20, 30]) (map (Angle)[0, 1, 2])   flatXSlope flatYSlope)
 
+-- ===================================== createBottomFacesWithVariableSlope===========================================
 
- 
+
+createBottomFacesWithVariableSlopeTest = TestCase $ assertEqual
+  "createBottomFacesWithVariableSlopeSimplified test"
+  ( [BottomFace {b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, f1 = Point {x_axis = 0.34884291803342393, y_axis = -19.985197389297014, z_axis = -0.6857068829855988}, b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis =0.0}, f4 = Point {x_axis = 0.0, y_axis = -9.998476951563912, z_axis = -0.17452406437283513}},BottomFace {b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, f1 = Point {x_axis = 1.045650113906792, y_axis = -29.943501507144447, z_axis = -1.5143755580849436}, b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, f4 = Point {x_axis = 0.34884291803342393, y_axis = -19.985197389297014, z_axis = -0.6857068829855988}}])
+
+  (createBottomFacesWithVariableSlope
+    (Point 0 0 0) (map (Radius) [10, 20, 30]) (map (Angle)[0, 1, 2])
+    [(PosXSlope 1),(PosXSlope 2),(PosXSlope 3)]
+    [(PosYSlope 1),(PosYSlope 2),(PosYSlope 3)]     )
+
+
+
 {----------------------------------- set x/y values for target quadrant ------------------------------------------------
 setYPolarityForQuadrant :: QuadrantAngle -> Double -> Double
 setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of

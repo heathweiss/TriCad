@@ -14,9 +14,7 @@ module MiscShapes.RvVentCaps(hello, debug, stlFile, writeRvCapStlFile) where
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
-  createBottomFaces,
   createTopFacesWithVariableSlope,
-  createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
   xyQuadrantAngle,
   createCornerPoint,

@@ -25,12 +25,16 @@ library
                    Tests.MathTest, Tests.MathPolarTest, 
                    Tests.TransformTest, Tests.JsonTest, Tests.ParseTest
                    -- HeelGenerators
-                   HeelGenerators.BlackRunnerHeel,  HeelGenerators.BlackRunnerToe,
-                   HeelGenerators.SandalsToe, HeelGenerators.KeenToe, HeelGenerators.KeenHeel
+                   HeelGenerators.KeenToe, HeelGenerators.KeenHeel
+                   --HeelGenerators.SandalsToe, HeelGenerators.SandalsHeel
+                   --HeelGenerators.BlackRunnerHeel,  HeelGenerators.BlackRunnerToe,
+                     --Have not been redone for changes to MathPolar.
+                     --Leave in untill sure I will not need them further for printing shoe lifts
                    -- Sockets
                    Sockets.Bicycle
                    -- Misc Shapes
-                   MiscShapes.RvVentCaps, MiscShapes.ScanRaw
+                   MiscShapes.ScanRaw
+                   MiscShapes.RvVentCaps
                    --adaptors
                    Adaptors.HockeyStick
                    --Shapes
