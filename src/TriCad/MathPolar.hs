@@ -3,7 +3,6 @@ module TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
   createBottomFaces,
-  createBottomFacesSimplified,
   createRightFaces,
   createLeftFaces,
   createVerticalCubes,
@@ -405,36 +404,9 @@ the [BottomFace] is done.
 All Lines are created from the inputs, using Polar math.
 QuadrantAngle
 -}
-createBottomFaces :: Point -> [Radius] -> [Double] -> Slope -> Slope -> [CornerPoints]
-createBottomFaces inOrigin inRadius inAngles xSlope ySlope  =
-    (createCornerPoint
-      (F4)
-      inOrigin
-      (head inRadius) 
-      (radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles))))
-      (Angle (head inAngles))
-      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles)))
-    ) 
-    +++
-    B4 inOrigin
-    ++>
-    [(createCornerPoint
-      (F1)
-      inOrigin
-      currRadius
-      (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle)))
-      (Angle angle)
-      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle))
-     ) 
-     +++
-     B1 inOrigin
-       | angle <- tail inAngles
-       | currRadius <- tail inRadius
-    ]
 
-
-createBottomFacesSimplified :: Point -> [Radius] -> [Angle] -> Slope -> Slope -> [CornerPoints]
-createBottomFacesSimplified inOrigin radii angles xSlope ySlope  =
+createBottomFaces :: Point -> [Radius] -> [Angle] -> Slope -> Slope -> [CornerPoints]
+createBottomFaces inOrigin radii angles xSlope ySlope  =
     (createCornerPointSimplified
       (F4)
       inOrigin
