@@ -11,7 +11,7 @@ import TriCad.MathPolar(
   createCornerPoint,
   createCornerPointSimplified,
   Slope(..),
-  QuadrantAngle(..),
+  Angle(..),
   --setYPolarityForQuadrant,
   --setXPolarityForQuadrant,
   )

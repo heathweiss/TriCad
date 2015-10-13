@@ -19,7 +19,7 @@ module TriCad.MathPolar(
   MultiDegreeRadii(..),
   flatXSlope,
   flatYSlope,
-  QuadrantAngle(..),
+  Angle(..),
   --setYPolarityForQuadrant,
   --setXPolarityForQuadrant,
   Degree(..),
@@ -109,7 +109,7 @@ Angle:
 This will be the replacement for all of the others. It is simply a wrapper around Double.
 Once the others are gone, should make it a newtype, for efficiency.
 -}
-data QuadrantAngle = Quadrant1Angle  { quadAngle::Double}
+data Angle =         Quadrant1Angle  { quadAngle::Double}
                    | Quadrant2Angle  { quadAngle::Double}
                    | Quadrant3Angle  { quadAngle::Double}
                    | Quadrant4Angle  { quadAngle::Double}
@@ -181,7 +181,7 @@ data Slope = NegXYSlope {angle :: Double}
 Each quadrant will be 0-90 degrees.
 Orientated such as sin can be used for all quadrants, to calculate x, and cos for y
 -}
-xyQuadrantAngle :: Double ->  QuadrantAngle
+xyQuadrantAngle :: Double ->  Angle
 xyQuadrantAngle currAngle 
   | currAngle < 0 = xyQuadrantAngle (360 - currAngle)
   | currAngle <= 90 = Quadrant1Angle currAngle
@@ -206,7 +206,7 @@ should this return a type Angle = NegZAngle PosZAngle then continue on with test
 
 -}
 
-slopeAdjustedForVerticalAngle :: Slope -> Slope -> QuadrantAngle -> Slope
+slopeAdjustedForVerticalAngle :: Slope -> Slope -> Angle -> Slope
 slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant1Angle xyAngle)
   | ((sinDegrees xyAngle) * xSlope) >= ((cosDegrees xyAngle) * ySlope)  = PosXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
   | otherwise = NegXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
@@ -286,16 +286,16 @@ orign: Point
 -The starting point which gets adjusted to give the return point. That way, this point can be created relative to some position, instead of at an origin of 0 0 0
 
 -}
-createCornerPoint :: (Point-> CornerPoints) -> Point -> Radius -> Radius ->  QuadrantAngle -> Slope -> CornerPoints
+createCornerPoint :: (Point-> CornerPoints) -> Point -> Radius -> Radius ->  Angle -> Slope -> CornerPoints
 createCornerPoint cPoint origin (Radius horizRadius) (adjustedRadius)  (Angle xyAngle) (slope) =
-                             let setXPolarityForQuadrant :: QuadrantAngle -> Double -> Double
+                             let setXPolarityForQuadrant :: Angle -> Double -> Double
                                  setXPolarityForQuadrant angle val = case getCurrentQuadrant angle of
                                      Quadrant1 -> val
                                      Quadrant2 -> val
                                      Quadrant3 -> negate val
                                      Quadrant4 -> negate val
                                      
-                                 setYPolarityForQuadrant :: QuadrantAngle -> Double -> Double
+                                 setYPolarityForQuadrant :: Angle -> Double -> Double
                                  setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of
                                      Quadrant1 -> negate val
                                      Quadrant2 -> val
@@ -312,7 +312,7 @@ createCornerPoint cPoint origin (Radius horizRadius) (adjustedRadius)  (Angle xy
 
                                  
                                  --What quadrant of the xy plane, is the angle in?
-                                 getCurrentQuadrant :: QuadrantAngle -> Quadrant
+                                 getCurrentQuadrant :: Angle -> Quadrant
                                  getCurrentQuadrant ang       | quadAngle ang  < 0 = getCurrentQuadrant $ Angle (360 + (quadAngle ang))
                                                               | quadAngle ang <= 90 = Quadrant1
                                                               | quadAngle ang <= 180 = Quadrant2
@@ -339,16 +339,16 @@ createCornerPoint cPoint origin (Radius horizRadius) (adjustedRadius)  (Angle xy
                                   )
 
 
-createCornerPointSimplified :: (Point-> CornerPoints) -> Point -> Radius ->  QuadrantAngle -> Slope -> Slope -> CornerPoints
+createCornerPointSimplified :: (Point-> CornerPoints) -> Point -> Radius ->  Angle -> Slope -> Slope -> CornerPoints
 createCornerPointSimplified cPoint origin horizRadius xyAngle xSlope ySlope  =
-                             let setXPolarityForQuadrant :: QuadrantAngle -> Double -> Double
+                             let setXPolarityForQuadrant :: Angle -> Double -> Double
                                  setXPolarityForQuadrant angle val = case getCurrentQuadrant angle of
                                      Quadrant1 -> val
                                      Quadrant2 -> val
                                      Quadrant3 -> negate val
                                      Quadrant4 -> negate val
                                      
-                                 setYPolarityForQuadrant :: QuadrantAngle -> Double -> Double
+                                 setYPolarityForQuadrant :: Angle -> Double -> Double
                                  setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of
                                      Quadrant1 -> negate val
                                      Quadrant2 -> val
@@ -365,7 +365,7 @@ createCornerPointSimplified cPoint origin horizRadius xyAngle xSlope ySlope  =
 
                                  
                                  --What quadrant of the xy plane, is the angle in?
-                                 getCurrentQuadrant :: QuadrantAngle -> Quadrant
+                                 getCurrentQuadrant :: Angle -> Quadrant
                                  getCurrentQuadrant ang       | quadAngle ang  < 0 = getCurrentQuadrant $ Angle (360 + (quadAngle ang))
                                                               | quadAngle ang <= 90 = Quadrant1
                                                               | quadAngle ang <= 180 = Quadrant2
@@ -397,9 +397,14 @@ createCornerPointSimplified cPoint origin horizRadius xyAngle xSlope ySlope  =
                                     )
                                   )
  
-{------------------------------------------------------------- createPerimeterBottomFaces--------------------------------------------
+{- |Create a single CornerPoints.BottomRightLine, and add it to the head of [BottomLeftLine]. This will give a BottomFace.
+Then add the next BottomLeftLine to this BottomFace to get the next BottomFace. Continue through the [BottomLeftLine] till
+the [BottomFace] is done.
 
+All Lines are created from the inputs, using Polar math.
+QuadrantAngle
 -}
+createBottomFaces :: Point -> [Radius] -> [Double] -> Slope -> Slope -> [CornerPoints]
 createBottomFaces inOrigin inRadius inAngles xSlope ySlope  =
     (createCornerPoint
       (F4)

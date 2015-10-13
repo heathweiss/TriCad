@@ -6,7 +6,6 @@ import TriCad.MathPolar(
   createBottomFaces,
   radiusAdjustedForZslope,
   xyQuadrantAngle,
-  QuadrantAngle(..),
   createCornerPoint,
   Slope(..),
   Radius(..),
@@ -20,7 +19,7 @@ import TriCad.CornerPointsFaceConversions(lowerFaceFromUpperFace, backBottomLine
 import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
 import TriCad.StlFileWriter(writeStlToFile, writeStlDebugToFile)
 
-blackRunnerHeelStlFile = newStlShape "BlackRunnerHeel" adaptorTriangles --  braceTriangles
+blackRunnerHeelStlFile = newStlShape "BlackRunnerHeel"    braceTriangles-- adaptorTriangles
 blackRunnerHeelDebug =  braceV2CubesDebug
 
 {-
