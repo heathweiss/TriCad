@@ -3,6 +3,7 @@ module TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
   createBottomFaces,
+  createBottomFacesSimplified,
   createRightFaces,
   createLeftFaces,
   createVerticalCubes,
@@ -430,6 +431,37 @@ createBottomFaces inOrigin inRadius inAngles xSlope ySlope  =
        | angle <- tail inAngles
        | currRadius <- tail inRadius
     ]
+
+
+createBottomFacesSimplified :: Point -> [Radius] -> [Angle] -> Slope -> Slope -> [CornerPoints]
+createBottomFacesSimplified inOrigin radii angles xSlope ySlope  =
+    (createCornerPointSimplified
+      (F4)
+      inOrigin
+      (head radii)
+      (head angles)
+      xSlope
+      ySlope
+    ) 
+    +++
+    B4 inOrigin
+    ++>
+    [(createCornerPointSimplified
+      (F1)
+      inOrigin
+      radius
+      angle
+      xSlope
+      ySlope
+     ) 
+     +++
+     B1 inOrigin
+       | angle <- tail angles
+       | radius <- tail radii
+    ]
+
+
+
 
 createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
     (createCornerPoint
