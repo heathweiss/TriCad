@@ -47,11 +47,11 @@ ringBase btmOrigin btmInnerRadius btmOuterRadius topOrigin topInnerRadius topOut
   topFaces ++++ btmFaces
    where
      topFaces =
-       (map (extractFrontTopLine) (createTopFaces topOrigin topOuterRadius angles flatXSlope flatYSlope))
+       (map (extractFrontTopLine) (createTopFaces topOrigin topOuterRadius (map (Angle) angles) flatXSlope flatYSlope))
        ++++
        (map
         (backTopLineFromFrontTopLine . extractFrontTopLine)
-        (createTopFaces topOrigin topInnerRadius angles flatXSlope flatYSlope)
+        (createTopFaces topOrigin topInnerRadius (map (Angle) angles) flatXSlope flatYSlope)
        )
      
      btmFaces =

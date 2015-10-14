@@ -380,38 +380,6 @@ createBottomFaces inOrigin radii angles xSlope ySlope  =
     ]
 
 
-{-
-createBottomFacesWithVariableSlopeOrig :: Point -> [Radius] -> [Double] -> [Slope] -> [Slope] -> [CornerPoints]
-createBottomFacesWithVariableSlopeOrig inOrigin inRadius inAngles xSlope ySlope  =
-    (createCornerPoint
-      (F4)
-      inOrigin
-      (head inRadius) 
-      (radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles))))
-      (Angle (head inAngles))
-      (slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles)))
-    ) 
-    +++
-    B4 inOrigin
-    ++>
-    [(createCornerPoint
-      (F1)
-      inOrigin
-      currRadius
-      (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle)))
-      (Angle angle)
-      (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle))
-     ) 
-     +++
-     B1 inOrigin
-       | angle <- tail inAngles
-       | currRadius <- tail inRadius
-       | currXSlope <- tail xSlope
-       | currYSlope <- tail ySlope
-    ]
-
--}
---the new simplfied
 createBottomFacesWithVariableSlope :: Point -> [Radius] -> [Angle] -> [Slope] -> [Slope] -> [CornerPoints]
 createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
     (createCornerPoint
@@ -443,6 +411,38 @@ createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
 {---------------------------------------------------------------- createTopFaces ----------------------------
 
 -}
+createTopFaces :: Point -> [Radius] -> [Angle] -> Slope -> Slope -> [CornerPoints]
+createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
+     (createCornerPoint
+      (F3)
+      inOrigin
+      (head inRadius) 
+      --(radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles))))
+      --(Angle (head inAngles))
+      (head inAngles)
+      --(slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles)))
+      xSlope ySlope
+    ) 
+    +++
+    B3 inOrigin
+    ++>
+    [(createCornerPoint
+      (F2)
+      inOrigin
+      currRadius
+      --(radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle)))
+      --(Angle angle)
+      angle
+      --(slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle))
+      xSlope
+      ySlope
+     ) 
+     +++
+     B2 inOrigin
+       | angle <- tail inAngles
+       | currRadius <- tail inRadius
+    ]
+{-before change inAngles from Double to Angle
 createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
      (createCornerPoint
       (F3)
@@ -471,7 +471,7 @@ createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
        | angle <- tail inAngles
        | currRadius <- tail inRadius
     ]
-
+-}
 createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
     (createCornerPoint
       (F3)

@@ -71,11 +71,11 @@ treadBtmCubes  =
 treadBtmFaces = 
   --front line
   map (extractBottomFrontLine)
-      (createBottomFaces treadBtmOrigin treadRadius (map (Angle) angles) flatXSlope flatYSlope)
+      (createBottomFaces treadBtmOrigin treadRadius angles flatXSlope flatYSlope)
   ++++
   --back line
   map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
-      (createBottomFaces treadBtmOrigin keyWayRadius (map (Angle) angles) flatXSlope flatYSlope)
+      (createBottomFaces treadBtmOrigin keyWayRadius angles flatXSlope flatYSlope)
 
 treadDebug = 
    [CubeName "treadCubes" | x <- [1..]]
@@ -124,11 +124,11 @@ adaptorTopFaces =
 adaptorBtmFaces = 
   --front line
   map (extractBottomFrontLine)
-      (createBottomFaces adaptorBtmOrigin soleRadius (map (Angle) angles) flatXSlope flatYSlope)
+      (createBottomFaces adaptorBtmOrigin soleRadius angles flatXSlope flatYSlope)
   ++++
   --back line
   map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
-      (createBottomFaces adaptorBtmOrigin keyWayRadius (map (Angle) angles) flatXSlope flatYSlope)
+      (createBottomFaces adaptorBtmOrigin keyWayRadius angles flatXSlope flatYSlope)
 
 adaptorTopOrigin = (Point{x_axis=0, y_axis=0, z_axis=30})
 adaptorBtmOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
@@ -163,13 +163,13 @@ keyDebug =
 keyCubes =
  createTopFaces topKeyOrigin keyRadius angles flatXSlope flatYSlope
  ++++
- createBottomFaces btmKeyOrigin keyRadius (map (Angle) angles) flatXSlope flatYSlope
+ createBottomFaces btmKeyOrigin keyRadius angles flatXSlope flatYSlope
 
 topKeyOrigin = (Point{x_axis=0, y_axis=(0), z_axis=20})
 btmKeyOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
 
 ------------------------------------------------------------------------- radius ---------------------------------------------------------------------
-angles = [0,10..380]
+angles = map (Angle) [0,10..380]
 
 --radius of the keyway, base on the shape of the keen sole.
 keyWayRadius = map (\(Radius x) -> (Radius (x * 0.5))) soleRadius

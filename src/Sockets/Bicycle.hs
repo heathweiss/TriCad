@@ -479,7 +479,7 @@ v0InnerRadius = map (\(Radius x) -> Radius (x * 0.9))
     
 v0OuterRadius = map (\(Radius x) -> (Radius (x * outerRadiusFactor))) v0InnerRadius
 
-angles = [0,10..360]
+angles = map (Angle) [0,10..360]
 
 v0BtmOrigin = (Point{x_axis=0, y_axis=0, z_axis=adaptorHeight})
 v0TopOrigin = (Point{x_axis=0, y_axis=0, z_axis=v0Height})
@@ -516,11 +516,11 @@ v0BtmFacesDebug =
 v0BtmFaces = 
   --front line
   map (extractBottomFrontLine)
-      (createBottomFaces v0BtmOrigin v0OuterRadius (map (Angle) angles) flatXSlope flatYSlope)
+      (createBottomFaces v0BtmOrigin v0OuterRadius angles flatXSlope flatYSlope)
   ++++
   --back line
   map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
-      (createBottomFaces v0BtmOrigin v0InnerRadius (map (Angle) angles) flatXSlope flatYSlope)
+      (createBottomFaces v0BtmOrigin v0InnerRadius angles flatXSlope flatYSlope)
 
 {------------------------------------------------------- adpt ----------------------------------------
 adapt from the 12.56 od mm bolt to v0 of the sockect
@@ -560,11 +560,11 @@ adaptorBtmFacesDebug =
 adaptorBtmFaces = 
   --front line
   map (extractBottomFrontLine)
-      (createBottomFaces origin adaptorOuterRadius (map (Angle) angles) flatXSlope flatYSlope)
+      (createBottomFaces origin adaptorOuterRadius angles flatXSlope flatYSlope)
   ++++
   --back line
   map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
-      (createBottomFaces origin adaptorInnerRadius (map (Angle) angles) flatXSlope flatYSlope)
+      (createBottomFaces origin adaptorInnerRadius angles flatXSlope flatYSlope)
 
 {-
 v0InnerRadius = map (\(Radius x) -> Radius (x * 0.9))

@@ -98,12 +98,12 @@ adaptorBtmFacesDebug =
 
 adaptorBtmFaces = 
   --front line
-  map (extractBottomFrontLine)
-      (createBottomFaces adaptorBtmOrigin treadRadius (map (Angle) angles) flatXSlope flatYSlope)
+  (map (extractBottomFrontLine)
+      (createBottomFaces adaptorBtmOrigin treadRadius angles flatXSlope flatYSlope))
   ++++
   --back line
   map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
-      (createBottomFaces adaptorBtmOrigin keyRadius (map (Angle) angles) flatXSlope flatYSlope)
+      (createBottomFaces adaptorBtmOrigin keyRadius angles flatXSlope flatYSlope)
 
 --------------------------------------------------------------------------- create the keyway ---------------------------------------------------------
 writeKeyToStlFile :: IO()
@@ -123,7 +123,7 @@ keyDebug =
 keyCubes =
  createTopFaces topKeyOrigin keyRadius angles flatXSlope flatYSlope
  ++++
- createBottomFaces btmKeyOrigin keyRadius (map (Angle) angles) flatXSlope flatYSlope
+ createBottomFaces btmKeyOrigin keyRadius angles flatXSlope flatYSlope
 
 topKeyOrigin = (Point{x_axis=0, y_axis=(0), z_axis=25})
 btmKeyOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
@@ -132,7 +132,7 @@ btmKeyOrigin = (Point{x_axis=0, y_axis=0, z_axis=0})
 
 
 --------------------------------------------------------------------------------- radii and other base info --------------------------------------------------------------------
-angles = [0,10..380]
+angles = map (Angle) [0,10..380]
 
 --radius of the keyway, base on the shape of the keen sole.
 keyRadius = map (\(Radius x) -> (Radius (x * 0.5))) soleRadius 
