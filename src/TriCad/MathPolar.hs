@@ -12,7 +12,6 @@ module TriCad.MathPolar(
   radiusAdjustedForZslope,
   xyQuadrantAngle,
   createCornerPoint,
-  createCornerPointSimplified,
   Slope(..),
   Radius(..),
   SingleDegreeRadii(..),
@@ -286,61 +285,9 @@ orign: Point
 -The starting point which gets adjusted to give the return point. That way, this point can be created relative to some position, instead of at an origin of 0 0 0
 
 -}
-createCornerPoint :: (Point-> CornerPoints) -> Point -> Radius -> Radius ->  Angle -> Slope -> CornerPoints
-createCornerPoint cPoint origin (Radius horizRadius) (adjustedRadius)  (Angle xyAngle) (slope) =
-                             let setXPolarityForQuadrant :: Angle -> Double -> Double
-                                 setXPolarityForQuadrant angle val = case getCurrentQuadrant angle of
-                                     Quadrant1 -> val
-                                     Quadrant2 -> val
-                                     Quadrant3 -> negate val
-                                     Quadrant4 -> negate val
-                                     
-                                 setYPolarityForQuadrant :: Angle -> Double -> Double
-                                 setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of
-                                     Quadrant1 -> negate val
-                                     Quadrant2 -> val
-                                     Quadrant3 -> val
-                                     Quadrant4 -> negate val
 
-                                 setZPolarityForQuadrant :: Slope -> Double -> Double
-                                 --all math polar tests pass, but the keen heel sole adaptor slopes are nfg.
-                                 setZPolarityForQuadrant slope val =
-                                   case slope of
-                                     (PosXYSlope _) ->  val
-                                     otherwise  -> negate val
-
-
-                                 
-                                 --What quadrant of the xy plane, is the angle in?
-                                 getCurrentQuadrant :: Angle -> Quadrant
-                                 getCurrentQuadrant ang       | quadAngle ang  < 0 = getCurrentQuadrant $ Angle (360 + (quadAngle ang))
-                                                              | quadAngle ang <= 90 = Quadrant1
-                                                              | quadAngle ang <= 180 = Quadrant2
-                                                              | quadAngle ang <= 270 = Quadrant3
-                                                              | quadAngle ang <= 360 = Quadrant4
-                                                              | quadAngle ang > 360 = getCurrentQuadrant $ Angle ((quadAngle ang) - 360)
-                                     
-                             in       
-                                 cPoint (Point 
-                                    (--x:
-                                     x_axis origin + (setXPolarityForQuadrant (Angle xyAngle) $
-                                      (radius adjustedRadius) * (sinDegrees  (quadAngle $ xyQuadrantAngle xyAngle))))--tested good
-                                    
-                                    
-                                    (--y:
-                                     y_axis origin + (setYPolarityForQuadrant (Angle xyAngle) $
-                                       (radius adjustedRadius) * (cosDegrees  (quadAngle $ xyQuadrantAngle  xyAngle))))-- tested good
-                                    
-                                    (--z:
-                                      case slope of
-                                        NegXYSlope slope' -> z_axis origin + (setZPolarityForQuadrant (NegXYSlope slope') (horizRadius * (sinDegrees (slope'))))
-                                        PosXYSlope slope' -> z_axis origin + (setZPolarityForQuadrant (PosXYSlope slope') (horizRadius * (sinDegrees (slope'))))
-                                    )
-                                  )
-
-
-createCornerPointSimplified :: (Point-> CornerPoints) -> Point -> Radius ->  Angle -> Slope -> Slope -> CornerPoints
-createCornerPointSimplified cPoint origin horizRadius xyAngle xSlope ySlope  =
+createCornerPoint :: (Point-> CornerPoints) -> Point -> Radius ->  Angle -> Slope -> Slope -> CornerPoints
+createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
                              let setXPolarityForQuadrant :: Angle -> Double -> Double
                                  setXPolarityForQuadrant angle val = case getCurrentQuadrant angle of
                                      Quadrant1 -> val
@@ -407,7 +354,7 @@ QuadrantAngle
 
 createBottomFaces :: Point -> [Radius] -> [Angle] -> Slope -> Slope -> [CornerPoints]
 createBottomFaces inOrigin radii angles xSlope ySlope  =
-    (createCornerPointSimplified
+    (createCornerPoint
       (F4)
       inOrigin
       (head radii)
@@ -418,7 +365,7 @@ createBottomFaces inOrigin radii angles xSlope ySlope  =
     +++
     B4 inOrigin
     ++>
-    [(createCornerPointSimplified
+    [(createCornerPoint
       (F1)
       inOrigin
       radius
@@ -467,7 +414,7 @@ createBottomFacesWithVariableSlopeOrig inOrigin inRadius inAngles xSlope ySlope 
 --the new simplfied
 createBottomFacesWithVariableSlope :: Point -> [Radius] -> [Angle] -> [Slope] -> [Slope] -> [CornerPoints]
 createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
-    (createCornerPointSimplified
+    (createCornerPoint
       (F4)
       inOrigin
       (head inRadius) 
@@ -478,7 +425,7 @@ createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
     +++
     B4 inOrigin
     ++>
-    [(createCornerPointSimplified
+    [(createCornerPoint
       (F1)
       inOrigin
       currRadius
@@ -501,9 +448,10 @@ createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
       (F3)
       inOrigin
       (head inRadius) 
-      (radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles))))
+      --(radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles))))
       (Angle (head inAngles))
-      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles)))
+      --(slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles)))
+      xSlope ySlope
     ) 
     +++
     B3 inOrigin
@@ -512,9 +460,11 @@ createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
       (F2)
       inOrigin
       currRadius
-      (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle)))
+      --(radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle)))
       (Angle angle)
-      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle))
+      --(slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle))
+      xSlope
+      ySlope
      ) 
      +++
      B2 inOrigin
@@ -527,9 +477,11 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
       (F3)
       inOrigin
       (head inRadius) 
-      (radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles))))
+      --(radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles))))
       (Angle (head inAngles))
-      (slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles)))
+      --(slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles)))
+      (head xSlope)
+      (head ySlope)
     ) 
     +++
     B3 inOrigin
@@ -538,9 +490,11 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
       (F2)
       inOrigin
       currRadius
-      (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle)))
+      --(radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle)))
       (Angle angle)
-      (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle))
+      --(slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle))
+      currXSlope
+      currYSlope
      ) 
      +++
      B2 inOrigin
@@ -621,9 +575,11 @@ createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor topFrontCo
       (topFrontConstructor)
       topOrigin
       (head $ radii inDegree) 
-      (radiusAdjustedForZslope (head $ radii inDegree) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree))))
+      --(radiusAdjustedForZslope (head $ radii inDegree) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree))))
       (Angle (degree inDegree))
-      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree)))
+      --(slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree)))
+      xSlope
+      ySlope
     ) 
     +++
     topBackConstructor topOrigin
@@ -632,9 +588,11 @@ createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor topFrontCo
       (btmFrontConstructor)
       (transposeZ (+(-currZVal)) topOrigin)  --topOrigin
       currRadius
-      (radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree))))
+      --(radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree))))
       (Angle (degree inDegree))
-      (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree)))
+      --(slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree)))
+      xSlope
+      ySlope
      ) 
      +++
      btmBackConstructor (transposeZ (+(-currZVal)) topOrigin)  --topOrigin
