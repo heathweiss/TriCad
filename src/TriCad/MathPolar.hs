@@ -10,7 +10,7 @@ module TriCad.MathPolar(
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
-  xyQuadrantAngle,
+  quadrantOfAngle,
   createCornerPoint,
   Slope(..),
   Radius(..),
@@ -178,16 +178,16 @@ data Slope = NegXYSlope {angle :: Double}
 
 {-
 Each quadrant will be 0-90 degrees.
-Orientated such as sin can be used for all quadrants, to calculate x, and cos for y
+Orientated so that, for all quadrants, sin to calculate x, and cos for y
 -}
-xyQuadrantAngle :: Double ->  Angle
-xyQuadrantAngle currAngle 
-  | currAngle < 0 = xyQuadrantAngle (360 - currAngle)
+quadrantOfAngle :: Double ->  Angle
+quadrantOfAngle currAngle 
+  | currAngle < 0 = quadrantOfAngle (360 - currAngle)
   | currAngle <= 90 = Quadrant1Angle currAngle
   | currAngle <= 180 = Quadrant2Angle (180 - currAngle)
   | currAngle <= 270 = Quadrant3Angle $ currAngle - 180   -- 90 - (270 - currAngle)
   | currAngle <= 360 = Quadrant4Angle (360 - currAngle)
-  | currAngle > 360 = xyQuadrantAngle (currAngle - 360)
+  | currAngle > 360 = quadrantOfAngle (currAngle - 360)
 
 
 
@@ -322,7 +322,7 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
 
 
 
-                                 adjustedSlope = slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (quadAngle xyAngle))
+                                 adjustedSlope = slopeAdjustedForVerticalAngle xSlope ySlope (quadrantOfAngle (quadAngle xyAngle))
                                                                                       
                                  adjustedRadius = (radiusAdjustedForZslope horizRadius adjustedSlope)
                                  
@@ -330,12 +330,12 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
                                  cPoint (Point 
                                     (--x:
                                      x_axis origin + (setXPolarityForQuadrant xyAngle $
-                                      (radius adjustedRadius) * (sinDegrees  (quadAngle $ xyQuadrantAngle (quadAngle xyAngle)))))--tested good
+                                      (radius adjustedRadius) * (sinDegrees  (quadAngle $ quadrantOfAngle (quadAngle xyAngle)))))--tested good
                                     
                                     
                                     (--y:
                                      y_axis origin + (setYPolarityForQuadrant xyAngle $
-                                       (radius adjustedRadius) * (cosDegrees  (quadAngle $ xyQuadrantAngle  (quadAngle xyAngle)))))-- tested good
+                                       (radius adjustedRadius) * (cosDegrees  (quadAngle $ quadrantOfAngle  (quadAngle xyAngle)))))-- tested good
 
                                     (--z:
                                        case  (adjustedSlope) of

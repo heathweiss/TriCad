@@ -7,7 +7,7 @@ import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   radiusAdjustedForZslope,
   Radius(..),
-  xyQuadrantAngle,
+  quadrantOfAngle,
   createCornerPoint,
   Slope(..),
   Angle(..),
@@ -185,25 +185,25 @@ setQuadrant3Xval190Test = TestCase $ assertEqual
 xyQuadrantAngle currAngle 
 -}
 getQuadrantAngleTest = TestCase $ assertEqual 
-  "getQuadrantAngleTest" (Quadrant1Angle 10) (xyQuadrantAngle 10  )
+  "getQuadrantAngleTest" (Quadrant1Angle 10) (quadrantOfAngle 10  )
 
 getQuadrantAngleTest2 = TestCase $ assertEqual 
-  "getQuadrantAngleTest2" (Quadrant2Angle 80) (xyQuadrantAngle 100  )
+  "getQuadrantAngleTest2" (Quadrant2Angle 80) (quadrantOfAngle 100  )
 
 getQuadrantAngleTest3 = TestCase $ assertEqual 
-  "getQuadrantAngleTest3" (Quadrant2Angle 10) (xyQuadrantAngle 170  )
+  "getQuadrantAngleTest3" (Quadrant2Angle 10) (quadrantOfAngle 170  )
 
 getQuadrantAngleTest4 = TestCase $ assertEqual 
-  "getQuadrantAngleTest4" (Quadrant3Angle 10) (xyQuadrantAngle 190  )
+  "getQuadrantAngleTest4" (Quadrant3Angle 10) (quadrantOfAngle 190  )
 
 getQuadrantAngleTest5 = TestCase $ assertEqual 
-  "getQuadrantAngleTest5" (Quadrant3Angle 80) (xyQuadrantAngle 260  )
+  "getQuadrantAngleTest5" (Quadrant3Angle 80) (quadrantOfAngle 260  )
 
 getQuadrantAngleTest6 = TestCase $ assertEqual 
-  "getQuadrantAngleTest6" (Quadrant4Angle 80) (xyQuadrantAngle 280  )
+  "getQuadrantAngleTest6" (Quadrant4Angle 80) (quadrantOfAngle 280  )
 
 getQuadrantAngleTest7 = TestCase $ assertEqual 
-  "getQuadrantAngleTest7" (Quadrant4Angle 10) (xyQuadrantAngle 350  )
+  "getQuadrantAngleTest7" (Quadrant4Angle 10) (quadrantOfAngle 350  )
 
 
 
@@ -215,17 +215,17 @@ slopeAdjustedForVerticalAngle xSlope ySlope xyAngle
 
 {--------all the y angles without an x angle-------}
 slopeForXYAngleAndYslopeTestX0Ypos0XY0 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestX0Ypos0XY0" (PosXYSlope (0)) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (xyQuadrantAngle 0)  )
+  "slopeForXYAngleAndYslopeTestX0Ypos0XY0" (PosXYSlope (0)) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (quadrantOfAngle 0)  )
 
 
 slopeForXYAngleAndYslopeTestX0Ypos10XY10 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY10" (NegXYSlope (4.92403876506104)) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 5) (xyQuadrantAngle 10)  )
+  "slopeForXYAngleAndYslopeTestY10" (NegXYSlope (4.92403876506104)) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 5) (quadrantOfAngle 10)  )
 
 slopeForXYAngleAndYslopeTestXPos1Ypos10XY10 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY10" (NegXYSlope (9.67442935245515)) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 10)  )
+  "slopeForXYAngleAndYslopeTestY10" (NegXYSlope (9.67442935245515)) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 10)  )
 
 slopeForXYAngleAndYslopeTestXPos10Ypos1XY10 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY10" (PosXYSlope (0.7516740236570952)) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 10)  )
+  "slopeForXYAngleAndYslopeTestY10" (PosXYSlope (0.7516740236570952)) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 10)  )
 
 {-
 x1 = sin(10) * 10 = 1.73648177667 pos
@@ -234,7 +234,7 @@ y + x = 2.721289529682 so it is a PosXYSlope
 
 -}
 slopeForXYAngleAndYslopeTestXPos10Yneg1XY10 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos10Yneg1XY10" (PosXYSlope (2.721289529681511)) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (xyQuadrantAngle 10)  )
+  "slopeForXYAngleAndYslopeTestXPos10Yneg1XY10" (PosXYSlope (2.721289529681511)) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (quadrantOfAngle 10)  )
 
 {-
 x1 = sin(10) * 1 = 0.173648177667 pos
@@ -243,14 +243,14 @@ y + x = 10.021725707787 so it is a PosXYSlope
 
 -}
 slopeForXYAngleAndYslopeTestXPos1Yneg10XY10 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos1Yneg10XY10" (PosXYSlope (10.02172570778901)) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 10)  )
+  "slopeForXYAngleAndYslopeTestXPos1Yneg10XY10" (PosXYSlope (10.02172570778901)) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (quadrantOfAngle 10)  )
 
 
 slopeForXYAngleAndYslopeTestXPos1YPos10XY80 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY80" (NegXYSlope 0.7516740236570961) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 80)  )
+  "slopeForXYAngleAndYslopeTestY80" (NegXYSlope 0.7516740236570961) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 80)  )
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY80 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 9.67442935245515) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 80)  )
+  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 9.67442935245515) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 80)  )
 
 {-
 x1 = sin(80) * 10 = 9.84807753012 pos
@@ -258,7 +258,7 @@ y10  = cos(80) * 1 = 0.173648177667 pos
 y + x = 10.021725707787 so it is a PosXYSlope
 -}
 slopeForXYAngleAndYslopeTestXPos10Yneg1XY80 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos10Yneg1XY80" (PosXYSlope (10.02172570778901)) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (xyQuadrantAngle 80)  )
+  "slopeForXYAngleAndYslopeTestXPos10Yneg1XY80" (PosXYSlope (10.02172570778901)) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (quadrantOfAngle 80)  )
 
 {-
 x1 = sin(80) * 1 = 0.984807753012 pos
@@ -266,19 +266,19 @@ y10  = cos(80) * 10 = 1.73648177667 pos
 y + x = 2.721289529682 so it is a PosXYSlope
 -}
 slopeForXYAngleAndYslopeTestXPos1Yneg10XY80 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos1Yneg1XY80" (PosXYSlope 2.721289529681512) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 80)  )
+  "slopeForXYAngleAndYslopeTestXPos1Yneg1XY80" (PosXYSlope 2.721289529681512) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (quadrantOfAngle 80)  )
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY90 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY90" (PosXYSlope 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 90)  )
+  "slopeForXYAngleAndYslopeTestY90" (PosXYSlope 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 90)  )
 
 slopeForXYAngleAndYslopeTestXPos1YPos10XY100 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 2.721289529681512) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 100)  )
+  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 2.721289529681512) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 100)  )
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY100 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 100)  )
+  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 100)  )
 -- ==================================================================================================================================================================================================
 slopeForXYAngleAndYslopeTestXPos0YNeg10XY100 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos0YNeg10XY100" (NegXYSlope {angle = 1.7364817766693041}) (slopeAdjustedForVerticalAngle (PosXSlope 0) (NegYSlope 10) (xyQuadrantAngle 100)  )
+  "slopeForXYAngleAndYslopeTestXPos0YNeg10XY100" (NegXYSlope {angle = 1.7364817766693041}) (slopeAdjustedForVerticalAngle (PosXSlope 0) (NegYSlope 10) (quadrantOfAngle 100)  )
 
 {-
 x1 = sin(100) * 1 = 0.984807753012 pos
@@ -286,14 +286,14 @@ y10  = cos(80) * 10 = 1.73648177667 neg
 y - x = 0.751674023658 NegXYSlope
 -}
 slopeForXYAngleAndYslopeTestXPos1YNeg10XY100 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos1YNeg10XY100" (NegXYSlope 0.7516740236570961) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 100)  )
+  "slopeForXYAngleAndYslopeTestXPos1YNeg10XY100" (NegXYSlope 0.7516740236570961) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (quadrantOfAngle 100)  )
 
 
 slopeForXYAngleAndYslopeTestXPos1YPos10XY170 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 170)  )
+  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 170)  )
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY170 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 2.721289529681511) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 170)  )
+  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 2.721289529681511) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 170)  )
 
 {-
 x1 = sin(10) * 0 = 0.173648177667 pos
@@ -301,7 +301,7 @@ y10  = cos(10) * 10 = 9.84807753012 neg
 y - x = 9.84807753012 NegXYSlope
 -}
 slopeForXYAngleAndYslopeTestXPos0YNeg1XY170 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos0YNeg1XY170" (NegXYSlope 9.84807753012208) (slopeAdjustedForVerticalAngle (PosXSlope 0) (NegYSlope 10) (xyQuadrantAngle 170)  )
+  "slopeForXYAngleAndYslopeTestXPos0YNeg1XY170" (NegXYSlope 9.84807753012208) (slopeAdjustedForVerticalAngle (PosXSlope 0) (NegYSlope 10) (quadrantOfAngle 170)  )
 
 {-
 x1 = sin(10) * 1 = 0 pos
@@ -309,13 +309,13 @@ y10  = cos(10) * 10 = 9.84807753012 neg
 y - x = 9.674429352453 NegXYSlope
 -}
 slopeForXYAngleAndYslopeTestXPos1YNeg1XY170 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos0YNeg1XY170" (NegXYSlope 9.67442935245515) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 170)  )
+  "slopeForXYAngleAndYslopeTestXPos0YNeg1XY170" (NegXYSlope 9.67442935245515) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (quadrantOfAngle 170)  )
 
 slopeForXYAngleAndYslopeTestXPos1YPos10XY190 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos1YPos10XY190" (PosXYSlope 9.67442935245515) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 190)  )
+  "slopeForXYAngleAndYslopeTestXPos1YPos10XY190" (PosXYSlope 9.67442935245515) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 190)  )
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY190 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos10YPos1XY190" (NegXYSlope 0.7516740236570952) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 190)  )
+  "slopeForXYAngleAndYslopeTestXPos10YPos1XY190" (NegXYSlope 0.7516740236570952) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 190)  )
 
 {-
 x1 = sin(10) * 1 = 0.173648177667 neg
@@ -324,20 +324,20 @@ y + x = 10.021725707787 NegXYSlope
 continue here with testing
 -}
 slopeForXYAngleAndYslopeTestXPos1YNeg10XY190 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos1YNeg10XY190" (NegXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 190)  )
+  "slopeForXYAngleAndYslopeTestXPos1YNeg10XY190" (NegXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (quadrantOfAngle 190)  )
 
 
 slopeForXYAngleAndYslopeTestXPos1YPos10XY260 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos1YPos10XY260" (PosXYSlope 0.7516740236570961) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 260)  )
+  "slopeForXYAngleAndYslopeTestXPos1YPos10XY260" (PosXYSlope 0.7516740236570961) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 260)  )
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY260 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos10YPos1XY260" (NegXYSlope 9.67442935245515) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 260)  )
+  "slopeForXYAngleAndYslopeTestXPos10YPos1XY260" (NegXYSlope 9.67442935245515) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 260)  )
 
 slopeForXYAngleAndYslopeTestXPos1YPos10XY280 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos1YPos10XY280" (NegXYSlope 2.721289529681512) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 280)  )
+  "slopeForXYAngleAndYslopeTestXPos1YPos10XY280" (NegXYSlope 2.721289529681512) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 280)  )
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY280 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos10YPos1XY280" (NegXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 280)  )
+  "slopeForXYAngleAndYslopeTestXPos10YPos1XY280" (NegXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 280)  )
 
 {-
 x1 = sin(80) * 1 = 0.984807753012 neg
@@ -346,7 +346,7 @@ y - x = 0.751674023658 PosXYSlope
 0.7516740236570961
 -}
 slopeForXYAngleAndYslopeTestXPos1YNeg10XY280 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos1YNeg10XY280" (PosXYSlope 0.7516740236570961) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 280)  )
+  "slopeForXYAngleAndYslopeTestXPos1YNeg10XY280" (PosXYSlope 0.7516740236570961) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (quadrantOfAngle 280)  )
 
 {-
 x1 = sin(80) * 10 = 9.84807753012 neg
@@ -355,14 +355,14 @@ y - x = 9.674429352453 NegXYSlope
 0.7516740236570961
 -}
 slopeForXYAngleAndYslopeTestXPos10YNeg1XY280 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos10YNeg1XY280" (NegXYSlope 9.67442935245515) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (xyQuadrantAngle 280)  )
+  "slopeForXYAngleAndYslopeTestXPos10YNeg1XY280" (NegXYSlope 9.67442935245515) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (quadrantOfAngle 280)  )
 
 
 slopeForXYAngleAndYslopeTestXPos1YPos10XY350 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos1YPos10XY350" (NegXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 350)  )
+  "slopeForXYAngleAndYslopeTestXPos1YPos10XY350" (NegXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 350)  )
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY350 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos10YPos1XY350" (NegXYSlope 2.721289529681511) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 350)  )
+  "slopeForXYAngleAndYslopeTestXPos10YPos1XY350" (NegXYSlope 2.721289529681511) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 350)  )
 
 slopeForXYAngleAndYslopeTestNeedMoreTesting = TestCase $ assertBool 
   "slopeForXYAngleAndYslopeTest: need to test for more variations of Pos/Neg X/Yslopes" False
@@ -372,10 +372,10 @@ slopeForXYAngleAndYslopeTestNeedMoreTesting = TestCase $ assertBool
 radiusAdjustedForZslope :: Radius -> Slope  -> Radius 
 -}
 radiusAdjustedForZslopeTestRad10PosX10PosY0XY10 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX10PosY0XY10" (DownRadius 9.857785663826117) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 10)))
+  "radiusAdjustedForZslopeTestRad10PosX10PosY0XY10" (DownRadius 9.857785663826117) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 10)))
 
 radiusAdjustedForZslopeTestRad10PosX0PosY10XY10 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX0PosY10XY10" (UpRadius 9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 10)))
+  "radiusAdjustedForZslopeTestRad10PosX0PosY10XY10" (UpRadius 9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 10)))
 
 {-
 x1 = sin(10) * 1 = 0.173648177667 pos
@@ -384,7 +384,7 @@ y + x = 10.02260159449 so it is a PosXYSlope
 adjustedRadius = Rad * cos(slope) = 10 * cos(10.02260159449) =  9.84739177006 UpRadius
 -}
 radiusAdjustedForZslopeTestRad10PosX1NegY10XY10 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY10" (UpRadius 9.84741837407899) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 10)))
+  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY10" (UpRadius 9.84741837407899) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (quadrantOfAngle 10)))
 
 {-
 x1 = sin(10) * 1 = 1.73648177667 pos
@@ -393,15 +393,15 @@ y + x = 2.721289529682 so it is a PosXYSlope
 adjustedRadius = Rad * cos(slope) = 10 * cos(2.721289529682) =  9.9887230255 UpRadius
 -}
 radiusAdjustedForZslopeTestRad10PosX10NegY1XY10 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX10NegY1XY10" (UpRadius 9.988723025495544) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (xyQuadrantAngle 10)))
+  "radiusAdjustedForZslopeTestRad10PosX10NegY1XY10" (UpRadius 9.988723025495544) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (quadrantOfAngle 10)))
 
 
 
 radiusAdjustedForZslopeTestRad10PosX1PosY10XY80 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY80" (DownRadius 9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 80)))
+  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY80" (DownRadius 9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 80)))
 
 radiusAdjustedForZslopeTestRad10PosX1PosY10XY100 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY100" (UpRadius 9.988723025495544) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 100)))
+  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY100" (UpRadius 9.988723025495544) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 100)))
 
 {-
 x1 = sin(80) * 10 = 9.84807753012 pos
@@ -410,7 +410,7 @@ y + x = 9.674429352453 so it is a PosXYSlope
 adjustedRadius = Rad * cos(slope) = 10 * cos(9.674429352453) =  9.85778566383 UpRadius
 -}
 radiusAdjustedForZslopeTestRad10PosX10NegY1XY100 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX10NegY1XY100" (UpRadius 9.857785663826117) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (xyQuadrantAngle 100)))
+  "radiusAdjustedForZslopeTestRad10PosX10NegY1XY100" (UpRadius 9.857785663826117) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (quadrantOfAngle 100)))
 
 {-
 x1 = sin(80) * 1 = 0.984807753012 pos
@@ -419,12 +419,12 @@ y + x = 0.751674023658 NegXYSlope
 adjustedRadius = Rad * cos(slope) = 10 * cos(0.751674023658) =  9.99913944706 DownRadius
 -}
 radiusAdjustedForZslopeTestRad10PosX1NegY10XY100 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX1NegY10XY100" (DownRadius  9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 100)))
+  "radiusAdjustedForZslopeTestRad10PosX1NegY10XY100" (DownRadius  9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (quadrantOfAngle 100)))
 
 
 
 radiusAdjustedForZslopeTestRad10PosX1PosY10XY170 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY170" (UpRadius 9.84741837407899) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 170)))
+  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY170" (UpRadius 9.84741837407899) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 170)))
 
 {-((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
 x1 = sin(10) * 10 = 1.73648177667 pos
@@ -433,7 +433,7 @@ y - x = 0.751674023658 PosXYSlope
 adjustedRadius = Rad * cos(slope) = 10 * cos(0.751674023658) =  9.99913944706 UpRadius
 -}
 radiusAdjustedForZslopeTestRad10PosX10NegY1XY170 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX10NegY1XY170" (UpRadius  9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (xyQuadrantAngle 170)))
+  "radiusAdjustedForZslopeTestRad10PosX10NegY1XY170" (UpRadius  9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (quadrantOfAngle 170)))
 
 {-
 x1 = sin(10) * 10 = 1.73648177667 pos
@@ -442,7 +442,7 @@ y - x = 9.674429352453 NegXYSlope
 adjustedRadius = Rad * cos(slope) = 10 * cos(9.674429352453) =  9.85778566383 DownRadius
 -}
 radiusAdjustedForZslopeTestRad10PosX1NegY10XY170 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX1NegY10XY170" (DownRadius  9.857785663826117) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (xyQuadrantAngle 170)))
+  "radiusAdjustedForZslopeTestRad10PosX1NegY10XY170" (DownRadius  9.857785663826117) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (quadrantOfAngle 170)))
 
 
 {-
@@ -452,7 +452,7 @@ y - x = 9.67355346575 so it is a PosXYSlope
 adjustedRadius = Rad * cos(slope) = 10 * cos(9.67355346575) =  9.857785663826117 UpRadius
 -}
 radiusAdjustedForZslopeTestRad10PosX1PosY10XY190 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY190" (UpRadius 9.857785663826117) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 190)))
+  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY190" (UpRadius 9.857785663826117) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 190)))
 
 {-
 x10 = sin(10) * 10 = 1.73648177667 neg as in 3rd quad
@@ -461,7 +461,7 @@ y - x = -0.751674023658 so it is a NegXYSlope
 adjustedRadius = Rad * cos(xySlope) = 10 * cos(0.751674023658) = 9.999139447055672 DownRadius as it was a NegXYSlope
 -}
 radiusAdjustedForZslopeTestRad10PosX10PosY1XY190 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX10PosY1XY190" (DownRadius 9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 190)))
+  "radiusAdjustedForZslopeTestRad10PosX10PosY1XY190" (DownRadius 9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 190)))
 
 
 
@@ -476,7 +476,7 @@ y - x = 10.021725707787 so it is a NegXYSlope
 adjustedRadius = Rad * cos(xySlope) = 10 * cos( 10.021725707787) = 9.84741837408 DownRadius as it was a NegXYSlope
 -}
 radiusAdjustedForZslopeTestRad10PosX1NegY1oXY190 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX10PosY1XY190" (DownRadius 9.84741837407899) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (xyQuadrantAngle 190)))
+  "radiusAdjustedForZslopeTestRad10PosX10PosY1XY190" (DownRadius 9.84741837407899) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (quadrantOfAngle 190)))
 
 
 
@@ -492,7 +492,7 @@ y + x = -2.721289529682 so it is a NegXYSlope
 adjustedRadius = Rad * cos(xySlope) = 10 * cos(2.721289529682) = 9.9887230255 DownRadius as it was a NegXYSlope
 -}
 radiusAdjustedForZslopeTestRad10PosX10NegY1XY190 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX10NegY1XY190" (DownRadius 9.988723025495544) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (xyQuadrantAngle 190)))
+  "radiusAdjustedForZslopeTestRad10PosX10NegY1XY190" (DownRadius 9.988723025495544) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (quadrantOfAngle 190)))
 
 {-
 x1 = sin(80) * 1 = 0.984807753012 neg as it is in 3rd quad
@@ -501,7 +501,7 @@ y - x = 0.751674023658 posXYSlope
 adjustedRadius = Rad * cos(xySlope) = 10 * cos(0.751674023658) = 9.999139447055672 UpRadius as it was a PosXYSlope
 -}
 radiusAdjustedForZslopeTestRad10PosX1PosY10XY260 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY260" (UpRadius 9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 260)))
+  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY260" (UpRadius 9.999139447055672) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 260)))
 
 {-
 x10 = sin(80) * 10 = 9.84807753012 neg as it is in 3rd quad
@@ -510,7 +510,7 @@ y - x = 9.674429352453 NegXYSlope
 adjustedRadius = Rad * cos(xySlope) = 10 * cos(9.674429352453) = 9.85778566383 DownRadius as it was a PosXYSlope
 -}
 radiusAdjustedForZslopeTestRad10PosX10PosY1XY260 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX10PosY1XY260" (DownRadius 9.857785663826117) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 260)))
+  "radiusAdjustedForZslopeTestRad10PosX10PosY1XY260" (DownRadius 9.857785663826117) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 260)))
 
 {-
 x1 = sin(80) * 1 = 0.984807753012 neg as it is in 4 quad
@@ -519,7 +519,7 @@ y + x = 2.721289529682 NegXYSlope
 adjustedRadius = Rad * cos(xySlope) = 10 * cos(2.721289529682) = 9.9887230255 DownRadius as it was a NegXYSlope
 -}
 radiusAdjustedForZslopeTestRad10PosX1PosY10XY280 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY280" (DownRadius 9.988723025495544) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 280)))
+  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY280" (DownRadius 9.988723025495544) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 280)))
 
 {-
 x10 = sin(80) * 10 = 9.84807753012 neg as it is in 4 quad
@@ -528,7 +528,7 @@ y + x = 10.021725707787 NegXYSlope
 adjustedRadius = Rad * cos(xySlope) = 10 * cos(10.021725707787) = 9.84741837408 DownRadius as it was a NegXYSlope
 -}
 radiusAdjustedForZslopeTestRad10PosX10PosY1XY280 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX10PosY1XY280" (DownRadius 9.84741837407899) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (xyQuadrantAngle 280)))
+  "radiusAdjustedForZslopeTestRad10PosX10PosY1XY280" (DownRadius 9.84741837407899) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 280)))
 
 {-
 x1 = sin(10) * 1 = 0.173648177667 neg as it is in 4 quad
@@ -537,7 +537,7 @@ y + x = 10.021725707787 NegXYSlope
 adjustedRadius = Rad * cos(xySlope) = 10 * cos(10.021725707787) = 9.84741837408 DownRadius as it was a NegXYSlope
 -}
 radiusAdjustedForZslopeTestRad10PosX1PosY10XY350 = TestCase $ assertEqual 
-  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY350" (DownRadius 9.84741837407899) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (xyQuadrantAngle 350)))
+  "radiusAdjustedForZslopeTestRad10PosX1PosY10XY350" (DownRadius 9.84741837407899) (radiusAdjustedForZslope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 350)))
 
 
 radiusAdjustedForZslopeTestNeedMoreTesting = TestCase $ assertBool 
