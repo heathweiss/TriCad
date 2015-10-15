@@ -5,9 +5,11 @@ import TriCad.CornerPoints(CornerPoints(..), (+++))
 import TriCad.Points(Point(..))
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
+  slopeAdjustedForVerticalAngleSimple,
   radiusAdjustedForZslope,
   Radius(..),
-  quadrantOfAngle,
+  --quadrantOfAngle,
+  trigAngle,
   createCornerPoint,
   Slope(..),
   Angle(..),
@@ -18,6 +20,9 @@ import TriCad.MathPolar(
   flatYSlope,
   )
 import TriCad.Math(sinDegrees,cosDegrees)
+
+--renamed in MathPolar. Do this for now to avoid renaming in my tests until refactoring is done.
+quadrantOfAngle = trigAngle
 
 
 mathPolarTestDo = do
@@ -64,6 +69,8 @@ mathPolarTestDo = do
   runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY350
   runTestTT slopeForXYAngleAndYslopeTestNeedMoreTesting
   runTestTT slopeForXYAngleAndYslopeTestXPos0YNeg10XY100
+
+  
  
   
   runTestTT radiusAdjustedForZslopeTestRad10PosX10PosY0XY10
@@ -215,11 +222,14 @@ slopeAdjustedForVerticalAngle xSlope ySlope xyAngle
 
 {--------all the y angles without an x angle-------}
 slopeForXYAngleAndYslopeTestX0Ypos0XY0 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestX0Ypos0XY0" (PosXYSlope (0)) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 0) (quadrantOfAngle 0)  )
-
+  "slopeForXYAngleAndYslopeTestX0Ypos0XY0"
+  (PosXYSlope (0))
+  (slopeAdjustedForVerticalAngleSimple (PosXSlope 0) (PosYSlope 0) (Angle 0)  )
 
 slopeForXYAngleAndYslopeTestX0Ypos10XY10 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY10" (NegXYSlope (4.92403876506104)) (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 5) (quadrantOfAngle 10)  )
+  "slopeForXYAngleAndYslopeTestY10"
+  (NegXYSlope (4.92403876506104))
+  (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 5) (quadrantOfAngle 10)  )
 
 slopeForXYAngleAndYslopeTestXPos1Ypos10XY10 = TestCase $ assertEqual 
   "slopeForXYAngleAndYslopeTestY10" (NegXYSlope (9.67442935245515)) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 10)  )

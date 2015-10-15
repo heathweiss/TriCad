@@ -1,6 +1,7 @@
 {-# LANGUAGE ParallelListComp #-}
 module TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
+  slopeAdjustedForVerticalAngleSimple,
   createTopFaces,
   createBottomFaces,
   createRightFaces,
@@ -10,7 +11,8 @@ module TriCad.MathPolar(
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
   radiusAdjustedForZslope,
-  quadrantOfAngle,
+  --quadrantOfAngle, renamed to trigAngle for now
+  trigAngle,
   createCornerPoint,
   Slope(..),
   Radius(..),
@@ -178,16 +180,20 @@ data Slope = NegXYSlope {angle :: Double}
 
 {-
 Each quadrant will be 0-90 degrees.
-Orientated so that, for all quadrants, sin to calculate x, and cos for y
+Orientated so that, for all quadrants:
+ -use sin to calculate x-axis
+ -use cos to calculate y-axis
 -}
-quadrantOfAngle :: Double ->  Angle
-quadrantOfAngle currAngle 
-  | currAngle < 0 = quadrantOfAngle (360 - currAngle)
+
+--quadrantOfAngle :: Double ->  Angle
+trigAngle :: Double ->  Angle
+trigAngle currAngle 
+  | currAngle < 0 = trigAngle (360 - currAngle)
   | currAngle <= 90 = Quadrant1Angle currAngle
   | currAngle <= 180 = Quadrant2Angle (180 - currAngle)
   | currAngle <= 270 = Quadrant3Angle $ currAngle - 180   -- 90 - (270 - currAngle)
   | currAngle <= 360 = Quadrant4Angle (360 - currAngle)
-  | currAngle > 360 = quadrantOfAngle (currAngle - 360)
+  | currAngle > 360 = trigAngle (currAngle - 360)
 
 
 
@@ -202,8 +208,65 @@ This could be done as a separate function, which would pre-adjust the angle, or 
 
 should this return a type Angle = NegZAngle PosZAngle then continue on with testing  
 
+the original function before oct 15/15 simplify
+
+slopeAdjustedForVerticalAngle :: Slope -> Slope -> Angle -> Slope
+slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant1Angle xyAngle)
+  | ((sinDegrees xyAngle) * xSlope) >= ((cosDegrees xyAngle) * ySlope)  = PosXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
+  | otherwise = NegXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
+
+slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant1Angle xyAngle) =
+  PosXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
+
+slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant2Angle xyAngle) =
+  PosXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
+
+slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant2Angle xyAngle)
+  | ((sinDegrees xyAngle) * xSlope) >= ((cosDegrees xyAngle) * ySlope)  = PosXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
+  | otherwise = NegXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
+
+-- ySlope is >= xSlope so it is a PosXYSlope
+slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant3Angle xyAngle)
+  | ((cosDegrees xyAngle) * ySlope)  >= ((sinDegrees xyAngle) * xSlope) = PosXYSlope $ abs $  ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope)
+  --xSlope is >  ySlope so it is a NegXYSlope
+  | otherwise = NegXYSlope $ abs $ ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope) 
+
+slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant3Angle xyAngle) =
+  NegXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
+
+slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant4Angle xyAngle) =
+  NegXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
+
+--ySlope is >= xSlope so it is a PosXYSlope
+slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant4Angle xyAngle)
+  | ((cosDegrees xyAngle) * ySlope)  >= ((sinDegrees xyAngle) * xSlope) = PosXYSlope $ abs $  ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope)
+  --xSlope is >  ySlope so it is a NegXYSlope
+  | otherwise = NegXYSlope $ abs $ ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope) 
+
 
 -}
+
+
+
+slopeAdjustedForVerticalAngleSimple :: Slope -> Slope -> Angle -> Slope
+slopeAdjustedForVerticalAngleSimple xSlope ySlope xyAngle =
+  
+        
+  case (trigAngle (quadAngle xyAngle)) of
+    (Quadrant1Angle trigAngle') ->
+      case xSlope of
+        (PosXSlope xSlope') -> case ySlope of
+                       (PosYSlope ySlope') ->
+                         if  ((sinDegrees trigAngle') *  xSlope') >= ((cosDegrees trigAngle') * ySlope')
+                           then PosXYSlope $ abs $ ((sinDegrees trigAngle') * xSlope') - ((cosDegrees trigAngle') * (angle ySlope))
+                           else NegXYSlope $ abs $ ((sinDegrees trigAngle') * xSlope') - ((cosDegrees trigAngle') * (angle ySlope))
+                       (NegYSlope ySlope') ->
+                         PosXYSlope $ ((sinDegrees trigAngle') * xSlope') + ((cosDegrees trigAngle') * ySlope')
+    --Quadrant2 ->
+    --Quadrant3 ->
+    --Quadrant4 ->
+
+
 
 slopeAdjustedForVerticalAngle :: Slope -> Slope -> Angle -> Slope
 slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant1Angle xyAngle)
@@ -322,7 +385,7 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
 
 
 
-                                 adjustedSlope = slopeAdjustedForVerticalAngle xSlope ySlope (quadrantOfAngle (quadAngle xyAngle))
+                                 adjustedSlope = slopeAdjustedForVerticalAngle xSlope ySlope (trigAngle (quadAngle xyAngle))
                                                                                       
                                  adjustedRadius = (radiusAdjustedForZslope horizRadius adjustedSlope)
                                  
@@ -330,12 +393,12 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
                                  cPoint (Point 
                                     (--x:
                                      x_axis origin + (setXPolarityForQuadrant xyAngle $
-                                      (radius adjustedRadius) * (sinDegrees  (quadAngle $ quadrantOfAngle (quadAngle xyAngle)))))--tested good
+                                      (radius adjustedRadius) * (sinDegrees  (quadAngle $ trigAngle (quadAngle xyAngle)))))--tested good
                                     
                                     
                                     (--y:
                                      y_axis origin + (setYPolarityForQuadrant xyAngle $
-                                       (radius adjustedRadius) * (cosDegrees  (quadAngle $ quadrantOfAngle  (quadAngle xyAngle)))))-- tested good
+                                       (radius adjustedRadius) * (cosDegrees  (quadAngle $ trigAngle  (quadAngle xyAngle)))))-- tested good
 
                                     (--z:
                                        case  (adjustedSlope) of
