@@ -38,37 +38,6 @@ mathPolarTestDo = do
   runTestTT getQuadrantAngleTest7
 
 
-  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY90
-  runTestTT slopeForXYAngleAndYslopeTestX0Ypos0XY0
-  runTestTT slopeForXYAngleAndYslopeTestX0Ypos10XY10
-  runTestTT slopeForXYAngleAndYslopeTestXPos1Ypos10XY10
-  runTestTT slopeForXYAngleAndYslopeTestXPos10Ypos1XY10
-  runTestTT slopeForXYAngleAndYslopeTestXPos10Yneg1XY10
-  runTestTT slopeForXYAngleAndYslopeTestXPos1Yneg10XY10
-  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY80
-  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY80
-  runTestTT slopeForXYAngleAndYslopeTestXPos10Yneg1XY80
-  runTestTT slopeForXYAngleAndYslopeTestXPos1Yneg10XY80
-  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY100
-  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY100
-  runTestTT slopeForXYAngleAndYslopeTestXPos1YNeg10XY100
-  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY170
-  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY170
-  runTestTT slopeForXYAngleAndYslopeTestXPos0YNeg1XY170
-  runTestTT slopeForXYAngleAndYslopeTestXPos1YNeg1XY170
-  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY190
-  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY190
-  runTestTT slopeForXYAngleAndYslopeTestXPos1YNeg10XY190
-  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY260
-  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY260
-  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY280
-  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY280
-  runTestTT slopeForXYAngleAndYslopeTestXPos1YNeg10XY280
-  runTestTT slopeForXYAngleAndYslopeTestXPos10YNeg1XY280
-  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY350
-  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY350
-  runTestTT slopeForXYAngleAndYslopeTestNeedMoreTesting
-  runTestTT slopeForXYAngleAndYslopeTestXPos0YNeg10XY100
 
   
  
@@ -124,6 +93,43 @@ mathPolarTestDo = do
   --runTestTT setQuadrant2YvalTest
   --runTestTT setQuadrant2Yval170Test
   --runTestTT setQuadrant3Xval190Test
+
+
+
+  putStrLn "\n\n" 
+  putStrLn "slopeForXYAngleAndYslopeTest tests"
+
+  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY90
+  runTestTT slopeForXYAngleAndYslopeTestX0Ypos0XY0
+  runTestTT slopeForXYAngleAndYslopeTestX0Ypos10XY10
+  runTestTT slopeForXYAngleAndYslopeTestXPos1Ypos10XY10
+  runTestTT slopeForXYAngleAndYslopeTestXPos10Ypos1XY10
+  runTestTT slopeForXYAngleAndYslopeTestXPos10Yneg1XY10
+  runTestTT slopeForXYAngleAndYslopeTestXPos1Yneg10XY10
+  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY80
+  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY80
+  runTestTT slopeForXYAngleAndYslopeTestXPos10Yneg1XY80
+  runTestTT slopeForXYAngleAndYslopeTestXPos1Yneg10XY80
+  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY100
+  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY100
+  runTestTT slopeForXYAngleAndYslopeTestXPos1YNeg10XY100
+  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY170
+  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY170
+  runTestTT slopeForXYAngleAndYslopeTestXPos0YNeg1XY170
+  runTestTT slopeForXYAngleAndYslopeTestXPos1YNeg1XY170
+  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY190
+  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY190
+  runTestTT slopeForXYAngleAndYslopeTestXPos1YNeg10XY190
+  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY260
+  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY260
+  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY280
+  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY280
+  runTestTT slopeForXYAngleAndYslopeTestXPos1YNeg10XY280
+  runTestTT slopeForXYAngleAndYslopeTestXPos10YNeg1XY280
+  runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY350
+  runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY350
+  runTestTT slopeForXYAngleAndYslopeTestNeedMoreTesting
+  runTestTT slopeForXYAngleAndYslopeTestXPos0YNeg10XY100
 
 
 fail1 = TestCase $ assertEqual
@@ -229,13 +235,17 @@ slopeForXYAngleAndYslopeTestX0Ypos0XY0 = TestCase $ assertEqual
 slopeForXYAngleAndYslopeTestX0Ypos10XY10 = TestCase $ assertEqual 
   "slopeForXYAngleAndYslopeTestY10"
   (NegXYSlope (4.92403876506104))
-  (slopeAdjustedForVerticalAngle (PosXSlope 0) (PosYSlope 5) (quadrantOfAngle 10)  )
+  (slopeAdjustedForVerticalAngleSimple (PosXSlope 0) (PosYSlope 5) (Angle 10)  )
 
 slopeForXYAngleAndYslopeTestXPos1Ypos10XY10 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY10" (NegXYSlope (9.67442935245515)) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 10)  )
+  "slopeForXYAngleAndYslopeTestY10"
+  (NegXYSlope (9.67442935245515))
+  (slopeAdjustedForVerticalAngleSimple (PosXSlope 1) (PosYSlope 10) (Angle 10)  )
 
 slopeForXYAngleAndYslopeTestXPos10Ypos1XY10 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY10" (PosXYSlope (0.7516740236570952)) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 10)  )
+  "slopeForXYAngleAndYslopeTestY10"
+  (PosXYSlope (0.7516740236570952))
+  (slopeAdjustedForVerticalAngleSimple (PosXSlope 10) (PosYSlope 1) (Angle 10)  )
 
 {-
 x1 = sin(10) * 10 = 1.73648177667 pos
@@ -244,7 +254,9 @@ y + x = 2.721289529682 so it is a PosXYSlope
 
 -}
 slopeForXYAngleAndYslopeTestXPos10Yneg1XY10 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos10Yneg1XY10" (PosXYSlope (2.721289529681511)) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (quadrantOfAngle 10)  )
+  "slopeForXYAngleAndYslopeTestXPos10Yneg1XY10"
+  (PosXYSlope (2.721289529681511))
+  (slopeAdjustedForVerticalAngleSimple (PosXSlope 10) (NegYSlope 1) (Angle 10)  )
 
 {-
 x1 = sin(10) * 1 = 0.173648177667 pos
@@ -253,14 +265,20 @@ y + x = 10.021725707787 so it is a PosXYSlope
 
 -}
 slopeForXYAngleAndYslopeTestXPos1Yneg10XY10 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos1Yneg10XY10" (PosXYSlope (10.02172570778901)) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (quadrantOfAngle 10)  )
+  "slopeForXYAngleAndYslopeTestXPos1Yneg10XY10"
+  (PosXYSlope (10.02172570778901))
+  (slopeAdjustedForVerticalAngleSimple (PosXSlope 1) (NegYSlope 10) (Angle 10)  )
 
 
 slopeForXYAngleAndYslopeTestXPos1YPos10XY80 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY80" (NegXYSlope 0.7516740236570961) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 80)  )
+  "slopeForXYAngleAndYslopeTestY80"
+  (NegXYSlope 0.7516740236570961)
+  (slopeAdjustedForVerticalAngleSimple (PosXSlope 1) (PosYSlope 10) (Angle 80)  )
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY80 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 9.67442935245515) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 80)  )
+  "slopeForXYAngleAndYslopeTestY80"
+  (PosXYSlope 9.67442935245515)
+  (slopeAdjustedForVerticalAngleSimple (PosXSlope 10) (PosYSlope 1) (Angle 80)  )
 
 {-
 x1 = sin(80) * 10 = 9.84807753012 pos
@@ -268,7 +286,9 @@ y10  = cos(80) * 1 = 0.173648177667 pos
 y + x = 10.021725707787 so it is a PosXYSlope
 -}
 slopeForXYAngleAndYslopeTestXPos10Yneg1XY80 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos10Yneg1XY80" (PosXYSlope (10.02172570778901)) (slopeAdjustedForVerticalAngle (PosXSlope 10) (NegYSlope 1) (quadrantOfAngle 80)  )
+  "slopeForXYAngleAndYslopeTestXPos10Yneg1XY80"
+  (PosXYSlope (10.02172570778901))
+  (slopeAdjustedForVerticalAngleSimple (PosXSlope 10) (NegYSlope 1) (Angle 80)  )
 
 {-
 x1 = sin(80) * 1 = 0.984807753012 pos
@@ -276,13 +296,17 @@ y10  = cos(80) * 10 = 1.73648177667 pos
 y + x = 2.721289529682 so it is a PosXYSlope
 -}
 slopeForXYAngleAndYslopeTestXPos1Yneg10XY80 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestXPos1Yneg1XY80" (PosXYSlope 2.721289529681512) (slopeAdjustedForVerticalAngle (PosXSlope 1) (NegYSlope 10) (quadrantOfAngle 80)  )
+  "slopeForXYAngleAndYslopeTestXPos1Yneg1XY80"
+  (PosXYSlope 2.721289529681512)
+  (slopeAdjustedForVerticalAngleSimple (PosXSlope 1) (NegYSlope 10) (Angle 80)  )
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY90 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY90" (PosXYSlope 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 90)  )
+  "slopeForXYAngleAndYslopeTestY90"
+  (PosXYSlope 10)
+  (slopeAdjustedForVerticalAngleSimple (PosXSlope 10) (PosYSlope 1) (Angle 90)  )
 
 slopeForXYAngleAndYslopeTestXPos1YPos10XY100 = TestCase $ assertEqual 
-  "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 2.721289529681512) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 100)  )
+  "slopeForXYAngleAndYslopeTestY80"(PosXYSlope 2.721289529681512) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 100)  )
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY100 = TestCase $ assertEqual 
   "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 100)  )
