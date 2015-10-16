@@ -370,23 +370,26 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
 
 
 
-                                 --adjustedSlope = slopeAdjustedForVerticalAngle xSlope ySlope (trigAngle (quadAngle xyAngle))
                                  adjustedSlope = slopeAdjustedForVerticalAngle xSlope ySlope ((xyAngle))
                                                                                       
                                  radiusAdjustedForSlope = radius (radiusAdjustedForZslope horizRadius adjustedSlope)
 
-                                 trigAngle' = (sinDegrees  (quadAngle $ trigAngle (quadAngle xyAngle)))
+                                 
+                                 --sinOfAngle = (sinDegrees  (quadAngle $ trigAngle (quadAngle xyAngle)))
+                                 sinOfAngle = sinDegrees baseOfAngle
+                                 --cosOfAngle = (cosDegrees  (quadAngle $ trigAngle (quadAngle xyAngle)))
+                                 cosOfAngle = cosDegrees baseOfAngle
+                                 baseOfAngle = (quadAngle $ trigAngle (quadAngle xyAngle))
                                  
                              in       
                                  cPoint (Point 
                                     (--x:
                                      x_axis origin + (setXPolarityForQuadrant xyAngle $
-                                      radiusAdjustedForSlope * (sinDegrees  (quadAngle $ trigAngle (quadAngle xyAngle)))))--tested good
-                                      --radiusAdjustedForSlope * trigAngle'))
+                                      radiusAdjustedForSlope * sinOfAngle))
                                     
                                     (--y:
                                      y_axis origin + (setYPolarityForQuadrant xyAngle $
-                                       radiusAdjustedForSlope * (cosDegrees  (quadAngle $ trigAngle  (quadAngle xyAngle)))))-- tested good
+                                       radiusAdjustedForSlope * cosOfAngle))
 
                                     (--z:
                                        case  (adjustedSlope) of
