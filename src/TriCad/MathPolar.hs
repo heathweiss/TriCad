@@ -176,6 +176,7 @@ data Slope = NegXYSlope {angle :: Double}
            | PosXSlope {angle :: Double}
            | NegYSlope {angle :: Double}
            | PosYSlope {angle :: Double}
+           
   deriving (Show, Eq)
 
 {-
@@ -195,6 +196,23 @@ trigAngle currAngle
   | currAngle <= 360 = Quadrant4Angle (360 - currAngle)
   | currAngle > 360 = trigAngle (currAngle - 360)
 
+slopeAdjustedForVerticalAngleSimple :: Slope -> Slope -> Angle -> Slope
+slopeAdjustedForVerticalAngleSimple xSlope ySlope xyAngle =
+  slopeAdjustedForVerticalAngle xSlope ySlope (trigAngle (quadAngle xyAngle))
+{-
+
+quadrant 1
+negx >= negy = negxy
+negx <  negy = posxy
+negx & posy = negxy
+
+posx &  negy = posxy
+posx <  posy = negxy
+posx >= posy = posxy
+posx n
+
+
+-}
 
 
 {-
@@ -210,98 +228,80 @@ should this return a type Angle = NegZAngle PosZAngle then continue on with test
 
 the original function before oct 15/15 simplify
 
-slopeAdjustedForVerticalAngle :: Slope -> Slope -> Angle -> Slope
-slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant1Angle xyAngle)
-  | ((sinDegrees xyAngle) * xSlope) >= ((cosDegrees xyAngle) * ySlope)  = PosXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
-  | otherwise = NegXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
-
-slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant1Angle xyAngle) =
-  PosXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
-
-slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant2Angle xyAngle) =
-  PosXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
-
-slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant2Angle xyAngle)
-  | ((sinDegrees xyAngle) * xSlope) >= ((cosDegrees xyAngle) * ySlope)  = PosXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
-  | otherwise = NegXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
-
--- ySlope is >= xSlope so it is a PosXYSlope
-slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant3Angle xyAngle)
-  | ((cosDegrees xyAngle) * ySlope)  >= ((sinDegrees xyAngle) * xSlope) = PosXYSlope $ abs $  ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope)
-  --xSlope is >  ySlope so it is a NegXYSlope
-  | otherwise = NegXYSlope $ abs $ ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope) 
-
-slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant3Angle xyAngle) =
-  NegXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
-
-slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant4Angle xyAngle) =
-  NegXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
-
---ySlope is >= xSlope so it is a PosXYSlope
-slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant4Angle xyAngle)
-  | ((cosDegrees xyAngle) * ySlope)  >= ((sinDegrees xyAngle) * xSlope) = PosXYSlope $ abs $  ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope)
-  --xSlope is >  ySlope so it is a NegXYSlope
-  | otherwise = NegXYSlope $ abs $ ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope) 
-
-
 -}
 
 
-
-slopeAdjustedForVerticalAngleSimple :: Slope -> Slope -> Angle -> Slope
-slopeAdjustedForVerticalAngleSimple xSlope ySlope xyAngle =
-  
-        
-  case (trigAngle (quadAngle xyAngle)) of
-    (Quadrant1Angle trigAngle') ->
-      case xSlope of
-        (PosXSlope xSlope') -> case ySlope of
-                       (PosYSlope ySlope') ->
-                         if  ((sinDegrees trigAngle') *  xSlope') >= ((cosDegrees trigAngle') * ySlope')
-                           then PosXYSlope $ abs $ ((sinDegrees trigAngle') * xSlope') - ((cosDegrees trigAngle') * (angle ySlope))
-                           else NegXYSlope $ abs $ ((sinDegrees trigAngle') * xSlope') - ((cosDegrees trigAngle') * (angle ySlope))
-                       (NegYSlope ySlope') ->
-                         PosXYSlope $ ((sinDegrees trigAngle') * xSlope') + ((cosDegrees trigAngle') * ySlope')
-    --Quadrant2 ->
-    --Quadrant3 ->
-    --Quadrant4 ->
-
-
-
 slopeAdjustedForVerticalAngle :: Slope -> Slope -> Angle -> Slope
 slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant1Angle xyAngle)
-  | ((sinDegrees xyAngle) * xSlope) >= ((cosDegrees xyAngle) * ySlope)  = PosXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
+  | ((sinDegrees xyAngle) * xSlope) >= ((cosDegrees xyAngle) * ySlope)  =
+      PosXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
   | otherwise = NegXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
 
 slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant1Angle xyAngle) =
   PosXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
 
+slopeAdjustedForVerticalAngle (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant1Angle xyAngle) =
+   NegXYSlope $ (getXSlope xSlope xyAngle) + (getYSlope ySlope xyAngle)
+
+--not tested
+slopeAdjustedForVerticalAngle (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant1Angle xyAngle)
+  | (getYSlope ySlope xyAngle) >= (getXSlope xSlope xyAngle) = PosXYSlope $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
+  | otherwise = NegXYSlope $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
+
 slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant2Angle xyAngle) =
   PosXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
 
 slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant2Angle xyAngle)
-  | ((sinDegrees xyAngle) * xSlope) >= ((cosDegrees xyAngle) * ySlope)  = PosXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
-  | otherwise = NegXYSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
+  | (getXSlope xSlope xyAngle) >= (getYSlope ySlope xyAngle)  =
+      PosXYSlope $ abs $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
+  | otherwise = NegXYSlope $ abs $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
 
--- ySlope is >= xSlope so it is a PosXYSlope
+--not tested
+slopeAdjustedForVerticalAngle (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant2Angle xyAngle)
+  | (getYSlope ySlope xyAngle) <= (getXSlope xSlope xyAngle) = PosXYSlope $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
+  | otherwise = NegXYSlope $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
+
+--not tested
+slopeAdjustedForVerticalAngle (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant2Angle xyAngle) =
+  NegXYSlope $ (getXSlope xSlope xyAngle) + (getYSlope ySlope xyAngle)
+
 slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant3Angle xyAngle)
-  | ((cosDegrees xyAngle) * ySlope)  >= ((sinDegrees xyAngle) * xSlope) = PosXYSlope $ abs $  ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope)
-  --xSlope is >  ySlope so it is a NegXYSlope
-  | otherwise = NegXYSlope $ abs $ ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope) 
+  | (getYSlope ySlope xyAngle)  >= (getXSlope xSlope xyAngle) =
+      PosXYSlope $ abs $  (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
+  | otherwise = NegXYSlope $ abs $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle) 
 
 slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant3Angle xyAngle) =
   NegXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
 
+--not tested
+slopeAdjustedForVerticalAngle (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant3Angle xyAngle)  =
+  PosXYSlope $ (getXSlope xSlope xyAngle) + (getYSlope ySlope xyAngle)
+
+--not tested
+slopeAdjustedForVerticalAngle (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant3Angle xyAngle)
+  | (getXSlope xSlope xyAngle) >= (getYSlope ySlope xyAngle) = PosXYSlope $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
+  | otherwise = NegXYSlope $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
+
 slopeAdjustedForVerticalAngle (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant4Angle xyAngle) =
-  NegXYSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
+  NegXYSlope $ (getXSlope xSlope xyAngle) + (getYSlope ySlope xyAngle)
 
---ySlope is >= xSlope so it is a PosXYSlope
 slopeAdjustedForVerticalAngle (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant4Angle xyAngle)
-  | ((cosDegrees xyAngle) * ySlope)  >= ((sinDegrees xyAngle) * xSlope) = PosXYSlope $ abs $  ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope)
-  --xSlope is >  ySlope so it is a NegXYSlope
-  | otherwise = NegXYSlope $ abs $ ((cosDegrees xyAngle) * ySlope) - ((sinDegrees xyAngle) * xSlope) 
+  | (getYSlope ySlope xyAngle)  >= (getXSlope xSlope xyAngle) =
+      PosXYSlope $ abs $  (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
+  | otherwise = NegXYSlope $ abs $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
 
-                                                                                        
+--not tested
+slopeAdjustedForVerticalAngle (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant4Angle xyAngle)
+  | (getXSlope xSlope xyAngle) >= (getYSlope ySlope xyAngle) = PosXYSlope $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
+  | otherwise = NegXYSlope $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
+
+--not tested
+slopeAdjustedForVerticalAngle (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant4Angle xyAngle) =
+  PosXYSlope $ (getXSlope xSlope xyAngle) + (getYSlope ySlope xyAngle)
+   
+getXSlope xSlope' xyAngle' = ((sinDegrees xyAngle') * xSlope')
+getYSlope ySlope' xyAngle' = ((cosDegrees xyAngle') * ySlope')
+
 
 {-
 Shorten the radius on the xy plane, for the changes in the z plane.

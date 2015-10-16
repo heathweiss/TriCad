@@ -128,9 +128,8 @@ mathPolarTestDo = do
   runTestTT slopeForXYAngleAndYslopeTestXPos10YNeg1XY280
   runTestTT slopeForXYAngleAndYslopeTestXPos1YPos10XY350
   runTestTT slopeForXYAngleAndYslopeTestXPos10YPos1XY350
-  runTestTT slopeForXYAngleAndYslopeTestNeedMoreTesting
   runTestTT slopeForXYAngleAndYslopeTestXPos0YNeg10XY100
-
+  runTestTT slopeForXYAngleAndYslopeTestnegX0Ypos0XY0
 
 fail1 = TestCase $ assertEqual
  "fail 1=============================================" (True) (False)
@@ -232,6 +231,13 @@ slopeForXYAngleAndYslopeTestX0Ypos0XY0 = TestCase $ assertEqual
   (PosXYSlope (0))
   (slopeAdjustedForVerticalAngleSimple (PosXSlope 0) (PosYSlope 0) (Angle 0)  )
 
+slopeForXYAngleAndYslopeTestnegX0Ypos0XY0 = TestCase $ assertEqual 
+  "slopeForXYAngleAndYslopeTestnegX0Ypos0XY0"
+  (NegXYSlope (0))
+  (slopeAdjustedForVerticalAngleSimple (NegXSlope 0) (PosYSlope 0) (Angle 0)  )
+
+
+
 slopeForXYAngleAndYslopeTestX0Ypos10XY10 = TestCase $ assertEqual 
   "slopeForXYAngleAndYslopeTestY10"
   (NegXYSlope (4.92403876506104))
@@ -310,7 +316,7 @@ slopeForXYAngleAndYslopeTestXPos1YPos10XY100 = TestCase $ assertEqual
 
 slopeForXYAngleAndYslopeTestXPos10YPos1XY100 = TestCase $ assertEqual 
   "slopeForXYAngleAndYslopeTestY80" (PosXYSlope 10.02172570778901) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 100)  )
--- ==================================================================================================================================================================================================
+
 slopeForXYAngleAndYslopeTestXPos0YNeg10XY100 = TestCase $ assertEqual 
   "slopeForXYAngleAndYslopeTestXPos0YNeg10XY100" (NegXYSlope {angle = 1.7364817766693041}) (slopeAdjustedForVerticalAngle (PosXSlope 0) (NegYSlope 10) (quadrantOfAngle 100)  )
 
@@ -398,8 +404,6 @@ slopeForXYAngleAndYslopeTestXPos1YPos10XY350 = TestCase $ assertEqual
 slopeForXYAngleAndYslopeTestXPos10YPos1XY350 = TestCase $ assertEqual 
   "slopeForXYAngleAndYslopeTestXPos10YPos1XY350" (NegXYSlope 2.721289529681511) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 350)  )
 
-slopeForXYAngleAndYslopeTestNeedMoreTesting = TestCase $ assertBool 
-  "slopeForXYAngleAndYslopeTest: need to test for more variations of Pos/Neg X/Yslopes" False
 
 
 {-test for radius adjustment on the xy plane, for various x and y slopes
