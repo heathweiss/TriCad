@@ -350,13 +350,7 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
                                      Quadrant2 -> length
                                      Quadrant3 -> length
                                      Quadrant4 -> negate length
-
-                                 setZPolarityForQuadrant :: Slope -> AxisLength -> AxisLength
-                                 setZPolarityForQuadrant slope length =
-                                   case slope of
-                                     (PosXYSlope _) ->  length
-                                     otherwise  -> negate length
-
+ 
 
                                  
                                  --What quadrant of the xy plane, is the angle in?
@@ -374,33 +368,29 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
                                                                                       
                                  radiusAdjustedForSlope = radius (radiusAdjustedForZslope horizRadius adjustedSlope)
 
-                                 
+                                 baseOfAngle = (quadAngle $ trigAngle (quadAngle xyAngle))
                                  sinOfAngle = sinDegrees baseOfAngle
                                  cosOfAngle = cosDegrees baseOfAngle
-                                 baseOfAngle = (quadAngle $ trigAngle (quadAngle xyAngle))
+                                 
+                                 setXaxis = x_axis origin + (setXPolarityForQuadrant xyAngle $
+                                              radiusAdjustedForSlope * sinOfAngle)
 
-                                 addXaxisLengthToOrigin = x_axis origin + (setXPolarityForQuadrant xyAngle $
-                                      radiusAdjustedForSlope * sinOfAngle)
-
-                                 addYaxisLengthToOrigin = y_axis origin + (setYPolarityForQuadrant xyAngle $
-                                       radiusAdjustedForSlope * cosOfAngle)
+                                 setYaxis = y_axis origin + (setYPolarityForQuadrant xyAngle $
+                                              radiusAdjustedForSlope * cosOfAngle)
+                                 
+                                 setZaxis =
+                                   let length = (radius horizRadius) * (sinDegrees (angle adjustedSlope))
+                                       z_axis' = z_axis origin
+                                   in
+                                    case adjustedSlope of
+                                     (PosXYSlope _) -> z_axis' +  length
+                                     otherwise  -> z_axis' - length
+                                 
                                  
                              in       
-                                 cPoint (Point 
-                                     addXaxisLengthToOrigin
-                                    
-                                    --y:
-                                    --(
-                                     --y_axis origin + (setYPolarityForQuadrant xyAngle $
-                                     --  radiusAdjustedForSlope * cosOfAngle))
-                                    addYaxisLengthToOrigin
+                                 cPoint (Point setXaxis setYaxis setZaxis)
 
-                                    (--z:
-                                       case  (adjustedSlope) of
-                                        NegXYSlope slope' -> z_axis origin + (setZPolarityForQuadrant (NegXYSlope slope') ((radius horizRadius) * (sinDegrees (slope'))))
-                                        PosXYSlope slope' -> z_axis origin + (setZPolarityForQuadrant (PosXYSlope slope') ((radius horizRadius) * (sinDegrees (slope'))))
-                                    )
-                                  )
+                                  
  
 {- |Create a single CornerPoints.BottomRightLine, and add it to the head of [BottomLeftLine]. This will give a BottomFace.
 Then add the next BottomLeftLine to this BottomFace to get the next BottomFace. Continue through the [BottomLeftLine] till
