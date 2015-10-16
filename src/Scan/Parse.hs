@@ -17,7 +17,7 @@ import Control.Applicative
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BS
 --import Scan.Transform(minValueIndices, average, PixelValue(..))
-import qualified TriCad.MathPolar as MP (MultiDegreeRadii(..),SingleDegreeRadii(..), Radius(..), Degree) 
+import qualified TriCad.MathPolar as MP (SingleDegreeRadii(..), Radius(..), Degree) 
 --import TriCad.Types( Name(..))
 
 --used to remvove leading/trailing spaces.

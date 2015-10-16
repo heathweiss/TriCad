@@ -54,22 +54,16 @@ flatYSlope = PosYSlope 0
 
 -- |Degree of a circle.
 type Degree = Double
+
+-- |The center of a radial shape.
+type Origin = Point
+
+-- |Amount used to transpose a point
+type TransposeFactor = Double
  
 
 {-|
-Represents a radius, which is what all shapes in math polar, are creates from.
-
-
-Known uses:
--Everywhere that a CornerPoints is made via MathPolar.
-
-
--Scan.Parse.Raw uses it for parsing raw image data into json.
-
--Scan.Json uses it for encoding/decoding scanner data.
- It is made an instance of ToJSON and FromJSON in Scan.Json module.
- Allows it to be stored as json data, so the raw data only has to be processed once.
-
+Represents a radius of a circular shape, which is what all shapes in math polar are created from.
 -}
 data Radius = Radius {radius :: Double}
              | DownRadius {radius :: Double} -- | Radius slopes down from origin z-axis. 
@@ -332,7 +326,7 @@ orign: Point
 
 -}
 
-createCornerPoint :: (Point-> CornerPoints) -> Point -> Radius ->  Angle -> Slope -> Slope -> CornerPoints
+createCornerPoint :: (Point-> CornerPoints) -> Origin -> Radius ->  Angle -> Slope -> Slope -> CornerPoints
 createCornerPoint cPoint origin horizRadius verticalAngle xSlope ySlope  =
                              let 
                                  
@@ -402,7 +396,7 @@ All Lines are created from the inputs, using Polar math.
 QuadrantAngle
 -}
 
-createBottomFaces :: Point -> [Radius] -> [Angle] -> Slope -> Slope -> [CornerPoints]
+createBottomFaces :: Origin -> [Radius] -> [Angle] -> Slope -> Slope -> [CornerPoints]
 createBottomFaces inOrigin radii angles xSlope ySlope  =
     (createCornerPoint
       (F4)
@@ -430,7 +424,7 @@ createBottomFaces inOrigin radii angles xSlope ySlope  =
     ]
 
 
-createBottomFacesWithVariableSlope :: Point -> [Radius] -> [Angle] -> [Slope] -> [Slope] -> [CornerPoints]
+createBottomFacesWithVariableSlope :: Origin -> [Radius] -> [Angle] -> [Slope] -> [Slope] -> [CornerPoints]
 createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
     (createCornerPoint
       (F4)
@@ -461,7 +455,7 @@ createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
 {---------------------------------------------------------------- createTopFaces ----------------------------
 
 -}
-createTopFaces :: Point -> [Radius] -> [Angle] -> Slope -> Slope -> [CornerPoints]
+createTopFaces :: Origin -> [Radius] -> [Angle] -> Slope -> Slope -> [CornerPoints]
 createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
      (createCornerPoint
       (F3)
@@ -576,7 +570,7 @@ An array of LeftFace or RightFace depending on data constructors passed in.
 
 
 
-createVerticalFaces :: Point -> SingleDegreeRadii -> Slope -> Slope -> [Double] -> (Point-> CornerPoints) ->
+createVerticalFaces :: Origin -> SingleDegreeRadii -> Slope -> Slope -> [TransposeFactor] -> (Point-> CornerPoints) ->
                        (Point-> CornerPoints) -> (Point-> CornerPoints) -> (Point-> CornerPoints) -> [CornerPoints]
 createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor topFrontConstructor topBackConstructor
                             btmFrontConstructor btmBackConstructor =
@@ -612,13 +606,13 @@ createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor topFrontCo
 
 
 --RightFace version of createVerticalFaces
-createRightFaces :: Point -> SingleDegreeRadii -> Slope -> Slope -> [Double] -> [CornerPoints]
+createRightFaces :: Origin -> SingleDegreeRadii -> Slope -> Slope -> [TransposeFactor] -> [CornerPoints]
 createRightFaces topOrigin inDegree xSlope ySlope zTransposeFactor  =
   createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor (F3) (B3) (F4) (B4)
 
 
 --LeftFace version of createVerticalFaces
-createLeftFaces :: Point -> SingleDegreeRadii -> Slope -> Slope -> [Double] -> [CornerPoints]
+createLeftFaces :: Origin -> SingleDegreeRadii -> Slope -> Slope -> [TransposeFactor] -> [CornerPoints]
 createLeftFaces topOrigin inDegree xSlope ySlope zTransposeFactor  =
   createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor (F2) (B2) (F1) (B1)
 
@@ -629,7 +623,7 @@ Can already create LeftFace, problem is to create an array of them from the vert
 Cannot just map over them with createLeftFaces, because the degree is changing from column to column.
 For this reason, will have to use recursion.
 -}
-createLeftFacesMultiColumns ::  Point -> [SingleDegreeRadii] -> Slope -> Slope -> [Double] -> [[CornerPoints]]
+createLeftFacesMultiColumns ::  Origin -> [SingleDegreeRadii] -> Slope -> Slope -> [TransposeFactor] -> [[CornerPoints]]
 createLeftFacesMultiColumns _ [] _ _ _ = []
 createLeftFacesMultiColumns topOrigin (d:ds) xSlope ySlope zTransposeFactor =
   (createLeftFaces topOrigin d xSlope ySlope zTransposeFactor ) :
