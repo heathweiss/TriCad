@@ -337,22 +337,6 @@ createCornerPoint :: (Point-> CornerPoints) -> Point -> Radius ->  Angle -> Slop
 createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
                              let 
                                  
-                                 setXPolarityForQuadrant :: Angle -> AxisLength -> AxisLength
-                                 setXPolarityForQuadrant angle length = case getCurrentQuadrant angle of
-                                     Quadrant1 -> length
-                                     Quadrant2 -> length
-                                     Quadrant3 -> negate length
-                                     Quadrant4 -> negate length
-                                     
-                                 setYPolarityForQuadrant :: Angle -> AxisLength -> AxisLength
-                                 setYPolarityForQuadrant angle length = case getCurrentQuadrant angle of
-                                     Quadrant1 -> negate length
-                                     Quadrant2 -> length
-                                     Quadrant3 -> length
-                                     Quadrant4 -> negate length
- 
-
-                                 
                                  --What quadrant of the xy plane, is the angle in?
                                  getCurrentQuadrant :: Angle -> Quadrant
                                  getCurrentQuadrant ang       | quadAngle ang  < 0 = getCurrentQuadrant $ Angle (360 + (quadAngle ang))
@@ -369,14 +353,33 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
                                  radiusAdjustedForSlope = radius (radiusAdjustedForZslope horizRadius adjustedSlope)
 
                                  baseOfAngle = (quadAngle $ trigAngle (quadAngle xyAngle))
-                                 sinOfAngle = sinDegrees baseOfAngle
-                                 cosOfAngle = cosDegrees baseOfAngle
+                                 sinOfxyAngle = sinDegrees baseOfAngle
+                                 cosOfxyAngle = cosDegrees baseOfAngle
                                  
-                                 setXaxis = x_axis origin + (setXPolarityForQuadrant xyAngle $
-                                              radiusAdjustedForSlope * sinOfAngle)
+                                 
+                                 setXaxis =
+                                   let length = radiusAdjustedForSlope * sinOfxyAngle
+                                       x_axis' = x_axis origin
+                                   in
 
-                                 setYaxis = y_axis origin + (setYPolarityForQuadrant xyAngle $
-                                              radiusAdjustedForSlope * cosOfAngle)
+                                    case getCurrentQuadrant xyAngle of
+                                      Quadrant1 -> x_axis' + length
+                                      Quadrant2 -> x_axis' + length
+                                      Quadrant3 -> x_axis' - length
+                                      Quadrant4 -> x_axis' - length
+                                 
+                                 
+                                 setYaxis' =
+                                   let length = radiusAdjustedForSlope * cosOfxyAngle
+                                       y_axis' = y_axis origin
+                                   in
+
+                                    case getCurrentQuadrant xyAngle of
+                                      Quadrant1 -> y_axis' - length
+                                      Quadrant2 -> y_axis' + length
+                                      Quadrant3 -> y_axis' + length
+                                      Quadrant4 -> y_axis' - length
+
                                  
                                  setZaxis =
                                    let length = (radius horizRadius) * (sinDegrees (angle adjustedSlope))
@@ -388,7 +391,7 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
                                  
                                  
                              in       
-                                 cPoint (Point setXaxis setYaxis setZaxis)
+                                 cPoint (Point setXaxis setYaxis' setZaxis)
 
                                   
  
