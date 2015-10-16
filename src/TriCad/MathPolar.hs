@@ -9,7 +9,7 @@ module TriCad.MathPolar(
   createLeftFacesMultiColumns,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
-  radiusAdjustedForZslope,
+  adjustRadiusForSlope,
   --quadrantOfAngle, renamed to trigAngle for now
   trigAngle,
   createCornerPoint,
@@ -211,88 +211,88 @@ It is a wrapper around slopeAdjustedForVerticalAngleBase, so that the calculatio
 has to be written out once, instead of in each function.
 -}
 slopeAdjustedForVerticalAngle :: Slope -> Slope -> Angle -> Slope
-slopeAdjustedForVerticalAngle xSlope ySlope xyAngle =
-  slopeAdjustedForVerticalAngleBase xSlope ySlope (trigAngle (angle xyAngle))
+slopeAdjustedForVerticalAngle xSlope ySlope (Angle verticalAngle) =
+  slopeAdjustedForVerticalAngleBase xSlope ySlope (trigAngle verticalAngle)
 
 slopeAdjustedForVerticalAngleBase :: Slope -> Slope -> Angle -> Slope
-slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant1Angle xyAngle)
-  | ((sinDegrees xyAngle) * xSlope) >= ((cosDegrees xyAngle) * ySlope)  =
-      PosSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
-  | otherwise = NegSlope $ abs $ ((sinDegrees xyAngle) * xSlope) - ((cosDegrees xyAngle) * ySlope)
+slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant1Angle verticalAngle)
+  | ((sinDegrees verticalAngle) * xSlope) >= ((cosDegrees verticalAngle) * ySlope)  =
+      PosSlope $ abs $ ((sinDegrees verticalAngle) * xSlope) - ((cosDegrees verticalAngle) * ySlope)
+  | otherwise = NegSlope $ abs $ ((sinDegrees verticalAngle) * xSlope) - ((cosDegrees verticalAngle) * ySlope)
 
-slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant1Angle xyAngle) =
-  PosSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
+slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant1Angle verticalAngle) =
+  PosSlope $ ((sinDegrees verticalAngle) * xSlope) + ((cosDegrees verticalAngle) * ySlope)
 
-slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant1Angle xyAngle) =
-   NegSlope $ (getXSlope xSlope xyAngle) + (getYSlope ySlope xyAngle)
-
---not tested
-slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant1Angle xyAngle)
-  | (getYSlope ySlope xyAngle) >= (getXSlope xSlope xyAngle) = PosSlope $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
-  | otherwise = NegSlope $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
-
-slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant2Angle xyAngle) =
-  PosSlope $(getXSlope xSlope xyAngle) + (getYSlope ySlope xyAngle)
-
-slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant2Angle xyAngle)
-  | (getXSlope xSlope xyAngle) >= (getYSlope ySlope xyAngle)  =
-      PosSlope $ abs $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
-  | otherwise = NegSlope $ abs $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
+slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant1Angle verticalAngle) =
+   NegSlope $ (getXSlope xSlope verticalAngle) + (getYSlope ySlope verticalAngle)
 
 --not tested
-slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant2Angle xyAngle)
-  | (getYSlope ySlope xyAngle) <= (getXSlope xSlope xyAngle) = PosSlope $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
-  | otherwise = NegSlope $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
+slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant1Angle verticalAngle)
+  | (getYSlope ySlope verticalAngle) >= (getXSlope xSlope verticalAngle) = PosSlope $ (getYSlope ySlope verticalAngle) - (getXSlope xSlope verticalAngle)
+  | otherwise = NegSlope $ (getXSlope xSlope verticalAngle) - (getYSlope ySlope verticalAngle)
+
+slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant2Angle verticalAngle) =
+  PosSlope $(getXSlope xSlope verticalAngle) + (getYSlope ySlope verticalAngle)
+
+slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant2Angle verticalAngle)
+  | (getXSlope xSlope verticalAngle) >= (getYSlope ySlope verticalAngle)  =
+      PosSlope $ abs $ (getXSlope xSlope verticalAngle) - (getYSlope ySlope verticalAngle)
+  | otherwise = NegSlope $ abs $ (getXSlope xSlope verticalAngle) - (getYSlope ySlope verticalAngle)
 
 --not tested
-slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant2Angle xyAngle) =
-  NegSlope $ (getXSlope xSlope xyAngle) + (getYSlope ySlope xyAngle)
-
-slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant3Angle xyAngle)
-  | (getYSlope ySlope xyAngle)  >= (getXSlope xSlope xyAngle) =
-      PosSlope $ abs $  (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
-  | otherwise = NegSlope $ abs $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle) 
-
-slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant3Angle xyAngle) =
-  NegSlope $ ((sinDegrees xyAngle) * xSlope) + ((cosDegrees xyAngle) * ySlope)
+slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant2Angle verticalAngle)
+  | (getYSlope ySlope verticalAngle) <= (getXSlope xSlope verticalAngle) = PosSlope $ (getYSlope ySlope verticalAngle) - (getXSlope xSlope verticalAngle)
+  | otherwise = NegSlope $ (getXSlope xSlope verticalAngle) - (getYSlope ySlope verticalAngle)
 
 --not tested
-slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant3Angle xyAngle)  =
-  PosSlope $ (getXSlope xSlope xyAngle) + (getYSlope ySlope xyAngle)
+slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant2Angle verticalAngle) =
+  NegSlope $ (getXSlope xSlope verticalAngle) + (getYSlope ySlope verticalAngle)
+
+slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant3Angle verticalAngle)
+  | (getYSlope ySlope verticalAngle)  >= (getXSlope xSlope verticalAngle) =
+      PosSlope $ abs $  (getYSlope ySlope verticalAngle) - (getXSlope xSlope verticalAngle)
+  | otherwise = NegSlope $ abs $ (getYSlope ySlope verticalAngle) - (getXSlope xSlope verticalAngle) 
+
+slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant3Angle verticalAngle) =
+  NegSlope $ ((sinDegrees verticalAngle) * xSlope) + ((cosDegrees verticalAngle) * ySlope)
 
 --not tested
-slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant3Angle xyAngle)
-  | (getXSlope xSlope xyAngle) >= (getYSlope ySlope xyAngle) = PosSlope $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
-  | otherwise = NegSlope $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
-
-slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant4Angle xyAngle) =
-  NegSlope $ (getXSlope xSlope xyAngle) + (getYSlope ySlope xyAngle)
-
-slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant4Angle xyAngle)
-  | (getYSlope ySlope xyAngle)  >= (getXSlope xSlope xyAngle) =
-      PosSlope $ abs $  (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
-  | otherwise = NegSlope $ abs $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
+slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant3Angle verticalAngle)  =
+  PosSlope $ (getXSlope xSlope verticalAngle) + (getYSlope ySlope verticalAngle)
 
 --not tested
-slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant4Angle xyAngle)
-  | (getXSlope xSlope xyAngle) >= (getYSlope ySlope xyAngle) = PosSlope $ (getXSlope xSlope xyAngle) - (getYSlope ySlope xyAngle)
-  | otherwise = NegSlope $ (getYSlope ySlope xyAngle) - (getXSlope xSlope xyAngle)
+slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant3Angle verticalAngle)
+  | (getXSlope xSlope verticalAngle) >= (getYSlope ySlope verticalAngle) = PosSlope $ (getXSlope xSlope verticalAngle) - (getYSlope ySlope verticalAngle)
+  | otherwise = NegSlope $ (getYSlope ySlope verticalAngle) - (getXSlope xSlope verticalAngle)
+
+slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant4Angle verticalAngle) =
+  NegSlope $ (getXSlope xSlope verticalAngle) + (getYSlope ySlope verticalAngle)
+
+slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (NegYSlope ySlope) (Quadrant4Angle verticalAngle)
+  | (getYSlope ySlope verticalAngle)  >= (getXSlope xSlope verticalAngle) =
+      PosSlope $ abs $  (getYSlope ySlope verticalAngle) - (getXSlope xSlope verticalAngle)
+  | otherwise = NegSlope $ abs $ (getYSlope ySlope verticalAngle) - (getXSlope xSlope verticalAngle)
 
 --not tested
-slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant4Angle xyAngle) =
-  PosSlope $ (getXSlope xSlope xyAngle) + (getYSlope ySlope xyAngle)
+slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (PosYSlope ySlope) (Quadrant4Angle verticalAngle)
+  | (getXSlope xSlope verticalAngle) >= (getYSlope ySlope verticalAngle) = PosSlope $ (getXSlope xSlope verticalAngle) - (getYSlope ySlope verticalAngle)
+  | otherwise = NegSlope $ (getYSlope ySlope verticalAngle) - (getXSlope xSlope verticalAngle)
+
+--not tested
+slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant4Angle verticalAngle) =
+  PosSlope $ (getXSlope xSlope verticalAngle) + (getYSlope ySlope verticalAngle)
    
-getXSlope xSlope' xyAngle' = ((sinDegrees xyAngle') * xSlope')
-getYSlope ySlope' xyAngle' = ((cosDegrees xyAngle') * ySlope')
+getXSlope xSlope' verticalAngle' = ((sinDegrees verticalAngle') * xSlope')
+getYSlope ySlope' verticalAngle' = ((cosDegrees verticalAngle') * ySlope')
 
 
 {-
 Shorten the radius on the xy plane, for the changes in the z plane.
 As per standard 3D polar to cartesian conversion methods.
 -}
-radiusAdjustedForZslope :: Radius -> Slope -> Radius 
-radiusAdjustedForZslope (Radius radius) (PosSlope xySlope) = UpRadius $ radius * (cosDegrees (xySlope))
-radiusAdjustedForZslope (Radius radius) (NegSlope xySlope) = DownRadius $ radius * (cosDegrees (xySlope))
+adjustRadiusForSlope :: Radius -> Slope -> Radius 
+adjustRadiusForSlope (Radius radius) (PosSlope xySlope) = UpRadius $ radius * (cosDegrees (xySlope))
+adjustRadiusForSlope (Radius radius) (NegSlope xySlope) = DownRadius $ radius * (cosDegrees (xySlope))
 
 
   
@@ -333,7 +333,7 @@ orign: Point
 -}
 
 createCornerPoint :: (Point-> CornerPoints) -> Point -> Radius ->  Angle -> Slope -> Slope -> CornerPoints
-createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
+createCornerPoint cPoint origin horizRadius verticalAngle xSlope ySlope  =
                              let 
                                  
                                  --What quadrant of the xy plane, is the angle in?
@@ -347,21 +347,21 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
 
 
 
-                                 adjustedSlope = slopeAdjustedForVerticalAngle xSlope ySlope ((xyAngle))
+                                 currentSlope = slopeAdjustedForVerticalAngle xSlope ySlope verticalAngle
                                                                                       
-                                 radiusAdjustedForSlope = radius (radiusAdjustedForZslope horizRadius adjustedSlope)
+                                 radiusAdjustedForSlope = radius (adjustRadiusForSlope horizRadius currentSlope)
 
-                                 baseOfAngle = (angle $ trigAngle (angle xyAngle))
-                                 sinOfxyAngle = sinDegrees baseOfAngle
-                                 cosOfxyAngle = cosDegrees baseOfAngle
+                                 baseOfAngle = (angle $ trigAngle (angle verticalAngle))
+                                 sinOfVerticalAngle = sinDegrees baseOfAngle
+                                 cosOfVerticalAngle = cosDegrees baseOfAngle
                                  
                                  
                                  setXaxis =
-                                   let length = radiusAdjustedForSlope * sinOfxyAngle
+                                   let length = radiusAdjustedForSlope * sinOfVerticalAngle
                                        x_axis' = x_axis origin
                                    in
 
-                                    case getCurrentQuadrant xyAngle of
+                                    case getCurrentQuadrant verticalAngle of
                                       Quadrant1 -> x_axis' + length
                                       Quadrant2 -> x_axis' + length
                                       Quadrant3 -> x_axis' - length
@@ -369,11 +369,11 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
                                  
                                  
                                  setYaxis' =
-                                   let length = radiusAdjustedForSlope * cosOfxyAngle
+                                   let length = radiusAdjustedForSlope * cosOfVerticalAngle
                                        y_axis' = y_axis origin
                                    in
 
-                                    case getCurrentQuadrant xyAngle of
+                                    case getCurrentQuadrant verticalAngle of
                                       Quadrant1 -> y_axis' - length
                                       Quadrant2 -> y_axis' + length
                                       Quadrant3 -> y_axis' + length
@@ -381,10 +381,10 @@ createCornerPoint cPoint origin horizRadius xyAngle xSlope ySlope  =
 
                                  
                                  setZaxis =
-                                   let length = (radius horizRadius) * (sinDegrees (slope adjustedSlope))
+                                   let length = (radius horizRadius) * (sinDegrees (slope currentSlope))
                                        z_axis' = z_axis origin
                                    in
-                                    case adjustedSlope of
+                                    case currentSlope of
                                      (PosSlope _) -> z_axis' +  length
                                      otherwise  -> z_axis' - length
                                  
@@ -467,10 +467,7 @@ createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
       (F3)
       inOrigin
       (head inRadius) 
-      --(radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles))))
-      --(Angle (head inAngles))
       (head inAngles)
-      --(slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (head inAngles)))
       xSlope ySlope
     ) 
     +++
@@ -480,10 +477,7 @@ createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
       (F2)
       inOrigin
       currRadius
-      --(radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle)))
-      --(Angle angle)
       angle
-      --(slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle angle))
       xSlope
       ySlope
      ) 
@@ -499,9 +493,8 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
       (F3)
       inOrigin
       (head inRadius) 
-      --(radiusAdjustedForZslope (head inRadius) (slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles))))
+      
       (Angle (head inAngles))
-      --(slopeAdjustedForVerticalAngle (head xSlope) (head ySlope) (xyQuadrantAngle (head inAngles)))
       (head xSlope)
       (head ySlope)
     ) 
@@ -512,9 +505,7 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
       (F2)
       inOrigin
       currRadius
-      --(radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle)))
       (Angle angle)
-      --(slopeAdjustedForVerticalAngle currXSlope currYSlope (xyQuadrantAngle angle))
       currXSlope
       currYSlope
      ) 
@@ -597,9 +588,7 @@ createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor topFrontCo
       (topFrontConstructor)
       topOrigin
       (head $ radii inDegree) 
-      --(radiusAdjustedForZslope (head $ radii inDegree) (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree))))
       (Angle (degree inDegree))
-      --(slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree)))
       xSlope
       ySlope
     ) 
@@ -610,9 +599,7 @@ createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor topFrontCo
       (btmFrontConstructor)
       (transposeZ (+(-currZVal)) topOrigin)  --topOrigin
       currRadius
-      --(radiusAdjustedForZslope currRadius (slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree))))
       (Angle (degree inDegree))
-      --(slopeAdjustedForVerticalAngle xSlope ySlope (xyQuadrantAngle (degree inDegree)))
       xSlope
       ySlope
      ) 

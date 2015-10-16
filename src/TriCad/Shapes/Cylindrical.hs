@@ -12,7 +12,6 @@ import TriCad.MathPolar(
   createTopFaces,
   createBottomFaces,
   createTopFacesWithVariableSlope,
-  radiusAdjustedForZslope,
   Slope(..),
   Radius(..),
   Angle(..),
