@@ -5,7 +5,8 @@ import TriCad.MathPolar(Radius())
 import Scan.Json
 import Data.Aeson
 import qualified Data.ByteString.Lazy as BS
-import TriCad.MathPolar(Radius(..),SingleDegreeRadii(..),MultiDegreeRadii(..))
+import TriCad.MathPolar(Radius(..))
+import TriCad.VerticalFaces (SingleDegreeRadii(..), MultiDegreeRadii(..))
 
 
 jsonTestDo = do

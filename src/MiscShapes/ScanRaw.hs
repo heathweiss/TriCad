@@ -4,8 +4,6 @@ import qualified Data.List.Split as LS
 import TriCad.MathPolar(
   Slope(..),
   Radius(..),
-  MultiDegreeRadii(..),
-  SingleDegreeRadii(..),
   flatXSlope,
   flatYSlope,
   )
@@ -23,7 +21,8 @@ import GHC.Word (Word8)
 import Data.Aeson
 import Scan.Json()
 import qualified Scan.Parse as PA  ( MultiDegreePixelValues(..), parseCSVPixelValues)
-import TriCad.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalCubes )
+import TriCad.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalCubes,
+                           SingleDegreeRadii(..), MultiDegreeRadii(..))
 
 --create a [Word8] for: Right(B.pack $ strToWord8s)
 --which gets a bytstring of word8

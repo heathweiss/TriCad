@@ -7,8 +7,6 @@ module TriCad.MathPolar(
   createCornerPoint,
   Slope(..),
   Radius(..),
-  SingleDegreeRadii(..),
-  MultiDegreeRadii(..),
   flatXSlope,
   flatYSlope,
   Degree(..),
@@ -61,30 +59,6 @@ data Radius = Radius {radius :: Double}
              | UpRadius {radius :: Double}
    deriving (Show, Eq)
 
-{-
-Contains the [Radius] associated with a single degree from a vertical scan.
-
-Scan.Json module declares it an instance of ToJSON and FromJSON for the aeson package.
-
-Known uses:
-Raw image data is parse into Scan datatype, which contains [Degree]. This is then
-processed into cubes.
-
-Store the processed raw data as json, so the processing only has to be done once.
--}
-data SingleDegreeRadii = SingleDegreeRadii {degree::Degree, radii::[Radius]}
-     deriving (Show, Eq)
-
-{- |
-Contains all the filtered data from a scan.
-Is a [SingleDegreeRadii] and an assoc'd name.
-
-Known uses:
-Raw scan image data is processed into this, which is the last ADT, before being turned in CornerPoints.
-It can be read to/from json, so that all the processing of scan data, can be saved to file.
--}
-data MultiDegreeRadii = MultiDegreeRadii {name::String, degrees::[SingleDegreeRadii]}
-          deriving (Show, Eq)
 {-
 There are 4 quadrants to work with therfore the Quadarant1/2/3/4Angle
 They should be eliminated later, when I use quadrant correcting as per trig rules for obtuse angles.

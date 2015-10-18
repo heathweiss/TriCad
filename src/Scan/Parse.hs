@@ -16,7 +16,8 @@ import Data.Attoparsec.Char8
 import Control.Applicative
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BS
-import qualified TriCad.MathPolar as MP (SingleDegreeRadii(..), Radius(..), Degree) 
+import qualified TriCad.MathPolar as MP (Radius(..), Degree)
+import TriCad.VerticalFaces(SingleDegreeRadii(..))
 
 --used to remvove leading/trailing spaces.
 --need testing in place, then see if '\t' can be removed.

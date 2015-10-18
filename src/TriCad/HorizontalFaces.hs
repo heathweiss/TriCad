@@ -4,8 +4,9 @@ module TriCad.HorizontalFaces(
   createBottomFaces,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
+  
   )where
-import TriCad.MathPolar(SingleDegreeRadii(..), Slope(..), Point(..), Origin(..), createCornerPoint, Angle(..),
+import TriCad.MathPolar( Slope(..), Point(..), Origin(..), createCornerPoint, Angle(..),
                        Radius(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 
