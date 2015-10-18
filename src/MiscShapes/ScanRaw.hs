@@ -15,9 +15,9 @@ import TriCad.MathPolar(
   )
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
-import TriCad.StlCornerPoints((+++^))
-import TriCad.StlBase (StlShape(..), newStlShape)
-import TriCad.StlFileWriter(writeStlToFile)
+import Stl.StlCornerPoints((+++^))
+import Stl.StlBase (StlShape(..), newStlShape)
+import Stl.StlFileWriter(writeStlToFile)
 import Scan.Transform(pixelIndicesOfPixelValuesLTE, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString as B

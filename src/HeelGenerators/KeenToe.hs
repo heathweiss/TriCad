@@ -14,9 +14,9 @@ import TriCad.MathPolar(
   )
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
-import TriCad.StlCornerPoints((+++^))
-import TriCad.StlBase (StlShape(..), newStlShape, stlShapeToText)
-import TriCad.StlFileWriter(writeStlToFile)
+import Stl.StlCornerPoints((+++^))
+import Stl.StlBase (StlShape(..), newStlShape, stlShapeToText)
+import Stl.StlFileWriter(writeStlToFile)
 import TriCad.CornerPointsFaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace ) 
 import TriCad.CornerPointsFaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace,
                                           bottomFrontLineFromBackBottomLine, lowerFaceFromUpperFace)
