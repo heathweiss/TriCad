@@ -2,8 +2,6 @@
 module TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   adjustRadiusForSlope,
-  --quadrantOfAngle, renamed to trigAngle for now
-  trigAngle,
   createCornerPoint,
   Slope(..),
   Radius(..),
@@ -29,6 +27,126 @@ but it drifts off the y-axis.
 
 safari books: Triginometry 3rd edition is a good ref.
 -}
+
+
+{-
+For trig xy calculations, the neg/pos aspect of y will depend upon the current quadrant of the xy plane
+
+
+setYPolarityForQuadrant :: QuadrantAngle -> Double -> Double
+setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of
+                                     Quadrant1 -> negate val
+                                     Quadrant2 -> val
+                                     Quadrant3 -> val
+                                     Quadrant4 -> negate val
+-}
+        
+
+{-
+Change slope and xy angle into a single Slope value.
+Change radius into a Radius
+
+Given:
+cPoint : (Point-> CornerPoints)
+-A CornerPoints constructor such as F1
+
+adjustedRadius: Radius: 
+-The radius, after being adjusted for slope
+-Should get rid of this, and do the calculations inside createCornerPoint.
+ This would simplify calling this function.
+ It was used before for pattern matching, but that is no longer done.
+ However, will need to pass in xSlope and ySlope, instead of just the xySlope
+
+slope: Slope:
+The slope, having already been adjusted for x/y slopes and xy quadrant
+
+orign: Point
+-The starting point which gets adjusted to give the return point. That way, this point can be created relative to some position, instead of at an origin of 0 0 0
+
+-}
+
+createCornerPoint :: (Point-> CornerPoints) -> Origin -> Radius ->  Angle -> Slope -> Slope -> CornerPoints
+createCornerPoint cPoint origin horizRadius verticalAngle xSlope ySlope  =
+                             let 
+                                 
+                                 
+
+
+                                 currentSlope = slopeAdjustedForVerticalAngle xSlope ySlope verticalAngle
+                                                                                      
+                                 radiusAdjustedForSlope = radius (adjustRadiusForSlope horizRadius currentSlope)
+
+                                 baseOfAngle = (angle $ getQuadrantAngle verticalAngle)
+                                 sinOfVerticalAngle = sinDegrees baseOfAngle
+                                 cosOfVerticalAngle = cosDegrees baseOfAngle
+                                 
+{-                                 
+                                 setXaxis =
+                                   let length = radiusAdjustedForSlope * sinOfVerticalAngle
+                                       x_axis' = x_axis origin
+                                   in
+
+                                    case getCurrentQuadrant verticalAngle of
+                                      Quadrant1 -> x_axis' + length
+                                      Quadrant2 -> x_axis' + length
+                                      Quadrant3 -> x_axis' - length
+                                      Quadrant4 -> x_axis' - length
+-}
+                                 setXaxis =
+                                   let length = radiusAdjustedForSlope * sinOfVerticalAngle
+                                       x_axis' = x_axis origin
+                                   in
+                                      
+                                    case getQuadrantAngle verticalAngle of
+                                      (Quadrant1Angle _) -> x_axis' + length
+                                      (Quadrant2Angle _) -> x_axis' + length
+                                      (Quadrant3Angle _) -> x_axis' - length
+                                      (Quadrant4Angle _) -> x_axis' - length
+
+                                 {-
+                                 setYaxis' =
+                                   let length = radiusAdjustedForSlope * cosOfVerticalAngle
+                                       y_axis' = y_axis origin
+                                   in
+
+                                    case getCurrentQuadrant verticalAngle of
+                                      Quadrant1 -> y_axis' - length
+                                      Quadrant2 -> y_axis' + length
+                                      Quadrant3 -> y_axis' + length
+                                      Quadrant4 -> y_axis' - length
+-}
+                                 setYaxis' =
+                                   let length = radiusAdjustedForSlope * cosOfVerticalAngle
+                                       y_axis' = y_axis origin
+                                   in
+                                     
+                                    case getQuadrantAngle verticalAngle of
+                                      (Quadrant1Angle _) -> y_axis' - length
+                                      (Quadrant2Angle _) -> y_axis' + length
+                                      (Quadrant3Angle _) -> y_axis' + length
+                                      (Quadrant4Angle _) -> y_axis' - length
+                                   
+                                 
+                                 setZaxis =
+                                   let length = (radius horizRadius) * (sinDegrees (slope currentSlope))
+                                       z_axis' = z_axis origin
+                                   in
+                                    case currentSlope of
+                                     (PosSlope _) -> z_axis' +  length
+                                     (NegSlope _)  -> z_axis' - length
+                                 
+                                 
+                             in       
+                                 cPoint (Point setXaxis setYaxis' setZaxis)
+
+                                  
+ 
+
+
+
+
+
+
 
 {---------------------------------------------------------------------------
 e
@@ -77,32 +195,6 @@ data Angle =         Quadrant1Angle  { angle::Double}
 
 
 {-
-What quadrant of the xy plane, is the angle in?
-
-Used for:
-setYPolarityForQuadrant & setXPolarityForQuadrant use it to adjust the polarity of x/y for trig calculations
-
-getCurrentQuadrant :: QuadrantAngle -> Quadrant
-getCurrentQuadrant ang       | angle ang  < 0 = getCurrentQuadrant $ Angle (360 + (angleang))
-                             | angleang <= 90 = Quadrant1
-                             | angleang <= 180 = Quadrant2
-                             | angleang <= 270 = Quadrant3
-                             | angleang <= 360 = Quadrant4
-                             | angleang > 360 = getCurrentQuadrant $ Angle ((angleang) - 360)
--}
-{-
-Corresponds to the xy plane quadrants.
-
-Used for:
-getCurentQuadrent returns this type when it calculates the current quadrant for an angle.
-
--}
-data Quadrant = Quadrant1 -- neg y, pos x
-              | Quadrant2 -- pos y, pos x
-              | Quadrant3 -- pos y, neg x
-              | Quadrant4 -- neg y, neg x
-
-{-
 Used for:
 Neg/Pos XY Slope: 
 -Describe the slope resulting from the combining of the Neg/Pos X/Y slopes
@@ -141,22 +233,19 @@ data Slope = NegSlope {slope :: Double}
 type AxisLength = Double
 
 {-
-Each quadrant will be 0-90 degrees.
-Orientated so that, for all quadrants:
+Each quadrant will be 90 degrees with Quadrant 1 being 0-90 degrees.
+The resulting angle is such that, for all quadrants:
  -use sin to calculate x-axis
  -use cos to calculate y-axis
 -}
-
---quadrantOfAngle :: Double ->  Angle
-trigAngle :: Double ->  Angle
-trigAngle currAngle 
-  | currAngle < 0 = trigAngle (360 - currAngle)
+getQuadrantAngle :: Angle ->  Angle
+getQuadrantAngle (Angle currAngle )
+  | currAngle < 0 = getQuadrantAngle (Angle (360 - currAngle))
   | currAngle <= 90 = Quadrant1Angle currAngle
   | currAngle <= 180 = Quadrant2Angle (180 - currAngle)
   | currAngle <= 270 = Quadrant3Angle $ currAngle - 180   -- 90 - (270 - currAngle)
   | currAngle <= 360 = Quadrant4Angle (360 - currAngle)
-  | currAngle > 360 = trigAngle (currAngle - 360)
-
+  | currAngle > 360 = getQuadrantAngle (Angle(currAngle - 360))
 
 
 
@@ -170,8 +259,8 @@ It is a wrapper around slopeAdjustedForVerticalAngleBase, so that the calculatio
 has to be written out once, instead of in each function.
 -}
 slopeAdjustedForVerticalAngle :: Slope -> Slope -> Angle -> Slope
-slopeAdjustedForVerticalAngle xSlope ySlope (Angle verticalAngle) =
-  slopeAdjustedForVerticalAngleBase xSlope ySlope (trigAngle verticalAngle)
+slopeAdjustedForVerticalAngle xSlope ySlope verticalAngle =
+  slopeAdjustedForVerticalAngleBase xSlope ySlope (getQuadrantAngle verticalAngle)
 
 slopeAdjustedForVerticalAngleBase :: Slope -> Slope -> Angle -> Slope
 slopeAdjustedForVerticalAngleBase (PosXSlope xSlope) (PosYSlope ySlope) (Quadrant1Angle verticalAngle)
@@ -240,7 +329,8 @@ slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (PosYSlope ySlope) (Quadran
 --not tested
 slopeAdjustedForVerticalAngleBase (NegXSlope xSlope) (NegYSlope ySlope) (Quadrant4Angle verticalAngle) =
   PosSlope $ (getXSlope xSlope verticalAngle) + (getYSlope ySlope verticalAngle)
-   
+
+--Used to keep slopeAdjustedForVerticalAngleBase DRY.
 getXSlope xSlope' verticalAngle' = ((sinDegrees verticalAngle') * xSlope')
 getYSlope ySlope' verticalAngle' = ((cosDegrees verticalAngle') * ySlope')
 
@@ -255,106 +345,3 @@ adjustRadiusForSlope (Radius radius) (NegSlope xySlope) = DownRadius $ radius * 
 
 
   
-{-
-For trig xy calculations, the neg/pos aspect of y will depend upon the current quadrant of the xy plane
-
-
-setYPolarityForQuadrant :: QuadrantAngle -> Double -> Double
-setYPolarityForQuadrant angle val = case getCurrentQuadrant angle of
-                                     Quadrant1 -> negate val
-                                     Quadrant2 -> val
-                                     Quadrant3 -> val
-                                     Quadrant4 -> negate val
--}
-        
-
-{-
-Change slope and xy angle into a single Slope value.
-Change radius into a Radius
-
-Given:
-cPoint : (Point-> CornerPoints)
--A CornerPoints constructor such as F1
-
-adjustedRadius: Radius: 
--The radius, after being adjusted for slope
--Should get rid of this, and do the calculations inside createCornerPoint.
- This would simplify calling this function.
- It was used before for pattern matching, but that is no longer done.
- However, will need to pass in xSlope and ySlope, instead of just the xySlope
-
-slope: Slope:
-The slope, having already been adjusted for x/y slopes and xy quadrant
-
-orign: Point
--The starting point which gets adjusted to give the return point. That way, this point can be created relative to some position, instead of at an origin of 0 0 0
-
--}
-
-createCornerPoint :: (Point-> CornerPoints) -> Origin -> Radius ->  Angle -> Slope -> Slope -> CornerPoints
-createCornerPoint cPoint origin horizRadius verticalAngle xSlope ySlope  =
-                             let 
-                                 
-                                 --What quadrant of the xy plane, is the angle in?
-                                 getCurrentQuadrant :: Angle -> Quadrant
-                                 getCurrentQuadrant ang       | angle ang  < 0 = getCurrentQuadrant $ Angle (360 + (angle ang))
-                                                              | angle ang <= 90 = Quadrant1
-                                                              | angle ang <= 180 = Quadrant2
-                                                              | angle ang <= 270 = Quadrant3
-                                                              | angle ang <= 360 = Quadrant4
-                                                              | angle ang > 360 = getCurrentQuadrant $ Angle ((angle ang) - 360)
-
-
-
-                                 currentSlope = slopeAdjustedForVerticalAngle xSlope ySlope verticalAngle
-                                                                                      
-                                 radiusAdjustedForSlope = radius (adjustRadiusForSlope horizRadius currentSlope)
-
-                                 baseOfAngle = (angle $ trigAngle (angle verticalAngle))
-                                 sinOfVerticalAngle = sinDegrees baseOfAngle
-                                 cosOfVerticalAngle = cosDegrees baseOfAngle
-                                 
-                                 
-                                 setXaxis =
-                                   let length = radiusAdjustedForSlope * sinOfVerticalAngle
-                                       x_axis' = x_axis origin
-                                   in
-
-                                    case getCurrentQuadrant verticalAngle of
-                                      Quadrant1 -> x_axis' + length
-                                      Quadrant2 -> x_axis' + length
-                                      Quadrant3 -> x_axis' - length
-                                      Quadrant4 -> x_axis' - length
-                                 
-                                 
-                                 setYaxis' =
-                                   let length = radiusAdjustedForSlope * cosOfVerticalAngle
-                                       y_axis' = y_axis origin
-                                   in
-
-                                    case getCurrentQuadrant verticalAngle of
-                                      Quadrant1 -> y_axis' - length
-                                      Quadrant2 -> y_axis' + length
-                                      Quadrant3 -> y_axis' + length
-                                      Quadrant4 -> y_axis' - length
-
-                                 
-                                 setZaxis =
-                                   let length = (radius horizRadius) * (sinDegrees (slope currentSlope))
-                                       z_axis' = z_axis origin
-                                   in
-                                    case currentSlope of
-                                     (PosSlope _) -> z_axis' +  length
-                                     otherwise  -> z_axis' - length
-                                 
-                                 
-                             in       
-                                 cPoint (Point setXaxis setYaxis' setZaxis)
-
-                                  
- 
-
-
-
-
-

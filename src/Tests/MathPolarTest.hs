@@ -7,8 +7,6 @@ import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   adjustRadiusForSlope,
   Radius(..),
-  --quadrantOfAngle,
-  trigAngle,
   createCornerPoint,
   Slope(..),
   Angle(..),
@@ -17,14 +15,11 @@ import TriCad.MathPolar(
   )
 import TriCad.Math(sinDegrees,cosDegrees)
 
---renamed in MathPolar. Do this for now to avoid renaming in my tests until refactoring is done.
-quadrantOfAngle = trigAngle
 
 
 mathPolarTestDo = do
 
-  putStrLn "internal support functions" 
-
+  {-These don't need to be exported, but leave in case more testing is needed.
   runTestTT getQuadrantAngleTest
   runTestTT getQuadrantAngleTest2
   runTestTT getQuadrantAngleTest3
@@ -32,7 +27,7 @@ mathPolarTestDo = do
   runTestTT getQuadrantAngleTest5
   runTestTT getQuadrantAngleTest6
   runTestTT getQuadrantAngleTest7
-
+  -}
 
 
   
@@ -77,6 +72,7 @@ mathPolarTestDo = do
   runTestTT createFrontCornerTest
 
   ---------------- set xy quadrant tests==============================
+  --MathPolar does not need to export this.
   --leave for now, in case more testing is needed
   --runTestTT setQuadrant1YvalTest
   --runTestTT setQuadrant2YvalTest
@@ -157,31 +153,29 @@ setQuadrant3Xval190Test = TestCase $ assertEqual
   (-1)
   (setXPolarityForQuadrant (Quadrant3Angle 190) 1   )
 -}
-{----------------------------------- Try the quadrant angles -------------------------------------------------------------------
-xyQuadrantAngle currAngle 
--}
+{-getQuadrantAngle doen't need to be exported, but leave in case more testing is needed.
 getQuadrantAngleTest = TestCase $ assertEqual 
-  "getQuadrantAngleTest" (Quadrant1Angle 10) (quadrantOfAngle 10  )
+  "getQuadrantAngleTest" (Quadrant1Angle 10) (getQuadrantAngle (Angle 10)  )
 
 getQuadrantAngleTest2 = TestCase $ assertEqual 
-  "getQuadrantAngleTest2" (Quadrant2Angle 80) (quadrantOfAngle 100  )
+  "getQuadrantAngleTest2" (Quadrant2Angle 80) (getQuadrantAngle (Angle 100) )
 
 getQuadrantAngleTest3 = TestCase $ assertEqual 
-  "getQuadrantAngleTest3" (Quadrant2Angle 10) (quadrantOfAngle 170  )
+  "getQuadrantAngleTest3" (Quadrant2Angle 10) (getQuadrantAngle (Angle 170) )
 
 getQuadrantAngleTest4 = TestCase $ assertEqual 
-  "getQuadrantAngleTest4" (Quadrant3Angle 10) (quadrantOfAngle 190  )
+  "getQuadrantAngleTest4" (Quadrant3Angle 10) (getQuadrantAngle (Angle 190) )
 
 getQuadrantAngleTest5 = TestCase $ assertEqual 
-  "getQuadrantAngleTest5" (Quadrant3Angle 80) (quadrantOfAngle 260  )
+  "getQuadrantAngleTest5" (Quadrant3Angle 80) (getQuadrantAngle (Angle 260) )
 
 getQuadrantAngleTest6 = TestCase $ assertEqual 
-  "getQuadrantAngleTest6" (Quadrant4Angle 80) (quadrantOfAngle 280  )
+  "getQuadrantAngleTest6" (Quadrant4Angle 80) (getQuadrantAngle (Angle 280) )
 
 getQuadrantAngleTest7 = TestCase $ assertEqual 
-  "getQuadrantAngleTest7" (Quadrant4Angle 10) (quadrantOfAngle 350  )
+  "getQuadrantAngleTest7" (Quadrant4Angle 10) (getQuadrantAngle (Angle 350) )
 
-
+-}
 
 
 
