@@ -37,7 +37,7 @@ mathPolarTestDo = do
 
   
  
-  
+  putStrLn "adjust radius for slope"
   runTestTT adjustRadiusForSlopeTestRad10PosX10PosY0XY10
   runTestTT adjustRadiusForSlopeTestRad10PosX0PosY10XY10
   runTestTT adjustRadiusForSlopeTestRad10PosX1NegY10XY10
@@ -408,13 +408,15 @@ slopeForXYAngleAndYslopeTestXPos10YPos1XY350 = TestCase $ assertEqual
 
 
 {-test for radius adjustment on the xy plane, for various x and y slopes
-adjustRadiusForSlope :: Radius -> Slope  -> Radius 
+adjustRadiusForSlope :: Radius -> Slope  -> Radius
+=====================================================================================================================================
+                                          non- exhaustive pattern
 -}
 adjustRadiusForSlopeTestRad10PosX10PosY0XY10 = TestCase $ assertEqual 
-  "adjustRadiusForSlopeTestRad10PosX10PosY0XY10" (DownRadius 9.857785663826117) (adjustRadiusForSlope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (quadrantOfAngle 10)))
+  "adjustRadiusForSlopeTestRad10PosX10PosY0XY10" (DownRadius 9.857785663826117) (adjustRadiusForSlope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (Angle 10)))
 
 adjustRadiusForSlopeTestRad10PosX0PosY10XY10 = TestCase $ assertEqual 
-  "adjustRadiusForSlopeTestRad10PosX0PosY10XY10" (UpRadius 9.999139447055672) (adjustRadiusForSlope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (quadrantOfAngle 10)))
+  "adjustRadiusForSlopeTestRad10PosX0PosY10XY10" (UpRadius 9.999139447055672) (adjustRadiusForSlope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 10) (PosYSlope 1) (Angle 10)))
 
 {-
 x1 = sin(10) * 1 = 0.173648177667 pos
