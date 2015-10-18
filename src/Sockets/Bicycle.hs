@@ -1,9 +1,6 @@
 module Sockets.Bicycle (bicycleSocketDebug, bicycleSocketStlFile ) where
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
-  createTopFaces,
-  createBottomFaces,
-  createTopFacesWithVariableSlope,
   createCornerPoint,
   Slope(..),
   Radius(..),
@@ -11,6 +8,7 @@ import TriCad.MathPolar(
   flatXSlope,
   flatYSlope,
   )
+import TriCad.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import Stl.StlCornerPoints((+++^))

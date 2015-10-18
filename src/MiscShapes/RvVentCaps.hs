@@ -13,8 +13,6 @@ module MiscShapes.RvVentCaps(hello, debug, stlFile, writeRvCapStlFile) where
       
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
-  createTopFaces,
-  createTopFacesWithVariableSlope,
   createCornerPoint,
   Slope(..),
   Radius(..),
@@ -28,6 +26,7 @@ import TriCad.Points(Point(..), transposeZ)
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
 import TriCad.Shapes.Cylindrical(cylinderHollow, cylinderSolid)
+import TriCad.HorizontalFaces(createTopFacesWithVariableSlope, createTopFaces,)
 
 {--------------------------- overview -------------------------------------------
 The cap has to be printed upside-down, but flip it using Slic3r.

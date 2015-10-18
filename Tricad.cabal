@@ -19,12 +19,12 @@ library
   exposed-modules: TriCad.Points, TriCad.CornerPoints, TriCad.CornerPointsDebug,
                    TriCad.Math, TriCad.MathPolar, TriCad.CornerPointsFaceConversions,
                    TriCad.CornerPointsFaceExtraction,  TriCad.CornerPointsTranspose,
-                   TriCad.VerticalFaces,
+                   TriCad.VerticalFaces, TriCad.HorizontalFaces,
                    --stl
                    Stl.StlBase, Stl.StlCornerPoints, Stl.StlFileWriter,
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
-                   Tests.MathTest, Tests.MathPolarTest, 
+                   Tests.MathTest, Tests.MathPolarTest, Tests.HorizontalFacesTest,
                    Tests.TransformTest, Tests.JsonTest, Tests.ParseTest
                    -- HeelGenerators
                    HeelGenerators.KeenToe, HeelGenerators.KeenHeel
