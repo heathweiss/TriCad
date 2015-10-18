@@ -2,16 +2,12 @@ module MiscShapes.ScanRaw() where
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
 import TriCad.MathPolar(
-  createRightFaces,
-  createLeftFaces ,
   Slope(..),
   Radius(..),
   MultiDegreeRadii(..),
   SingleDegreeRadii(..),
   flatXSlope,
   flatYSlope,
-  createLeftFacesMultiColumns,
-  createVerticalCubes,
   )
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
@@ -27,6 +23,7 @@ import GHC.Word (Word8)
 import Data.Aeson
 import Scan.Json()
 import qualified Scan.Parse as PA  ( MultiDegreePixelValues(..), parseCSVPixelValues)
+import TriCad.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalCubes )
 
 --create a [Word8] for: Right(B.pack $ strToWord8s)
 --which gets a bytstring of word8
