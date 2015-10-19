@@ -5,7 +5,7 @@ Includes:
   cylinder
 -}
 
-module TriCad.Shapes.Cylindrical(hello, cylinderHollow, cylinderSolid) where
+module Primitives.Cylindrical(hello, cylinderHollow, cylinderSolid) where
 
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,

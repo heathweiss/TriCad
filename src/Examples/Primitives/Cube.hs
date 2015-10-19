@@ -1,5 +1,5 @@
-module Examples.Shapes.Cube(hello, writeJoinerStlFile, joinerCube) where
-import TriCad.Shapes.Cubical(rectangularCube)
+module Examples.Primitives.Cube(hello, writeJoinerStlFile, joinerCube) where
+import Primitives.Cubical(rectangularCube)
 import Stl.StlCornerPoints((+++^))
 import TriCad.CornerPoints( Faces(..))
 import Stl.StlBase (StlShape(..), newStlShape)

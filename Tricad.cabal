@@ -39,12 +39,12 @@ library
                    Examples.Scan.SingleLine
                    -- Misc Shapes
                    Examples.MiscShapes.RvVentCaps
-                   -- Shapes: Test shapes for TriCad.Shapes
-                   Examples.Shapes.Cube
+                   -- Primitives
+                   Examples.Primitives.Cube
                    --adaptors
                    Examples.Adaptors.HockeyStick
                    --Shapes
-                   TriCad.Shapes.Cylindrical, TriCad.Shapes.Cubical
+                   Primitives.Cylindrical, Primitives.Cubical
                    --Scanning
                    Scan.Transform,
                    Scan.Json, Scan.Parse

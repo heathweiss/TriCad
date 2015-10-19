@@ -1,6 +1,6 @@
 module Examples.Adaptors.HockeyStick where
 
-import  TriCad.Shapes.Cubical(rectangularCube)
+import  Primitives.Cubical(rectangularCube)
 
 
 {-

@@ -2,11 +2,11 @@
 For creating hexahedrons such as cubes, rectangular cubes, etc.
 -}
 
-module TriCad.Shapes.Cubical(rectangularCube) where
+module Primitives.Cubical(rectangularCube) where
 import TriCad.CornerPoints(CornerPoints(..),(+++),(+++$),(+++>>))
 import TriCad.Points (Point(..))
-import  TriCad.CornerPointsTranspose (transposeZ,transposeX,transposeY)
-import  TriCad.CornerPointsFaceConversions(
+import TriCad.CornerPointsTranspose (transposeZ,transposeX,transposeY)
+import TriCad.CornerPointsFaceConversions(
   upperFaceFromLowerFace,
   backFaceFromFrontFace,
   f23LineFromF14Line,

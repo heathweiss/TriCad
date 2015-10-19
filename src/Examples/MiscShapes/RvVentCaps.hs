@@ -25,7 +25,7 @@ import Stl.StlBase (StlShape(..), newStlShape)
 import TriCad.Points(Point(..), transposeZ)
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
-import TriCad.Shapes.Cylindrical(cylinderHollow, cylinderSolid)
+import Primitives.Cylindrical(cylinderHollow, cylinderSolid)
 import TriCad.HorizontalFaces(createTopFacesWithVariableSlope, createTopFaces,)
 
 {--------------------------- overview -------------------------------------------
