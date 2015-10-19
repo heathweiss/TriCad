@@ -17,7 +17,7 @@ closeStlShape,
 stlShapeToText
 )
 where
-import TriCad.Points (Point(..))
+import CornerPoints.Points (Point(..))
 import Text.Printf (printf)
 
 stlShapeToText :: StlShape -> String

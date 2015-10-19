@@ -4,7 +4,7 @@ For creating hexahedrons such as cubes, rectangular cubes, etc.
 
 module Primitives.Cubical(rectangularCube) where
 import TriCad.CornerPoints(CornerPoints(..),(+++),(+++$),(+++>>))
-import TriCad.Points (Point(..))
+import CornerPoints.Points (Point(..))
 import TriCad.CornerPointsTranspose (transposeZ,transposeX,transposeY)
 import TriCad.CornerPointsFaceConversions(
   upperFaceFromLowerFace,

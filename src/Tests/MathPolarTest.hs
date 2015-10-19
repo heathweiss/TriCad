@@ -2,7 +2,7 @@
 module Tests.MathPolarTest (mathPolarTestDo) where
 import Test.HUnit
 import TriCad.CornerPoints(CornerPoints(..), (+++))
-import TriCad.Points(Point(..))
+import CornerPoints.Points(Point(..))
 import TriCad.MathPolar(
   slopeAdjustedForVerticalAngle,
   adjustRadiusForSlope,

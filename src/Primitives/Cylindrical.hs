@@ -16,7 +16,7 @@ import TriCad.MathPolar(
   flatYSlope,
   )
 import TriCad.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
-import TriCad.Points(Point(..))
+import CornerPoints.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.CornerPointsFaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace )
 

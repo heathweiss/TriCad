@@ -22,7 +22,7 @@ import TriCad.MathPolar(
 import Stl.StlCornerPoints((+++^))
 import Stl.StlFileWriter(writeStlToFile)
 import Stl.StlBase (StlShape(..), newStlShape)
-import TriCad.Points(Point(..), transposeZ)
+import CornerPoints.Points(Point(..), transposeZ)
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
 import Primitives.Cylindrical(cylinderHollow, cylinderSolid)

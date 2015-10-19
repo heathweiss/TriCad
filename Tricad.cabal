@@ -16,7 +16,7 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  exposed-modules: TriCad.Points, TriCad.CornerPoints, TriCad.CornerPointsDebug,
+  exposed-modules: CornerPoints.Points, TriCad.CornerPoints, TriCad.CornerPointsDebug,
                    TriCad.MathPolar, TriCad.CornerPointsFaceConversions,
                    TriCad.CornerPointsFaceExtraction,  TriCad.CornerPointsTranspose,
                    TriCad.VerticalFaces, TriCad.HorizontalFaces,

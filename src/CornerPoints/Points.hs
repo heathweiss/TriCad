@@ -1,4 +1,4 @@
-module TriCad.Points (Point(..), transposeZ) where
+module CornerPoints.Points (Point(..), transposeZ) where
 import TriCad.Transposable(Transpose, transposeX, transposeY, transposeZ)
 {-------------------------- Point------------------------------
 Points in 3D geometry.
@@ -24,11 +24,10 @@ data Point =  Point { x_axis :: Double, y_axis :: Double, z_axis :: Double }
 
 {----------------       instance of equal ---------------
 In order to avoid double rounding errors and  trig errors which cause
-the same point, and thus CornerPoints, to be /= due to tiny differences,
+the same point, and thus CornerPoints, to be != due to tiny differences,
 give it a range of .01, and still allow the points to be equal.
 
-All the restrictions are just boilerplate to get it to compile.
-(Eq a, Num a, Ord a, Fractional a) =>
+All the type restrictions are to get it to compile.
 -}
 axisEqual :: (Eq a, Num a, Ord a, Fractional a) => a -> a -> Bool
 axisEqual  a b
@@ -48,5 +47,3 @@ instance Transpose Point where
   transposeY f (Point x y z) = Point x (f y) z
 
    
---transposePointz :: (Double -> Double) -> Point -> Point
---transposePointz transposeFormula (Point x y z) = Point x y (transposeFormula z)

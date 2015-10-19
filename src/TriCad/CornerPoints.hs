@@ -12,7 +12,7 @@ scaleCornerPointsZ,
 --upperfacefrom_,
 Faces(..)
 ) where
-import TriCad.Points (Point(..))
+import CornerPoints.Points (Point(..))
 import    Control.Applicative
 
 
@@ -475,10 +475,6 @@ a +++ b = CornerPointsError "illegal +++ operation"
 a ++> bs =
      tail $ scanl (+++) a bs
 
------------------------------------------------ generate faces ----------------------------------------------------
-upperFaceFrom_:: CornerPoints -> CornerPoints
-upperFaceFrom_ (BottomFace b1 f1 b4 f4) = TopFace b1 f1 b4 f4
- 
 ----------------------------------------------- scale cubes/points ------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------
 {-                                           Over view

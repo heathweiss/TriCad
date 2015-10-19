@@ -10,7 +10,7 @@ import TriCad.MathPolar(
   flatYSlope,
   )
 import TriCad.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
-import TriCad.Points(Point(..))
+import CornerPoints.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import Stl.StlCornerPoints((+++^))
 import Stl.StlBase (StlShape(..), newStlShape, stlShapeToText)

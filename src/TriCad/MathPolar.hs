@@ -12,7 +12,7 @@ module TriCad.MathPolar(
   Origin(..),
   Angle(..),
   ) where
-import TriCad.Points(Point(..))
+import CornerPoints.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import Math.Trigonometry(sinDegrees, cosDegrees)
 import TriCad.CornerPointsTranspose (transposeZ)

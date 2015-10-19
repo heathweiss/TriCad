@@ -4,7 +4,7 @@ transposeX,
 transposeY
 ) where
 import TriCad.CornerPoints
-import TriCad.Points(Point(..), transposeZ)
+import CornerPoints.Points(Point(..), transposeZ)
 import TriCad.Transposable(Transpose, transposeX, transposeY, transposeZ)
 ------------------------------------- transposing cubes/points ----------------------------------------------
 {-
