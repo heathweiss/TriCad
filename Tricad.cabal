@@ -26,19 +26,23 @@ library
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.HorizontalFacesTest,
                    Tests.TransformTest, Tests.JsonTest, Tests.ParseTest
-                   -- HeelGenerators
-                   HeelGenerators.KeenToe, HeelGenerators.KeenHeel
+                   --Examples
+                   -- Example ShoeLifts
+                   Examples.ShoeLift.KeenToe, Examples.ShoeLift.KeenHeel
                    --HeelGenerators.SandalsToe, HeelGenerators.SandalsHeel
                    --HeelGenerators.BlackRunnerHeel,  HeelGenerators.BlackRunnerToe,
                      --Have not been redone for changes to MathPolar.
-                     --Leave in untill sure I will not need them further for printing shoe lifts
+                     --Leave in until sure I will not need them further for printing shoe lifts
                    -- Sockets
-                   Sockets.Bicycle
+                   Examples.Sockets.Bicycle
+                   -- scanned shapes
+                   Examples.Scan.SingleLine
                    -- Misc Shapes
-                   MiscShapes.ScanRaw
-                   MiscShapes.RvVentCaps
+                   Examples.MiscShapes.RvVentCaps
+                   -- Shapes: Test shapes for TriCad.Shapes
+                   Examples.Shapes.Cube
                    --adaptors
-                   Adaptors.HockeyStick
+                   Examples.Adaptors.HockeyStick
                    --Shapes
                    TriCad.Shapes.Cylindrical, TriCad.Shapes.Cubical
                    --Scanning
