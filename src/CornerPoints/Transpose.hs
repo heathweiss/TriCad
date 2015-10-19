@@ -1,11 +1,11 @@
-module TriCad.CornerPointsTranspose (
+module CornerPoints.Transpose (
 transposeZ,
 transposeX,
 transposeY
 ) where
-import TriCad.CornerPoints
+import CornerPoints.CornerPoints
 import CornerPoints.Points(Point(..), transposeZ)
-import TriCad.Transposable(Transpose, transposeX, transposeY, transposeZ)
+import CornerPoints.Transposable(Transpose, transposeX, transposeY, transposeZ)
 ------------------------------------- transposing cubes/points ----------------------------------------------
 {-
 Used for: changing points by adding values, as opposed to mulipling with the scalePoints

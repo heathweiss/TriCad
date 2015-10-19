@@ -1,6 +1,6 @@
 module Tests.CornerPointsTest(cornerPointsTestDo ) where
 import Test.HUnit
-import TriCad.CornerPoints(CornerPoints(..), (+++), (++>), (++++))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++>), (++++))
 import CornerPoints.Points (Point(..)) 
 
 

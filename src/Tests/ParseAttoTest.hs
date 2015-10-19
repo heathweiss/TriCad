@@ -7,7 +7,7 @@ import Control.Applicative
 import Data.Char
 import Data.Word
 import Control.Applicative
-import qualified TriCad.MathPolar as MP (Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
+import qualified CornerPoints.Create as MP (Radius(..), MultiDegreeRadii(..), SingleDegreeRadii(..))
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import qualified  Data.ByteString.Char8 as BC (pack) 
 import GHC.Word (Word8)

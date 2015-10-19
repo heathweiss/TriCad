@@ -1,5 +1,5 @@
 module CornerPoints.Points (Point(..), transposeZ) where
-import TriCad.Transposable(Transpose, transposeX, transposeY, transposeZ)
+import CornerPoints.Transposable(Transpose, transposeX, transposeY, transposeZ)
 {-------------------------- Point------------------------------
 Points in 3D geometry.
 

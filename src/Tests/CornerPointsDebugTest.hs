@@ -1,8 +1,8 @@
 module Tests.CornerPointsDebugTest(cornerPointsDebugTestDo) where
 import Test.HUnit
-import TriCad.CornerPoints(CornerPoints(..), (+++), (++>), (++++))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++>), (++++))
 import CornerPoints.Points (Point(..)) 
-import TriCad.CornerPointsDebug((+++^?), (++^?), CubeName(..), CubeDebug(..), CubeDebugs(..), showDebugMsg)
+import CornerPoints.Debug((+++^?), (++^?), CubeName(..), CubeDebug(..), CubeDebugs(..), showDebugMsg)
 
 
 

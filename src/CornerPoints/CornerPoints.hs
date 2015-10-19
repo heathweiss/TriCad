@@ -1,4 +1,4 @@
-module TriCad.CornerPoints(
+module CornerPoints.CornerPoints(
 CornerPoints(..),
 (+++),
 (+++$),

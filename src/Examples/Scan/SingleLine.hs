@@ -1,14 +1,14 @@
 module Examples.Scan.SingleLine() where
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
-import TriCad.MathPolar(
+import CornerPoints.Create(
   Slope(..),
   Radius(..),
   flatXSlope,
   flatYSlope,
   )
 import CornerPoints.Points(Point(..))
-import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import Stl.StlCornerPoints((+++^))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
@@ -21,7 +21,7 @@ import GHC.Word (Word8)
 import Data.Aeson
 import Scan.Json()
 import qualified Scan.Parse as PA  ( MultiDegreePixelValues(..), parseCSVPixelValues)
-import TriCad.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalCubes,
+import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalCubes,
                            SingleDegreeRadii(..), MultiDegreeRadii(..))
 
 --create a [Word8] for: Right(B.pack $ strToWord8s)

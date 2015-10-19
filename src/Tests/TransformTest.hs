@@ -1,7 +1,7 @@
 module Tests.TransformTest() where
 import Test.HUnit
 import Scan.Transform(pixelIndicesOfPixelValuesLTE, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
-import qualified TriCad.MathPolar as MP ( Radius(..))
+import qualified CornerPoints.Create as MP ( Radius(..))
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString as B
 import qualified  Data.ByteString.Char8 as BC (pack) 
@@ -9,7 +9,7 @@ import GHC.Word (Word8)
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import Data.Attoparsec.Char8
 import Scan.Parse(SingleDegreePixelValues(..), parseCSVPixelValues, MultiDegreePixelValues(..),  )
-import qualified TriCad.VerticalFaces as VF (SingleDegreeRadii(..), MultiDegreeRadii(..))
+import qualified CornerPoints.VerticalFaces as VF (SingleDegreeRadii(..), MultiDegreeRadii(..))
 
 
 transformTest = do

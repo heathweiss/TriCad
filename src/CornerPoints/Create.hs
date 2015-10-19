@@ -1,5 +1,5 @@
 {-# LANGUAGE ParallelListComp #-}
-module TriCad.MathPolar(
+module CornerPoints.Create(
   slopeAdjustedForVerticalAngle,
   adjustRadiusForSlope,
   createCornerPoint,
@@ -13,9 +13,9 @@ module TriCad.MathPolar(
   Angle(..),
   ) where
 import CornerPoints.Points(Point(..))
-import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import Math.Trigonometry(sinDegrees, cosDegrees)
-import TriCad.CornerPointsTranspose (transposeZ)
+import CornerPoints.Transpose (transposeZ)
 
 {--------------------overview----------------------------------------
 Creates a radial shape using polar cood's.

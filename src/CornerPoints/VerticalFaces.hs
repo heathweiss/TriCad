@@ -1,14 +1,14 @@
 {-# LANGUAGE ParallelListComp #-}
-module TriCad.VerticalFaces(
+module CornerPoints.VerticalFaces(
   createRightFaces,
   createLeftFaces,
   createVerticalCubes,
   createLeftFacesMultiColumns,
   SingleDegreeRadii(..),
   MultiDegreeRadii(..),) where
-import TriCad.MathPolar(Slope(..), Point(..), Origin(..), createCornerPoint, Angle(..), Degree(..), Radius(..))
-import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
-import TriCad.CornerPointsTranspose (transposeZ)
+import CornerPoints.Create(Slope(..), Point(..), Origin(..), createCornerPoint, Angle(..), Degree(..), Radius(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+import CornerPoints.Transpose (transposeZ)
                            
 
 

@@ -1,5 +1,5 @@
 module Examples.Sockets.Bicycle (bicycleSocketDebug, bicycleSocketStlFile ) where
-import TriCad.MathPolar(
+import CornerPoints.Create(
   slopeAdjustedForVerticalAngle,
   createCornerPoint,
   Slope(..),
@@ -8,15 +8,15 @@ import TriCad.MathPolar(
   flatXSlope,
   flatYSlope,
   )
-import TriCad.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
+import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
-import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import Stl.StlCornerPoints((+++^))
 import Stl.StlBase (StlShape(..), newStlShape)
-import TriCad.CornerPointsFaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace ) 
-import TriCad.CornerPointsFaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine)
-import TriCad.CornerPointsTranspose ( transposeZ, transposeX)
-import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
+import CornerPoints.FaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace ) 
+import CornerPoints.FaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine)
+import CornerPoints.Transpose ( transposeZ, transposeX)
+import CornerPoints.Debug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
 
 bicycleSocketDebug = v0CubesDebug
 

@@ -1,14 +1,14 @@
 {-# LANGUAGE ParallelListComp #-}
-module TriCad.HorizontalFaces(
+module CornerPoints.HorizontalFaces(
   createTopFaces,
   createBottomFaces,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
   
   )where
-import TriCad.MathPolar( Slope(..), Point(..), Origin(..), createCornerPoint, Angle(..),
+import CornerPoints.Create( Slope(..), Point(..), Origin(..), createCornerPoint, Angle(..),
                        Radius(..))
-import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 
 
 {- |Create a single CornerPoints.BottomRightLine, and add it to the head of [BottomLeftLine]. This will give a BottomFace.

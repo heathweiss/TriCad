@@ -1,7 +1,7 @@
 module Stl.StlFileWriter(writeStlToFile, writeStlDebugToFile)  
 where
 import Stl.StlBase(stlShapeToText, StlShape(..))
-import TriCad.CornerPointsDebug((+++^?), (++^?), CubeName(..), CubeDebug(..), CubeDebugs(..), showDebugMsg)
+import CornerPoints.Debug((+++^?), (++^?), CubeName(..), CubeDebug(..), CubeDebugs(..), showDebugMsg)
 import System.IO
 
 {-

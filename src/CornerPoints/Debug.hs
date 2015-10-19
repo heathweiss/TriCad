@@ -7,8 +7,8 @@ is returned. This module is for collecting/viewing the errors that are generated
 See Tests.CornerPointsDebugTest for testing/examples of use.
 
 -}
-module TriCad.CornerPointsDebug((+++^?), (++^?), CubeName(..), CubeDebug(..), CubeDebugs(..), showDebugMsg) where
-import TriCad.CornerPoints (CornerPoints(..))
+module CornerPoints.Debug((+++^?), (++^?), CubeName(..), CubeDebug(..), CubeDebugs(..), showDebugMsg) where
+import CornerPoints.CornerPoints (CornerPoints(..))
 import Control.Applicative
 
 --the name of the cube or list of cubes. Gets attached to the debug structure, to make is more informative.

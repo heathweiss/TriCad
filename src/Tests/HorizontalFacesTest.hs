@@ -1,9 +1,9 @@
 {-# LANGUAGE ParallelListComp #-}
 module Tests.HorizontalFacesTest (horizontalFacesTestDo) where
 import Test.HUnit
-import TriCad.HorizontalFaces(createBottomFaces, createBottomFacesWithVariableSlope, createTopFaces,)
-import TriCad.CornerPoints(CornerPoints(..), (+++))
-import TriCad.MathPolar(Point(..),flatXSlope,flatYSlope, Slope(..), Angle(..), Radius(..))
+import CornerPoints.HorizontalFaces(createBottomFaces, createBottomFacesWithVariableSlope, createTopFaces,)
+import CornerPoints.CornerPoints(CornerPoints(..), (+++))
+import CornerPoints.Create(Point(..),flatXSlope,flatYSlope, Slope(..), Angle(..), Radius(..))
 
 horizontalFacesTestDo = do
     --------------------bottom/top faces------------------

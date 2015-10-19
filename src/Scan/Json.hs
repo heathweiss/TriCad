@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Scan.Json() where
-import TriCad.MathPolar(Radius(..))
-import TriCad.VerticalFaces(SingleDegreeRadii(..), MultiDegreeRadii(..))
+import CornerPoints.Create(Radius(..))
+import CornerPoints.VerticalFaces(SingleDegreeRadii(..), MultiDegreeRadii(..))
 import Data.Aeson
 import Control.Applicative
 import Control.Monad

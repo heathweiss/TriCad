@@ -2,7 +2,7 @@
 Typeclass for changing x y and/or z values of a Point or CubePoints.
 -}
 
-module TriCad.Transposable(Transpose, transposeX, transposeY, transposeZ) where
+module CornerPoints.Transposable(Transpose, transposeX, transposeY, transposeZ) where
 
 
 

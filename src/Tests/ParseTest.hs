@@ -7,12 +7,12 @@ import Control.Applicative
 import Data.Char
 import Data.Word
 import Control.Applicative
-import qualified TriCad.MathPolar as MP (Radius(..))
+import qualified CornerPoints.Create as MP (Radius(..))
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import qualified  Data.ByteString.Char8 as BC (pack) 
 import GHC.Word (Word8)
 import Scan.Transform(pixelIndicesOfPixelValuesLTE, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
-import qualified TriCad.VerticalFaces as VF (SingleDegreeRadii(..), MultiDegreeRadii(..))
+import qualified CornerPoints.VerticalFaces as VF (SingleDegreeRadii(..), MultiDegreeRadii(..))
 
 --create a [Word8] for: Right(B.pack $ strToWord8s)
 --which gets a bytstring of word8.

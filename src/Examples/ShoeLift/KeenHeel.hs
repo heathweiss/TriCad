@@ -1,6 +1,6 @@
 module Examples.ShoeLift.KeenHeel where
 
-import TriCad.MathPolar(
+import CornerPoints.Create(
   slopeAdjustedForVerticalAngle,
   Slope(..),
   Radius(..),
@@ -8,17 +8,17 @@ import TriCad.MathPolar(
   flatXSlope,
   flatYSlope,
   )
-import TriCad.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
+import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
-import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..),(+++>>))
+import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..),(+++>>))
 import Stl.StlCornerPoints((+++^))
 import Stl.StlBase (StlShape(..), newStlShape, stlShapeToText)
 import Stl.StlFileWriter(writeStlToFile)
-import TriCad.CornerPointsFaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace ) 
-import TriCad.CornerPointsFaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace,
+import CornerPoints.FaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace ) 
+import CornerPoints.FaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace,
                                           bottomFrontLineFromBackBottomLine, lowerFaceFromUpperFace)
-import TriCad.CornerPointsTranspose ( transposeZ, transposeX, transposeY)
-import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
+import CornerPoints.Transpose ( transposeZ, transposeX, transposeY)
+import CornerPoints.Debug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
 
 
 -------------------------------------------------------------------------- tread attachment and adaptor ----------------------------------------

@@ -1,6 +1,6 @@
 module Stl.StlCornerPoints((+++^)) where
 
-import TriCad.CornerPoints (CornerPoints(..), Faces(..))
+import CornerPoints.CornerPoints (CornerPoints(..), Faces(..))
 import Stl.StlBase (Triangle(..), newVertex)
 import Control.Applicative
 

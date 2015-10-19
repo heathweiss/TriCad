@@ -1,4 +1,4 @@
-module TriCad.CornerPointsFaceExtraction (
+module CornerPoints.FaceExtraction (
  extractFrontFace,
 extractBottomFrontLine,
  extractFrontTopLine,
@@ -7,7 +7,7 @@ extractBottomFrontLine,
  extractBottomFace,
  extractBackBottomLine
  ) where
-import TriCad.CornerPoints(CornerPoints(..))
+import CornerPoints.CornerPoints(CornerPoints(..))
 
 
 

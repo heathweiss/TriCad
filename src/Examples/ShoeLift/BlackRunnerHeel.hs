@@ -1,6 +1,6 @@
 module HeelGenerators.BlackRunnerHeel(blackRunnerHeelStlFile, blackRunnerHeelDebug,
                                      blackRunnerHeelToFile, blackRunnerHeelDebugToFile) where
-import TriCad.MathPolar(
+import CornerPoints.Create(
   slopeAdjustedForVerticalAngle,
   createTopFaces,
   createBottomFacesSimplified,
@@ -10,13 +10,13 @@ import TriCad.MathPolar(
   Radius(..),
   Angle(..),
   )
-import TriCad.Points(Point(..))
-import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
-import TriCad.StlCornerPoints((+++^))
-import TriCad.StlBase (StlShape(..), newStlShape, stlShapeToText)
-import TriCad.CornerPointsFaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace ) 
-import TriCad.CornerPointsFaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine)
-import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
+import CornerPoints.Points(Point(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+import CornerPoints.StlCornerPoints((+++^))
+import CornerPoints.StlBase (StlShape(..), newStlShape, stlShapeToText)
+import CornerPoints.FaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace ) 
+import CornerPoints.FaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine)
+import CornerPoints.Debug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
 import TriCad.StlFileWriter(writeStlToFile, writeStlDebugToFile)
 
 blackRunnerHeelStlFile = newStlShape "BlackRunnerHeel"    braceTriangles-- adaptorTriangles

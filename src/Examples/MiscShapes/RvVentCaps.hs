@@ -11,7 +11,7 @@ Neither slic3r or netfabb are showing errors
 
 module Examples.MiscShapes.RvVentCaps(hello, debug, stlFile, writeRvCapStlFile) where
       
-import TriCad.MathPolar(
+import CornerPoints.Create(
   slopeAdjustedForVerticalAngle,
   createCornerPoint,
   Slope(..),
@@ -23,10 +23,10 @@ import Stl.StlCornerPoints((+++^))
 import Stl.StlFileWriter(writeStlToFile)
 import Stl.StlBase (StlShape(..), newStlShape)
 import CornerPoints.Points(Point(..), transposeZ)
-import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
-import TriCad.CornerPointsDebug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+import CornerPoints.Debug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
 import Primitives.Cylindrical(cylinderHollow, cylinderSolid)
-import TriCad.HorizontalFaces(createTopFacesWithVariableSlope, createTopFaces,)
+import CornerPoints.HorizontalFaces(createTopFacesWithVariableSlope, createTopFaces,)
 
 {--------------------------- overview -------------------------------------------
 The cap has to be printed upside-down, but flip it using Slic3r.

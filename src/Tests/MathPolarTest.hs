@@ -1,9 +1,9 @@
 {-# LANGUAGE ParallelListComp #-}
 module Tests.MathPolarTest (mathPolarTestDo) where
 import Test.HUnit
-import TriCad.CornerPoints(CornerPoints(..), (+++))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++))
 import CornerPoints.Points(Point(..))
-import TriCad.MathPolar(
+import CornerPoints.Create(
   slopeAdjustedForVerticalAngle,
   adjustRadiusForSlope,
   Radius(..),

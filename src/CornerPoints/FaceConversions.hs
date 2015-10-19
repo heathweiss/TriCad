@@ -1,4 +1,4 @@
-module TriCad.CornerPointsFaceConversions(
+module CornerPoints.FaceConversions(
   upperFaceFromLowerFace,
   backFaceFromFrontFace,
   f23LineFromF14Line,
@@ -9,7 +9,7 @@ module TriCad.CornerPointsFaceConversions(
   frontTopLineFromBackTopLine,
   bottomFrontLineFromBackBottomLine
 ) where
-import TriCad.CornerPoints (CornerPoints(..))
+import CornerPoints.CornerPoints (CornerPoints(..))
 
 upperFaceFromLowerFace:: CornerPoints -> CornerPoints
 upperFaceFromLowerFace (BottomFace b1 f1 b4 f4) = TopFace b1 f1 b4 f4
