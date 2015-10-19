@@ -1,4 +1,4 @@
-module TriCad.Math(degreesToRadians,
+module Math.Trigonometry(degreesToRadians,
 radiansToDegrees,
 --upperZValueOfWedge,
 --upperYValueOfWedge,

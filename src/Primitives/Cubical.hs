@@ -16,7 +16,7 @@ import TriCad.CornerPointsFaceConversions(
   backBottomLineFromBottomFrontLine,
   frontTopLineFromBackTopLine,
   bottomFrontLineFromBackBottomLine)
-import  TriCad.Math(atanDegrees)
+import  Math.Trigonometry(atanDegrees)
 
 
 type ZHeight = Double

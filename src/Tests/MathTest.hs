@@ -1,5 +1,5 @@
 module Tests.MathTest(mathTestDo) where
-import TriCad.Math
+import Math.Trigonometry
 import Test.HUnit
 
 

@@ -14,7 +14,7 @@ module TriCad.MathPolar(
   ) where
 import TriCad.Points(Point(..))
 import TriCad.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
-import TriCad.Math(sinDegrees, cosDegrees)
+import Math.Trigonometry(sinDegrees, cosDegrees)
 import TriCad.CornerPointsTranspose (transposeZ)
 
 {--------------------overview----------------------------------------
@@ -80,18 +80,6 @@ createCornerPoint cPoint origin horizRadius verticalAngle xSlope ySlope  =
                                  sinOfVerticalAngle = sinDegrees baseOfAngle
                                  cosOfVerticalAngle = cosDegrees baseOfAngle
                                  
-{-                                 
-                                 setXaxis =
-                                   let length = radiusAdjustedForSlope * sinOfVerticalAngle
-                                       x_axis' = x_axis origin
-                                   in
-
-                                    case getCurrentQuadrant verticalAngle of
-                                      Quadrant1 -> x_axis' + length
-                                      Quadrant2 -> x_axis' + length
-                                      Quadrant3 -> x_axis' - length
-                                      Quadrant4 -> x_axis' - length
--}
                                  setXaxis =
                                    let length = radiusAdjustedForSlope * sinOfVerticalAngle
                                        x_axis' = x_axis origin
@@ -103,18 +91,7 @@ createCornerPoint cPoint origin horizRadius verticalAngle xSlope ySlope  =
                                       (Quadrant3Angle _) -> x_axis' - length
                                       (Quadrant4Angle _) -> x_axis' - length
 
-                                 {-
-                                 setYaxis' =
-                                   let length = radiusAdjustedForSlope * cosOfVerticalAngle
-                                       y_axis' = y_axis origin
-                                   in
-
-                                    case getCurrentQuadrant verticalAngle of
-                                      Quadrant1 -> y_axis' - length
-                                      Quadrant2 -> y_axis' + length
-                                      Quadrant3 -> y_axis' + length
-                                      Quadrant4 -> y_axis' - length
--}
+                                 
                                  setYaxis' =
                                    let length = radiusAdjustedForSlope * cosOfVerticalAngle
                                        y_axis' = y_axis origin

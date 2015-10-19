@@ -17,9 +17,11 @@ cabal-version:       >=1.10
 
 library
   exposed-modules: TriCad.Points, TriCad.CornerPoints, TriCad.CornerPointsDebug,
-                   TriCad.Math, TriCad.MathPolar, TriCad.CornerPointsFaceConversions,
+                   TriCad.MathPolar, TriCad.CornerPointsFaceConversions,
                    TriCad.CornerPointsFaceExtraction,  TriCad.CornerPointsTranspose,
                    TriCad.VerticalFaces, TriCad.HorizontalFaces,
+                   --math
+                   Math.Trigonometry,
                    --stl
                    Stl.StlBase, Stl.StlCornerPoints, Stl.StlFileWriter,
                    -- tests

@@ -13,7 +13,7 @@ import TriCad.MathPolar(
   flatXSlope,
   flatYSlope,
   )
-import TriCad.Math(sinDegrees,cosDegrees)
+import Math.Trigonometry(sinDegrees,cosDegrees)
 
 
 
