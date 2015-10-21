@@ -27,7 +27,8 @@ library
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.HorizontalFacesTest,
-                   Tests.TransformTest, Tests.JsonTest, Tests.ParseTest
+                   Tests.TransformTest, Tests.JsonTest, Tests.ParseTest,
+                   Tests.VerticalFacesTest,
                    --Examples
                    -- Example ShoeLifts
                    Examples.ShoeLift.KeenToe, Examples.ShoeLift.KeenHeel

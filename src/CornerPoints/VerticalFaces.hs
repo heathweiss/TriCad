@@ -2,10 +2,11 @@
 module CornerPoints.VerticalFaces(
   createRightFaces,
   createLeftFaces,
-  createVerticalCubes,
+  createHorizontallyAlignedCubes,
   createLeftFacesMultiColumns,
   SingleDegreeRadii(..),
-  MultiDegreeRadii(..),) where
+  MultiDegreeRadii(..),
+  TransposeFactor(..)) where
 import CornerPoints.Create(Slope(..), Point(..), Origin(..), createCornerPoint, Angle(..), Degree(..), Radius(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import CornerPoints.Transpose (transposeZ)
@@ -70,49 +71,55 @@ An array of LeftFace or RightFace depending on data constructors passed in.
 
 createVerticalFaces :: Origin -> SingleDegreeRadii -> Slope -> Slope -> [TransposeFactor] -> (Point-> CornerPoints) ->
                        (Point-> CornerPoints) -> (Point-> CornerPoints) -> (Point-> CornerPoints) -> [CornerPoints]
-createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor topFrontConstructor topBackConstructor
+createVerticalFaces origin (SingleDegreeRadii degree' radii') xSlope ySlope zTransposeFactor topFrontConstructor topBackConstructor
                             btmFrontConstructor btmBackConstructor =
   
   --zipWith  (\x y -> transposeZ ((-x)+) y  ) --negating x causes the z_axis to decrease from the top, as it should.
   -- zTransposeFactor --this should be an infinit of the height for each pixel, measured from topOrigin.
-  
-   ((createCornerPoint
-      (topFrontConstructor)
-      topOrigin
-      (head $ radii inDegree) 
-      (Angle (degree inDegree))
-      xSlope
-      ySlope
-    ) 
-    +++
-    topBackConstructor topOrigin
-    ++>
-    [(createCornerPoint
-      (btmFrontConstructor)
-      (transposeZ (+(-currZVal)) topOrigin)  --topOrigin
-      currRadius
-      (Angle (degree inDegree))
-      xSlope
-      ySlope
-     ) 
-     +++
-     btmBackConstructor (transposeZ (+(-currZVal)) topOrigin)  --topOrigin
-       | currRadius <- tail $ radii inDegree
-       | currZVal <-  tail zTransposeFactor
-    ]
-   )
+   let topFrontPoint =
+         (createCornerPoint
+           (topFrontConstructor)
+           origin
+           (head $ radii') 
+           (Angle degree')
+           xSlope
+           ySlope
+         )
+       topBackPoint =  topBackConstructor origin
 
+       topLine = topFrontPoint +++ topBackPoint
 
---RightFace version of createVerticalFaces
+       bottomLines =
+         [(createCornerPoint
+            (btmFrontConstructor)
+            (transposeZ (+(-currZVal)) origin)  --topOrigin
+            currRadius
+            (Angle degree')
+            xSlope
+            ySlope
+          ) 
+          +++
+          btmBackConstructor (transposeZ (+(-currZVal)) origin)  --topOrigin
+            | currRadius <- tail $ radii'
+            | currZVal <-  zTransposeFactor
+         ]
+       
+   in  
+       topLine
+       ++>
+       bottomLines
+   
+
+-- |Create a column of RightFace
 createRightFaces :: Origin -> SingleDegreeRadii -> Slope -> Slope -> [TransposeFactor] -> [CornerPoints]
-createRightFaces topOrigin inDegree xSlope ySlope zTransposeFactor  =
-  createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor (F3) (B3) (F4) (B4)
+createRightFaces origin singleDegreeRadii xSlope ySlope zTransposeFactor  =
+  createVerticalFaces origin singleDegreeRadii xSlope ySlope zTransposeFactor (F3) (B3) (F4) (B4)
 
 
---LeftFace version of createVerticalFaces
+-- |Create a column of LeftFace 
 createLeftFaces :: Origin -> SingleDegreeRadii -> Slope -> Slope -> [TransposeFactor] -> [CornerPoints]
-createLeftFaces topOrigin inDegree xSlope ySlope zTransposeFactor  =
-  createVerticalFaces topOrigin inDegree xSlope ySlope zTransposeFactor (F2) (B2) (F1) (B1)
+createLeftFaces origin singleDegreeRadii xSlope ySlope zTransposeFactor  =
+  createVerticalFaces origin singleDegreeRadii xSlope ySlope zTransposeFactor (F2) (B2) (F1) (B1)
 
 
 
@@ -129,18 +136,18 @@ createLeftFacesMultiColumns topOrigin (d:ds) xSlope ySlope zTransposeFactor =
 
 
 
-{-
-Join a [RightFace] to [[LeftFace]] using a ++>
-Normally: RightFace ++> [LeftFaces] so need recursion to work through the extra level of lists.
 
-I stopped the test for now, till I can create a [[LeftFace]].
-At this point I can only create a[LeftFace]
+{- |Join a [RightFace] to [[LeftFace]]
+    Results in [[CornerPoints]] where each inner list represents horizontal layer..-}
+{-
+
+Normally: RightFace ++> [LeftFaces], instead of  [RightFace] ++> [[LeftFace]],  so need recursion to work through the extra level of lists.
 -}
-createVerticalCubes :: [CornerPoints] -> [[CornerPoints]] -> [CornerPoints]
-createVerticalCubes ([]) _ = []
-createVerticalCubes (x:xs) (ys) =
+createHorizontallyAlignedCubes :: [CornerPoints] -> [[CornerPoints]] -> [[CornerPoints]]
+createHorizontallyAlignedCubes ([]) _ = []
+createHorizontallyAlignedCubes (x:xs) (ys) =
   let headOfLeftFaces = map (head) ys
-  in (x ++> headOfLeftFaces) ++  (createVerticalCubes xs (map (tail) ys) )
+  in (x ++> headOfLeftFaces) : (createHorizontallyAlignedCubes xs (map (tail) ys) )
 
 
 -- Amount used to transpose a point

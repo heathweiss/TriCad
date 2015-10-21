@@ -7,6 +7,7 @@ import Tests.MathTest(mathTestDo)
 import Tests.JsonTest(jsonTestDo)
 import Tests.ParseTest(parseTestDo)
 import Tests.HorizontalFacesTest (horizontalFacesTestDo)
+import Tests.VerticalFacesTest(verticalFacesTestDo)
 
 runAllTestsDo = do
   putStrLn "corner points debug test"
@@ -23,4 +24,6 @@ runAllTestsDo = do
   parseTestDo
   putStrLn "horizontal faces test"
   horizontalFacesTestDo
+  putStrLn "vertical faces test"
+  verticalFacesTestDo
   

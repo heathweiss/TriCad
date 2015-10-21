@@ -139,7 +139,7 @@ flatYSlope = PosYSlope 0
 
 -- |Degree of a circle.
 type Degree = Double
-
+  
 -- |The center of a radial shape.
 type Origin = Point
 
