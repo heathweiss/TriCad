@@ -97,7 +97,7 @@ writeStlFileFromScan scan =
       frontTriangles = [FaceFront | x <- [1..]]
       triangles =
        zipWith  (+++^)
-        ([FacesFrontTop | x <- [1..4]] :   [frontTriangles | x <- [5..65]] ++:  [FacesBottomFront | x <- [66..]] 
+        ([FacesFrontTop | x <- [1..]] :   [frontTriangles | x <- [5..65]] ++:  [FacesBottomFront | x <- [66..]] 
 
         ) 
         --  +++^
