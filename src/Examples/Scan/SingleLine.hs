@@ -44,7 +44,10 @@ parseRawDataToScanAndSaveToJson  = do
 
    putStrLn "done" 
 
-
+canItParseOnly = do
+ contents <- B.readFile "src/Data/scanRawDataWithDegrees.raww"
+ let multiDegreePixelValues = PA.parseCSVPixelValues contents
+ print $ show  multiDegreePixelValues
 {-
 Create an stl file from raw data using ParseAtto.
 Note that I can't use json yet, as it has not been changed for the new Scan datatype changes.

@@ -12,7 +12,8 @@ This raw data file,  is a camera image processed by the opencv scanning code.
 
 module Scan.Parse(MultiDegreePixelValues(..), SingleDegreePixelValues(..), PixelValue(..), parseCSVPixelValues) where
 import Data.Word
-import Data.Attoparsec.Char8
+--import Data.Attoparsec.Char8
+import Data.Attoparsec.ByteString.Char8
 import Control.Applicative
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BS
