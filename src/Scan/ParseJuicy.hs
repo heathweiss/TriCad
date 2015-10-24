@@ -71,24 +71,59 @@ showAverageLTE100RedPixelValuesFor1Row = do
          extractCR (PixelYCbCr8 _ _ cr) =
            pixel8ToWord8 cr
 
-showAverageLTE100RedPixelValuesForAllRows = do
-      contents <-   readImage "src/Data/IMG_2457.JPG"
+
+
+showAverageGTE100RedValuesForAllRows :: IO ()
+showAverageGTE100RedValuesForAllRows  = do
+      contents <-   readImage filePath
       case  contents of
         Left err -> putStrLn err
         Right (ImageYCbCr8 img) ->
-          putStrLn $ show $ readAllRows img
+          putStrLn $ show $ reduceAllRows  (toAvgIndexPos) img
           --putStrLn $ show $ readAllcolumns img
         otherwise -> putStrLn "another format"
       where
-         
-         readAllcolumns img' row  =
+         toAvgIndexPos ::  RowIndex -> (Image  PixelYCbCr8) -> AvgIndexPosition
+         toAvgIndexPos  row img'  =
            averageIndexValue $  pixelIndicesOfPixelValuesGTE  160  [ extractCR $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
-         readAllRows img'' = [readAllcolumns img'' y  | y <-  [0..((imageHeight img'')-1)]]
-         
+
+         reduceAllRows ::  ( RowIndex -> (Image  PixelYCbCr8) ->  AvgIndexPosition) -> (Image  PixelYCbCr8) -> [AvgIndexPosition]
+         --reduceAllRows ::  ( RowIndex -> (Image  PixelYCbCr8) ->  AvgIndexPosition)  -> [AvgIndexPosition]
+         reduceAllRows reducer img''  = [reducer  y img'' | y <-  [0..((imageHeight img'')-1)]]
+
+         extractCR :: (PixelYCbCr8) -> RedValue
          extractCR (PixelYCbCr8 _ _ cr) =
            pixel8ToWord8 cr
 
+         filePath :: FilePath
+         filePath = "src/Data/IMG_2457.JPG"
 
+{-
+showAverageGTE100RedValuesForAllRows :: IO ()
+showAverageGTE100RedValuesForAllRows  = do
+      contents <-   readImage filePath
+      case  contents of
+        Left err -> putStrLn err
+        Right (ImageYCbCr8 img) ->
+          putStrLn $ show $ reduceAllRows  (toAvgIndexPos) img
+          --putStrLn $ show $ readAllcolumns img
+        otherwise -> putStrLn "another format"
+      where
+         toAvgIndexPos :: (Image  PixelYCbCr8) -> RowIndex -> AvgIndexPosition
+         toAvgIndexPos img' row  =
+           averageIndexValue $  pixelIndicesOfPixelValuesGTE  160  [ extractCR $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
+
+         reduceAllRows ::  ((Image  PixelYCbCr8) -> RowIndex -> AvgIndexPosition) -> (Image  PixelYCbCr8) -> [AvgIndexPosition]
+         reduceAllRows reducer img''  = [reducer img'' y  | y <-  [0..((imageHeight img'')-1)]]
+
+         extractCR :: (PixelYCbCr8) -> RedValue
+         extractCR (PixelYCbCr8 _ _ cr) =
+           pixel8ToWord8 cr
+
+         filePath :: FilePath
+         filePath = "src/Data/IMG_2457.JPG"
+
+-}
 
 showFullColorsFor1Row = do
       contents <-   readImage "src/Data/IMG_2457.JPG"
@@ -128,3 +163,6 @@ averageIndexValue :: [Int] -> Double
 averageIndexValue list =
   (fromIntegral $ L.sum list)  / (fromIntegral $ length list)
   
+type RedValue = Word8
+type AvgIndexPosition = Double
+type RowIndex = Int
