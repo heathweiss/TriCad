@@ -78,8 +78,8 @@ showAverageOfIndicesOfRedValuesForEachRow  = do
       jpegImage <-   readImage filePath
       case  jpegImage of
         Left err -> putStrLn err
-        Right (ImageYCbCr8 img) ->
-          putStrLn $ show $ reduceEachRowOfThe img  (toAvgOf (indicesOfPixelValuesGTE) redLaserLine)  
+        Right (ImageYCbCr8 jpegImage') ->
+          putStrLn $ show $ reduceEachRowOfThe jpegImage'  (toAvgOf (indicesOfPixelValuesGTE) redLaserLine)  
         otherwise -> putStrLn "another format"
       where
          toAvgOf :: ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  RowIndex -> (Image  PixelYCbCr8) -> AvgIndexPosition
