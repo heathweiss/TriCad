@@ -55,12 +55,13 @@ showBlackPixelValues = do
            y
          
 
+
 showAverageLTE100RedPixelValuesFor1Row = do
-      contents <-   readImage "src/Data/IMG_2457.JPG"
-      case  contents of
+      jpegImage <-   readImage "src/Data/IMG_2457.JPG"
+      case  jpegImage of
         Left err -> putStrLn err
-        Right (ImageYCbCr8 img) ->
-          putStrLn $ show $ averageIndexValueOf $  pixelIndicesOfPixelValuesLTE  100 $ readAllcolumns img
+        Right (ImageYCbCr8 jpegImage') ->
+          putStrLn $ show $ averageValueOf $  indicesOfThePixelValuesGTE  redLaserLine $ readAllcolumns jpegImage'
           --putStrLn $ show $ readAllcolumns img
         otherwise -> putStrLn "another format"
       where
@@ -70,24 +71,138 @@ showAverageLTE100RedPixelValuesFor1Row = do
          
          extractCR (PixelYCbCr8 _ _ cr) =
            pixel8ToWord8 cr
+           
+         redLaserLine :: TargetValue
+         redLaserLine = 160
 
 
+getRedLaserLine :: FilePath -> IO ()
+getRedLaserLine filePath =
+  processSingleImageToReducedEachRowToTargetValueIndex filePath (extractCR) (averageValueOf) (indicesOfThePixelValuesGTE) redLaserLine
 
-showAverageOfIndicesOfRedValuesForEachRow:: IO ()
-showAverageOfIndicesOfRedValuesForEachRow  = do
+processSingleImageToReducedEachRowToTargetValueIndex:: FilePath -> ((PixelYCbCr8) -> Word8) ->  ([Int] -> Double)   ->         ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  IO ()
+processSingleImageToReducedEachRowToTargetValueIndex   filePath    extractColor                 reduceIndexesOfTargetPixels     pixelsThatQualifyAsA           targetValue  = do
       jpegImage <-   readImage filePath
       case  jpegImage of
         Left err -> putStrLn err
         Right (ImageYCbCr8 jpegImage') ->
-          putStrLn $ show $ reduceEachRowOfThe jpegImage'  (toAvgOf (indicesOfPixelValuesGTE) redLaserLine)  
+          putStrLn $ show $ reduceEachRowOfThe jpegImage'  (toASingleIndexValueFrom (pixelsThatQualifyAsA) targetValue)  
         otherwise -> putStrLn "another format"
       where
-         toAvgOf :: ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  RowIndex -> (Image  PixelYCbCr8) -> AvgIndexPosition
-         toAvgOf    pixelValuesGTE                  targetValue     row         img'  =
-           averageIndexValueOf $  pixelValuesGTE  targetValue  [ extractCR $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
+         toASingleIndexValueFrom :: ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  RowIndex -> (Image  PixelYCbCr8) -> TargetValueIndex
+         toASingleIndexValueFrom    pixelsThatQualifyAsA'                  targetValue     row         img'  =
+           reduceIndexesOfTargetPixels $  pixelsThatQualifyAsA'  targetValue  [ extractColor $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
+
+         reduceEachRowOfThe :: (Image  PixelYCbCr8) ->  ( RowIndex -> (Image  PixelYCbCr8) ->  TargetValueIndex) ->  [TargetValueIndex]
+         reduceEachRowOfThe    img''                    reducer                                                       =
+           [reducer  y img'' | y <-  [0..((imageHeight img'')-1)]]
+
+{-
+processSingleImageToReducedRowValuesBase:: FilePath -> ((PixelYCbCr8) -> Word8) ->  ([Int] -> Double)   ->         ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  IO ()
+processSingleImageToReducedRowValuesBase   filePath    extractColor                 reduceIndexesOfTargetPixels     pixelsThatQualifyAsA           targetValue  = do
+      jpegImage <-   readImage filePath
+      case  jpegImage of
+        Left err -> putStrLn err
+        Right (ImageYCbCr8 jpegImage') ->
+          putStrLn $ show $ reduceEachRowOfThe jpegImage'  (toASingleIndexValueFrom (pixelsThatQualifyAsA) targetValue)  
+        otherwise -> putStrLn "another format"
+      where
+         toASingleIndexValueFrom :: ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  RowIndex -> (Image  PixelYCbCr8) -> TargetValueIndex
+         toASingleIndexValueFrom    pixelsThatQualifyAsA'                  targetValue     row         img'  =
+           reduceIndexesOfTargetPixels $  pixelsThatQualifyAsA'  targetValue  [ extractColor $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
+
+         reduceEachRowOfThe :: (Image  PixelYCbCr8) ->  ( RowIndex -> (Image  PixelYCbCr8) ->  TargetValueIndex) ->  [TargetValueIndex]
+         reduceEachRowOfThe    img''                    reducer                                                       =
+           [reducer  y img'' | y <-  [0..((imageHeight img'')-1)]]
+===============================================================================
+processSingleImageToReducedRowValuesBase:: FilePath -> ((PixelYCbCr8) -> Word8) ->  ([Int] -> Double)   ->         ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  IO ()
+processSingleImageToReducedRowValuesBase   filePath    extractColor                 reduceIndexesOfTargetPixels     pixelsThatQualifyAsA           targetValue  = do
+      jpegImage <-   readImage filePath
+      case  jpegImage of
+        Left err -> putStrLn err
+        Right (ImageYCbCr8 jpegImage') ->
+          putStrLn $ show $ reduceEachRowOfThe jpegImage'  (toASingleIndexValueFrom (pixelsThatQualifyAsA) targetValue)  
+        otherwise -> putStrLn "another format"
+      where
+         toASingleIndexValueFrom :: ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  RowIndex -> (Image  PixelYCbCr8) -> AvgIndexPosition
+         toASingleIndexValueFrom    pixelsThatQualifyAsA'                  targetValue     row         img'  =
+           reduceIndexesOfTargetPixels $  pixelsThatQualifyAsA'  targetValue  [ extractColor $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
 
          reduceEachRowOfThe :: (Image  PixelYCbCr8) ->  ( RowIndex -> (Image  PixelYCbCr8) ->  AvgIndexPosition) ->  [AvgIndexPosition]
-         reduceEachRowOfThe    img''                    reducer  = [reducer  y img'' | y <-  [0..((imageHeight img'')-1)]]
+         reduceEachRowOfThe    img''                    reducer                                                       =
+           [reducer  y img'' | y <-  [0..((imageHeight img'')-1)]]
+
+=================================================================================
+processSingleImageToReducedRowValuesBase:: FilePath -> ((PixelYCbCr8) -> Word8) ->  ([Int] -> Double)   ->         ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  IO ()
+processSingleImageToReducedRowValuesBase   filePath    extractColor                 reduceIndexesOfTargetPixels     pixelsThatQualifyAsA              targetValue  = do
+      jpegImage <-   readImage filePath
+      case  jpegImage of
+        Left err -> putStrLn err
+        Right (ImageYCbCr8 jpegImage') ->
+          putStrLn $ show $ reduceEachRowOfThe jpegImage'  (toASingleIndexValueFrom (pixelsThatQualifyAsA) targetValue)  
+        otherwise -> putStrLn "another format"
+      where
+         toASingleIndexValueFrom :: ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  RowIndex -> (Image  PixelYCbCr8) -> AvgIndexPosition
+         toASingleIndexValueFrom    pixelValuesGTE                  targetValue     row         img'  =
+           reduceIndexesOfTargetPixels $  pixelValuesGTE  targetValue  [ extractColor $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
+
+         reduceEachRowOfThe :: (Image  PixelYCbCr8) ->  ( RowIndex -> (Image  PixelYCbCr8) ->  AvgIndexPosition) ->  [AvgIndexPosition]
+         reduceEachRowOfThe    img''                    reducer                                                       =
+           [reducer  y img'' | y <-  [0..((imageHeight img'')-1)]] 
+===============================================================================================================
+processSingleImageToReducedRowValuesBase:: FilePath -> ((PixelYCbCr8) -> Word8) ->  ([Int] -> Int)   ->  ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  IO ()
+processSingleImageToReducedRowValuesBase   filePath    extractColor                reduceTargetPixels     pixelsThatQualifyAs              targetValue  = do
+      jpegImage <-   readImage filePath
+      case  jpegImage of
+        Left err -> putStrLn err
+        Right (ImageYCbCr8 jpegImage') ->
+          putStrLn $ show $ reduceEachRowOfThe jpegImage'  (toASingleValueFrom (pixelsThatQualifyAs) targetValue)  
+        otherwise -> putStrLn "another format"
+      where
+         toASingleValueFrom :: ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  RowIndex -> (Image  PixelYCbCr8) -> AvgIndexPosition
+         toASingleValueFrom    pixelValuesGTE                  targetValue     row         img'  =
+           averageValueOf $  pixelValuesGTE  targetValue  [ extractColor $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
+
+         reduceEachRowOfThe :: (Image  PixelYCbCr8) ->  ( RowIndex -> (Image  PixelYCbCr8) ->  AvgIndexPosition) ->  [AvgIndexPosition]
+         reduceEachRowOfThe    img''                    reducer                                                       =
+           [reducer  y img'' | y <-  [0..((imageHeight img'')-1)]]
+=========================================================================================================
+processSingleImageToReducedRowValuesBase:: FilePath -> ((PixelYCbCr8) -> Word8) -> ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  IO ()
+processSingleImageToReducedRowValuesBase   filePath    extractColor                pixelsThatQualifyAs              targetValue  = do
+      jpegImage <-   readImage filePath
+      case  jpegImage of
+        Left err -> putStrLn err
+        Right (ImageYCbCr8 jpegImage') ->
+          putStrLn $ show $ reduceEachRowOfThe jpegImage'  (toTheAvgOfThe (pixelsThatQualifyAs) targetValue)  
+        otherwise -> putStrLn "another format"
+      where
+         toTheAvgOfThe :: ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  RowIndex -> (Image  PixelYCbCr8) -> AvgIndexPosition
+         toTheAvgOfThe    pixelValuesGTE                  targetValue     row         img'  =
+           averageValueOf $  pixelValuesGTE  targetValue  [ extractColor $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
+
+         reduceEachRowOfThe :: (Image  PixelYCbCr8) ->  ( RowIndex -> (Image  PixelYCbCr8) ->  AvgIndexPosition) ->  [AvgIndexPosition]
+         reduceEachRowOfThe    img''                    reducer                                                       =
+           [reducer  y img'' | y <-  [0..((imageHeight img'')-1)]]
+-}         
+
+         
+
+showAverageOfIndicesOfLaserLineValuesForEachRow:: IO ()
+showAverageOfIndicesOfLaserLineValuesForEachRow  = do
+      jpegImage <-   readImage filePath
+      case  jpegImage of
+        Left err -> putStrLn err
+        Right (ImageYCbCr8 jpegImage') ->
+          putStrLn $ show $ reduceEachRowOfThe jpegImage'  (toTheAvgOfThe (indicesOfThePixelValuesGTE) redLaserLine)  
+        otherwise -> putStrLn "another format"
+      where
+         toTheAvgOfThe :: ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  RowIndex -> (Image  PixelYCbCr8) -> AvgIndexPosition
+         toTheAvgOfThe    pixelValuesGTE                  targetValue     row         img'  =
+           averageValueOf $  pixelValuesGTE  targetValue  [ extractCR $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
+
+         reduceEachRowOfThe :: (Image  PixelYCbCr8) ->  ( RowIndex -> (Image  PixelYCbCr8) ->  AvgIndexPosition) ->  [AvgIndexPosition]
+         reduceEachRowOfThe    img''                    reducer                                                       =
+           [reducer  y img'' | y <-  [0..((imageHeight img'')-1)]]
 
          extractCR :: (PixelYCbCr8) -> RedValue
          extractCR (PixelYCbCr8 _ _ cr) =
@@ -96,9 +211,36 @@ showAverageOfIndicesOfRedValuesForEachRow  = do
          filePath :: FilePath
          filePath = "src/Data/IMG_2457.JPG"
 
-         redLaserLine :: TargetValue
-         redLaserLine = 160
+         --redLaserLine :: TargetValue
+         --redLaserLine = 160
+{-
+showAverageOfIndicesOfLaserLineValuesForEachRow:: IO ()
+showAverageOfIndicesOfLaserLineValuesForEachRow  = do
+      jpegImage <-   readImage filePath
+      case  jpegImage of
+        Left err -> putStrLn err
+        Right (ImageYCbCr8 jpegImage') ->
+          putStrLn $ show $ reduceEachRowOfThe jpegImage'  (toTheAvgOfThe (indicesOfThePixelValuesGTE) redLaserLine)  
+        otherwise -> putStrLn "another format"
+      where
+         toTheAvgOfThe :: ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  RowIndex -> (Image  PixelYCbCr8) -> AvgIndexPosition
+         toTheAvgOfThe    pixelValuesGTE                  targetValue     row         img'  =
+           averageValueOf $  pixelValuesGTE  targetValue  [ extractCR $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
 
+         reduceEachRowOfThe :: (Image  PixelYCbCr8) ->  ( RowIndex -> (Image  PixelYCbCr8) ->  AvgIndexPosition) ->  [AvgIndexPosition]
+         reduceEachRowOfThe    img''                    reducer                                                       =
+           [reducer  y img'' | y <-  [0..((imageHeight img'')-1)]]
+
+         extractCR :: (PixelYCbCr8) -> RedValue
+         extractCR (PixelYCbCr8 _ _ cr) =
+           pixel8ToWord8 cr
+
+         filePath :: FilePath
+         filePath = "src/Data/IMG_2457.JPG"
+
+         --redLaserLine :: TargetValue
+         --redLaserLine = 160
+-}
 
 
 showFullColorsFor1Row = do
@@ -123,11 +265,11 @@ https://ocharles.org.uk/blog/posts/2013-12-16-24-days-of-hackage-repa.html
 {- hoogle findIndices to see the word8 bytestring version.
    Instead of list comprehension, will be able to use findIndices alone.
 -}
-pixelIndicesOfPixelValuesLTE :: Word8 -> [Word8] -> [Int]
-pixelIndicesOfPixelValuesLTE thresholdValue rawData  = ( L.findIndices) (<=thresholdValue) rawData
+indicesOFPixelValuesLTE :: Word8 -> [Word8] -> [Int]
+indicesOFPixelValuesLTE thresholdValue rawData  = ( L.findIndices) (<=thresholdValue) rawData
 
-indicesOfPixelValuesGTE :: Word8 -> [Word8] -> [Int]
-indicesOfPixelValuesGTE thresholdValue rawData  = ( L.findIndices) (>=thresholdValue) rawData
+indicesOfThePixelValuesGTE :: Word8 -> [Word8] -> [Int]
+indicesOfThePixelValuesGTE thresholdValue rawData  = ( L.findIndices) (>=thresholdValue) rawData
 
 
 
@@ -135,11 +277,18 @@ pixel8ToWord8 :: Pixel8 -> Word8
 pixel8ToWord8 pixel = pixel
 
 
-averageIndexValueOf :: [Int] -> Double
-averageIndexValueOf list =
+averageValueOf :: [Int] -> Double
+averageValueOf list =
   (fromIntegral $ L.sum list)  / (fromIntegral $ length list)
   
 type RedValue = Word8
 type AvgIndexPosition = Double
+type TargetValueIndex = Double
 type RowIndex = Int
 type TargetValue = Word8
+
+redLaserLine :: TargetValue
+redLaserLine = 160
+
+extractCR :: (PixelYCbCr8) -> Word8
+extractCR (PixelYCbCr8 _ _ cr) =  pixel8ToWord8 cr
