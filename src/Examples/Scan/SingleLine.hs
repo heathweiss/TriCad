@@ -25,7 +25,7 @@ import Scan.Json()
 import qualified Scan.Parse as PA  ( MultiDegreePixelValues(..), parseCSVPixelValues)
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createHorizontallyAlignedCubes,
                            SingleDegreeRadii(..), MultiDegreeRadii(..))
-
+import Scan.Transform (reduceScanRows)
 --create a [Word8] for: Right(B.pack $ strToWord8s)
 --which gets a bytstring of word8
 strToWord8s :: String -> [Word8]
@@ -85,13 +85,85 @@ readTrianglesFromJsonFileAndWriteToStlFile = do
       Just (MultiDegreeRadii name degrees) -> writeStlFileFromScan (MultiDegreeRadii name degrees)
       Nothing                  -> putStrLn "Nothing"
 
+{-
+reduceScanRows :: Int -> MultiDegreeRadii -> Either String MultiDegreeRadii
+-}
+readMultiDegreeRadiiFromJsonReduceAndWriteBackToJson = do 
+  contents <- BL.readFile "src/Data/scanFullData.json"
+  case (decode contents) of 
+      Just (MultiDegreeRadii name degrees) ->
+        let reduced = (Right (MultiDegreeRadii name degrees) ) >>= reduceScanRows 20
+        in  case reduced of
+              Left err -> putStrLn err
+              Right (MultiDegreeRadii name degrees) -> BL.writeFile "src/Data/scanFullData.json" $ encode $ MultiDegreeRadii name degrees
+                                                      
+      Nothing                  -> putStrLn "json file not read"
+{-
+parseRawDataToScanAndSaveToJson  = do
+   contents <- B.readFile "src/Data/scanRawDataWitDegrees.raww"
+   let multiDegreePixelValues = PA.parseCSVPixelValues contents
+       multiDegreeRadii = multiDegreePixelValuesToMultiDegreeRadii "myScan" (pixelIndicesAverageToRadius . pixelIndicesOfPixelValuesLTE 75) multiDegreePixelValues  >>= reduceScanRows 10
+   case (multiDegreeRadii) of
+    Left msg -> putStrLn msg
+    Right (MultiDegreeRadii name degrees_) -> BL.writeFile "src/Data/scanFullData.json" $ encode $ MultiDegreeRadii name degrees_
 
+   putStrLn "done"
 
+======================================================
+readMultiDegreeRadiiFromJsonReduceAndWriteBackToJson = do 
+  contents <- BL.readFile "src/Data/scanFullData.json"
+  case (decode contents) of 
+      Just (MultiDegreeRadii name degrees) ->
+        writeStlFileFromScanMonadic $ (Right (MultiDegreeRadii name degrees) ) >>= reduceScanRows 1200 
+                                                      
+      Nothing                  -> putStrLn "json file not read"
+=====================================================
+readMultiDegreeRadiiFromJsonReduceAndWriteBackToJson = do 
+  contents <- BL.readFile "src/Data/scanFullData.json"
+  case (decode contents) of 
+      Just (MultiDegreeRadii name degrees) ->
+        writeStlFileFromScanMonadic $ reduceScanRows 120 (MultiDegreeRadii name degrees)
+                                                      
+      Nothing                  -> putStrLn "json file not read"
+=================================================
+compiles
+readMultiDegreeRadiiFromJsonReduceAndWriteBackToJson = do 
+  contents <- BL.readFile "src/Data/scanFullData.json"
+  case (decode contents) of 
+      Just (MultiDegreeRadii name degrees) ->
+             let temp = reduceScanRows 120 (MultiDegreeRadii name degrees)
+             in 
+                 case temp of
+                   Right (MultiDegreeRadii name degrees) ->   writeStlFileFromScan (MultiDegreeRadii name degrees)
+                   -- reduceScanRows 120 (MultiDegreeRadii name degrees) >>= writeStlFileFromScan
+                                                              
+                   Left err -> putStrLn err
+      Nothing  -> putStrLn "json file not read"
+================================================================
+readMultiDegreeRadiiFromJsonReduceAndWriteBackToJson = do 
+  contents <- BL.readFile "src/Data/scanFullData.json"
+  case (decode contents) of 
+      Just (MultiDegreeRadii name degrees) ->
+        case (MultiDegreeRadii name degrees) of
+          Left err -> putStrLn "MultiDegreeRadii: " ++ err
+          Right (MultiDegreeRadii name degrees) ->  writeStlFileFromScan $  reduceScanRows 120 (MultiDegreeRadii name degrees)
+      Nothing                  -> putStrLn "json file not read"
+
+=================================
+readMultiDegreeRadiiFromJsonReduceAndWriteBackToJson = do 
+  contents <- BL.readFile "src/Data/scanFullData.json"
+  case (decode contents) of 
+      Just (MultiDegreeRadii name degrees) ->
+        case (MultiDegreeRadii name degrees) of
+          Left err -> putStrLn "MultiDegreeRadii: " ++ err
+          Right (MultiDegreeRadii name degrees) ->  writeStlFileFromScan $  reduceScanRows 120 (MultiDegreeRadii name degrees)
+      Nothing                  -> putStrLn "json file not read"
+-}
 
 --this is set up to have rows reduced by 10
 --This is a support function, not to be called directly.
 --Used by parseCannedRawDataToScanWriteStlFileWithParseAtto
-
+writeStlFileFromScan :: MultiDegreeRadii -> IO ()
 writeStlFileFromScan scan = 
   let origin = (Point{x_axis=0, y_axis=0, z_axis=50})
       heightPerPixel = 10
@@ -112,6 +184,33 @@ writeStlFileFromScan scan =
 
 
 
-     
+
+writeStlFileFromScanMonadic :: (Either String MultiDegreeRadii) -> IO ()
+writeStlFileFromScanMonadic scan =
+  let origin = (Point{x_axis=0, y_axis=0, z_axis=50})
+      heightPerPixel = 10
+      scan' =
+        case scan of
+                Right (MultiDegreeRadii name' degrees') -> (MultiDegreeRadii name' degrees')
+      leftFaces = createLeftFacesMultiColumns origin (tail $ degrees scan') flatXSlope flatYSlope [0,heightPerPixel..]
+      rightFaces = createRightFaces origin (head $ degrees scan') flatXSlope flatYSlope [0,heightPerPixel..]
+      frontTriangles = [FaceFront | x <- [1..]]
+      triangles =
+       zipWith  (+++^)
+        ([FacesFrontTop | x <- [1..]] :   [frontTriangles | x <- [5..65]] ++:  [FacesBottomFront | x <- [66..]] 
+      
+        ) 
+        --  +++^
+        (createHorizontallyAlignedCubes rightFaces leftFaces)
+      stlFile = newStlShape "backscratcher" $ concat triangles
+  in
+      case scan of
+        Right scan'' -> writeStlToFile stlFile
+                        
+        Left err -> putStrLn err
+{-
+
+
+-}     
 
 

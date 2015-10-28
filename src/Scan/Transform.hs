@@ -53,11 +53,26 @@ Used for:
 Take a list of indices, such as minValueIndices, and give the average indice.
 Pixel indice * mm/indice  == Radius
 -}
+
 pixelIndicesAverageToRadius :: [PixelIndice] -> Radius
 pixelIndicesAverageToRadius list = let temp = (fromIntegral $ L.sum list)  / (fromIntegral $ length list)
                in
                    Radius {radius=temp}
+{-
+should I watch for a zero value.
+And if there is one, what to use for a default
 
+
+
+pixelIndicesAverageToRadius :: [PixelIndice] -> Radius
+pixelIndicesAverageToRadius list =
+               let temp =
+                     if ((length list)) == 0
+                        then 0
+                     else (fromIntegral $ L.sum list)  / (fromIntegral $ length list)
+               in
+                   Radius {radius=temp}
+-}
 
 
 
