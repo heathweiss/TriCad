@@ -62,6 +62,9 @@ showBlackPixelValues = do
          extractY (PixelYCbCr8 y _ _) =
            y
 
+
+
+
 showFirstAndLastCenterOfRedLaser = do
   jpegImage <-   readImage "src/Data/scanImages/center.JPG"
   let
@@ -100,8 +103,8 @@ showFirstAndLastCenterOfRedLaser = do
 For a single row of an image:
 EdgeDetect a set of values, and return the average index.
 -}
---
-showAverageIndexOfTargetValuesForRowBase :: (Either String (DynamicImage )) -> (Word8 -> [Word8] -> [Int]) ->  TargetValue -> RowIndex ->  (Either String Double)
+--TargetValue
+showAverageIndexOfTargetValuesForRowBase :: (Either String (DynamicImage )) -> (TargetValue -> [TargetValue] -> [ColumnIndex]) ->  TargetValue -> RowIndex ->  (Either String AvgIndexPosition)
 showAverageIndexOfTargetValuesForRowBase    (Right(ImageYCbCr8 jpegImage'))    indicesOf                       targetValue    targetRow     = do
           Right $ averageValueOf $  indicesOf targetValue $ readAllcolumns jpegImage'
       where
@@ -115,9 +118,9 @@ showAverageIndexOfTargetValuesForRowBase    (Right(ImageYCbCr8 jpegImage'))    i
 showAverageIndexOfTargetValuesForRowBase    (Left err)  _ _ _ = do
   Left err
 {-
-showAverageIndexOfTargetValuesFor1RowBase :: (Either String (DynamicImage )) -> RowIndex -> TargetValue -> (Either String Double)
-showAverageIndexOfTargetValuesFor1RowBase    (Right(ImageYCbCr8 jpegImage'))    targetRow   targetValue  = do
-          Right $ averageValueOf $  indicesOfThePixelValuesGTE targetValue $ readAllcolumns jpegImage'
+showAverageIndexOfTargetValuesForRowBase :: (Either String (DynamicImage )) -> (Word8 -> [Word8] -> [Int]) ->  TargetValue -> RowIndex ->  (Either String AvgIndexPosition)
+showAverageIndexOfTargetValuesForRowBase    (Right(ImageYCbCr8 jpegImage'))    indicesOf                       targetValue    targetRow     = do
+          Right $ averageValueOf $  indicesOf targetValue $ readAllcolumns jpegImage'
       where
          readAllcolumns img' =
            [extractCR $ pixelAt img' x targetRow |  x <- [0..(imageWidth img')]]
@@ -126,7 +129,7 @@ showAverageIndexOfTargetValuesFor1RowBase    (Right(ImageYCbCr8 jpegImage'))    
          extractCR (PixelYCbCr8 _ _ cr) =
            pixel8ToWord8 cr
 
-showAverageIndexOfTargetValuesFor1RowBase    (Left err)  _ _  = do
+showAverageIndexOfTargetValuesForRowBase    (Left err)  _ _ _ = do
   Left err
 -}
 
@@ -492,6 +495,7 @@ type AvgIndexPosition = Double
 type TargetValueIndex = Double
 type RowIndex = Int
 type TargetValue = Word8
+type ColumnIndex = Int
 
 redLaserLine :: TargetValue
 redLaserLine = 190
