@@ -61,27 +61,74 @@ showBlackPixelValues = do
 
          extractY (PixelYCbCr8 y _ _) =
            y
-         
 
+showFirstAndLastCenterOfRedLaser = do
+  jpegImage <-   readImage "src/Data/scanImages/center.JPG"
+  let
+    showAverageIndexOfTargetValuesForRow =
+          showAverageIndexOfTargetValuesForRowBase jpegImage indicesOfThePixelValuesGTE redLaserLine
 
-showAverageLTE100RedPixelValuesFor1Row = do
-      jpegImage <-   readImage "src/Data/IMG_2457.JPG"
-      case  jpegImage of
-        Left err -> putStrLn err
-        Right (ImageYCbCr8 jpegImage') ->
-          putStrLn $ show $ averageValueOf $  indicesOfThePixelValuesGTE  redLaserLine $ readAllcolumns jpegImage'
-          --putStrLn $ show $ readAllcolumns img
-        otherwise -> putStrLn "another format"
+    lastRowIndex = 
+      case jpegImage of
+        Right (ImageYCbCr8 jpegImage') -> (imageHeight jpegImage') - 2
+ 
+  case (showAverageIndexOfTargetValuesForRow 0) of
+     Right center -> putStrLn $ show center
+     Left err     -> putStrLn err
+
+  case (showAverageIndexOfTargetValuesForRow lastRowIndex) of
+     Right center -> putStrLn $ show center
+     Left err     -> putStrLn err
+
+ 
+    
+
+{-
+showFirstAndLastCenterOfRedLaser = do
+  jpegImage <-   readImage "src/Data/scanImages/center.JPG"
+  case (showAverageIndexOfTargetValuesFor1RowBase jpegImage 0 redLaserLine) of
+   Right center -> putStrLn $ show center
+   Left err     -> putStrLn err
+
+  case (showAverageIndexOfTargetValuesFor1RowBase jpegImage 10 redLaserLine) of
+   Right center -> putStrLn $ show center
+   Left err     -> putStrLn err
+-}
+
+--Word8 -> [Word8] -> [Int]
+{-
+For a single row of an image:
+EdgeDetect a set of values, and return the average index.
+-}
+--
+showAverageIndexOfTargetValuesForRowBase :: (Either String (DynamicImage )) -> (Word8 -> [Word8] -> [Int]) ->  TargetValue -> RowIndex ->  (Either String Double)
+showAverageIndexOfTargetValuesForRowBase    (Right(ImageYCbCr8 jpegImage'))    indicesOf                       targetValue    targetRow     = do
+          Right $ averageValueOf $  indicesOf targetValue $ readAllcolumns jpegImage'
       where
          readAllcolumns img' =
-           [extractCR $ pixelAt img' x 10 |  x <- [0..(imageWidth img')]]
+           [extractCR $ pixelAt img' x targetRow |  x <- [0..(imageWidth img')]]
 
          
          extractCR (PixelYCbCr8 _ _ cr) =
            pixel8ToWord8 cr
-           
-         redLaserLine :: TargetValue
-         redLaserLine = 160
+
+showAverageIndexOfTargetValuesForRowBase    (Left err)  _ _ _ = do
+  Left err
+{-
+showAverageIndexOfTargetValuesFor1RowBase :: (Either String (DynamicImage )) -> RowIndex -> TargetValue -> (Either String Double)
+showAverageIndexOfTargetValuesFor1RowBase    (Right(ImageYCbCr8 jpegImage'))    targetRow   targetValue  = do
+          Right $ averageValueOf $  indicesOfThePixelValuesGTE targetValue $ readAllcolumns jpegImage'
+      where
+         readAllcolumns img' =
+           [extractCR $ pixelAt img' x targetRow |  x <- [0..(imageWidth img')]]
+
+         
+         extractCR (PixelYCbCr8 _ _ cr) =
+           pixel8ToWord8 cr
+
+showAverageIndexOfTargetValuesFor1RowBase    (Left err)  _ _  = do
+  Left err
+-}
 
 {-
 Shows that using Control.Monad, reads the image ok as it only returns success instead of error msg.
@@ -106,6 +153,10 @@ showMeTheErrorsForRedLaserLine = do
              Right (ImageYCbCr8 jpegImage) -> (SingleDegreeRadii currDegree (map (Radius) (getRedLaserLineSingleImage redLaserLine jpegImage)))
         
         readImage' fileName = readImage $ filePathBuilder fileName
+
+
+--showTopAndBottomTargetValue =
+  
 
 
 {- |
