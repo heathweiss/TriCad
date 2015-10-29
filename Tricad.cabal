@@ -39,7 +39,7 @@ library
                    -- Sockets
                    Examples.Sockets.Bicycle
                    -- scanned shapes
-                   Examples.Scan.SingleLine
+                   Examples.Scan.SingleLine, Examples.Scan.WalkerSocket
                    -- Misc Shapes
                    Examples.MiscShapes.RvVentCaps
                    -- Primitives

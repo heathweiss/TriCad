@@ -1,4 +1,3 @@
-{-# LANGUAGE ParallelListComp #-}
 module Examples.Scan.SingleLine() where
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
