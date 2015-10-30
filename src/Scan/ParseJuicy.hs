@@ -1,6 +1,7 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE ParallelListComp #-}
-module Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii, getRedLaserLineSingleImage) where
+module Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii,  TargetValueIndex(..), ofThe, forThe, andThen,
+                        getThePixelsRightOfCenter, removeLeftOfCenterPixels, getRedLaserLineSingleImage) where
 import Codec.Picture.Jpg
 import Codec.Picture
 import Codec.Picture.Types
@@ -17,54 +18,41 @@ import qualified Data.ByteString.Lazy.Char8 as BL
 import Scan.Json
 import Data.Aeson
 
-hello = "hello"
 
---https://www.reddit.com/r/haskellquestions/comments/2p0tk0/juicy_pixels_simple_example_code/
-useReadImage :: IO ()
-useReadImage = do
-  contents <- readImage "src/Data/line.jpg"
-  case contents of
-   Left err -> putStrLn err
-   Right _  -> putStrLn "decoded"
+type RedValue = Word8
+type AvgIndexPosition = Double
+type TargetValueIndex = Double
+type CenterIndex = Double
+type RowIndex = Int
+type TargetValue = Word8
+type ColumnIndex = Int
+type AdjustmentFactor = Double
 
-
-{-
-shows the color info about a pixel
-see:
-  https://en.wikipedia.org/wiki/YCbCr
-  about how to decode that data, to find my laser line.
--}
-readJpegPixelValue = do
-  contents <-   readImage "src/Data/line.jpg"
-  case  contents of
-   Left err -> putStrLn err
-   Right (ImageYCbCr8 img) ->
-     --convertImage img
-     --putStrLn $ show $ imageWidth img
-     putStrLn $ show $ pixelAt img 10 10 
-   otherwise -> putStrLn "another format"
-
-
-{-
-get the greyscale Y values from the first row of the image.
--}
-showBlackPixelValues = do
-      contents <-   readImage "src/Data/line.jpg"
-      case  contents of
-        Left err -> putStrLn err
-        Right (ImageYCbCr8 img) ->
-          putStrLn $ show $ readAllcolumns img
-        otherwise -> putStrLn "another format"
-      where
-         readAllcolumns img' =
-           [extractY $ pixelAt img' x 10 |  x <- [0..(imageWidth img')]]
-
-         extractY (PixelYCbCr8 y _ _) =
-           y
+--ToDo: Create a DSL module, perhaps in a helper folder, for DSL helpers like this.
+ofThe = id
+forThe = id
+andThen = id
 
 
 
+removeLeftOfCenterPixels :: CenterIndex -> CenterIndex -> RowIndex -> RowIndex -> AdjustmentFactor
+removeLeftOfCenterPixels    btmCenterIndex topCenterIndex totalRows   currentRow =
+  let pixelOffset = btmCenterIndex - topCenterIndex
+      
+  in
+    topCenterIndex +  ((pixelOffset * (fromIntegral currentRow))  /(fromIntegral totalRows))
 
+
+
+getThePixelsRightOfCenter :: (RowIndex ->  AdjustmentFactor ) -> ColumnIndex ->        RowIndex ->   TargetValueIndex
+getThePixelsRightOfCenter    centerAdjustment                    colIndexOfTargeValue  rowIndex         =
+  (fromIntegral colIndexOfTargeValue) - (centerAdjustment rowIndex)
+
+{- | Shows the index of the red laser line for an image.
+
+Handy to have a look at the alignment of the camera and laser.
+Take a picture with something flat, facing the camera, on the origin.
+Not used during processing of a scan.-}
 showFirstAndLastCenterOfRedLaser = do
   jpegImage <-   readImage "src/Data/scanImages/center.JPG"
   let
@@ -87,23 +75,13 @@ showFirstAndLastCenterOfRedLaser = do
     
 
 {-
-showFirstAndLastCenterOfRedLaser = do
-  jpegImage <-   readImage "src/Data/scanImages/center.JPG"
-  case (showAverageIndexOfTargetValuesFor1RowBase jpegImage 0 redLaserLine) of
-   Right center -> putStrLn $ show center
-   Left err     -> putStrLn err
-
-  case (showAverageIndexOfTargetValuesFor1RowBase jpegImage 10 redLaserLine) of
-   Right center -> putStrLn $ show center
-   Left err     -> putStrLn err
--}
-
---Word8 -> [Word8] -> [Int]
-{-
 For a single row of an image:
 EdgeDetect a set of values, and return the average index.
+
+Used by:
+showFirstAndLastCenterOfRedLaser
 -}
---TargetValue
+
 showAverageIndexOfTargetValuesForRowBase :: (Either String (DynamicImage )) -> (TargetValue -> [TargetValue] -> [ColumnIndex]) ->  TargetValue -> RowIndex ->  (Either String AvgIndexPosition)
 showAverageIndexOfTargetValuesForRowBase    (Right(ImageYCbCr8 jpegImage'))    indicesOf                       targetValue    targetRow     = do
           Right $ averageValueOf $  indicesOf targetValue $ readAllcolumns jpegImage'
@@ -117,56 +95,23 @@ showAverageIndexOfTargetValuesForRowBase    (Right(ImageYCbCr8 jpegImage'))    i
 
 showAverageIndexOfTargetValuesForRowBase    (Left err)  _ _ _ = do
   Left err
-{-
-showAverageIndexOfTargetValuesForRowBase :: (Either String (DynamicImage )) -> (Word8 -> [Word8] -> [Int]) ->  TargetValue -> RowIndex ->  (Either String AvgIndexPosition)
-showAverageIndexOfTargetValuesForRowBase    (Right(ImageYCbCr8 jpegImage'))    indicesOf                       targetValue    targetRow     = do
-          Right $ averageValueOf $  indicesOf targetValue $ readAllcolumns jpegImage'
-      where
-         readAllcolumns img' =
-           [extractCR $ pixelAt img' x targetRow |  x <- [0..(imageWidth img')]]
 
-         
-         extractCR (PixelYCbCr8 _ _ cr) =
-           pixel8ToWord8 cr
+{- |
 
-showAverageIndexOfTargetValuesForRowBase    (Left err)  _ _ _ = do
-  Left err
+Used for:
+Curry in the value for the red laser line, and pass it into process10DegreeImagesToMultiDegreeRadii
+as the ((Image  PixelYCbCr8) -> [TargetValueIndex]) edgeDetector, when processing a scan using the red laser.
+
 -}
-
-{-
-Shows that using Control.Monad, reads the image ok as it only returns success instead of error msg.
-
-So why does the monad version of process10DegreeImagesToRedLaserLine return the err value.
--}
-showMeTheErrorsForRedLaserLine = do
-  --degree list must end with the last degree read, prior to the 360 degree. Must start with 0
-  singleDegreeRadiis  <- forM [0,10..350] (\currDegree -> do
-    jpegImage <-  readImage' $ show currDegree
-    case jpegImage of
-            Left err -> return  err
-            Right (ImageYCbCr8 jpegImage') -> return "success"
-    )
-
-  
-  print $ map (show) singleDegreeRadiis
-  
-  where setSingleDegreeRadii imageAsRead currDegree =
-           case imageAsRead of
-             Left err -> (SingleDegreeRadii currDegree [Radius 0]) 
-             Right (ImageYCbCr8 jpegImage) -> (SingleDegreeRadii currDegree (map (Radius) (getRedLaserLineSingleImage redLaserLine jpegImage)))
-        
-        readImage' fileName = readImage $ filePathBuilder fileName
-
-
---showTopAndBottomTargetValue =
-  
-
+getRedLaserLineSingleImage :: TargetValue -> (Image  PixelYCbCr8) -> [TargetValueIndex]
+getRedLaserLineSingleImage    redLaserLine   jpegImage = 
+  processSingleImageToReducedEachRowToTargetValueIndex jpegImage (extractCR) (averageValueOf) (indicesOfThePixelValuesGTE) redLaserLine
 
 {- |
 Process the images from src/Data/scanImages, into a json file of multiDegreeRadii.
-Needs an edgeDetector passed, such as detecting the red laser line.
+Needs an edgeDetector passed in, such as detecting the red laser line.
 -}
---
+--processScanImagesToMultiDegreeRadiiOfRedLaserLine = process10DegreeImagesToMultiDegreeRadii (getRedLaserLineSingleImage redLaserLine)
 process10DegreeImagesToMultiDegreeRadii :: ((Image  PixelYCbCr8) -> [TargetValueIndex]) -> IO ()
 process10DegreeImagesToMultiDegreeRadii     edgeDetector   = do
   jpegImage0 <-   readImage' "0"
@@ -236,75 +181,6 @@ process10DegreeImagesToMultiDegreeRadii     edgeDetector   = do
         readImage' fileName = readImage $ filePathBuilder fileName
 
 {-
-has getRedLaserLineSingleImage built right in, need another version where this could be brought in as a base function.
-process10DegreeImagesToMultiDegreeRadiiOfRedLaserLine  = do
-  jpegImage0 <-   readImage' "0"
-  jpegImage10 <-  readImage' "10"
-  jpegImage20 <-  readImage' "20"
-  jpegImage30 <-  readImage' "30"
-  jpegImage40 <-  readImage' "40"
-  jpegImage50 <-  readImage' "50"
-  jpegImage60 <-  readImage' "60"
-  jpegImage70 <-  readImage' "70"
-  jpegImage80 <-  readImage' "80"
-  jpegImage90 <-  readImage' "90"
-  jpegImage100 <-  readImage' "100"
-  jpegImage110 <-  readImage' "110"
-  jpegImage120 <-  readImage' "120"
-  jpegImage130 <-  readImage' "130"
-  jpegImage140 <-  readImage' "140"
-  jpegImage150 <-  readImage' "150"
-  jpegImage160 <-  readImage' "160"
-  jpegImage170 <-  readImage' "170"
-  jpegImage180 <-  readImage' "180"
-  jpegImage190 <-  readImage' "190"
-  jpegImage200 <-  readImage' "200"
-  jpegImage210 <-  readImage' "210"
-  jpegImage220 <-  readImage' "220"
-  jpegImage230 <-  readImage' "230"
-  jpegImage240 <-  readImage' "240"
-  jpegImage250 <-  readImage' "250"
-  jpegImage260 <-  readImage' "260"
-  jpegImage270 <-  readImage' "270"
-  jpegImage280 <-  readImage' "280"
-  jpegImage290 <-  readImage' "290"
-  jpegImage300 <-  readImage' "300"
-  jpegImage310 <-  readImage' "310"
-  jpegImage320 <-  readImage' "320"
-  jpegImage330 <-  readImage' "330"
-  jpegImage340 <-  readImage' "340"
-  jpegImage350 <-  readImage' "350"
-  
-
-  let
-      singleDegreeRadiiList :: [SingleDegreeRadii]
-      singleDegreeRadiiList =
-        [
-          setSingleDegreeRadii currImage currDegree
-          | currDegree <- [0,10..350]
-          | currImage <- [jpegImage0, jpegImage10, jpegImage20, jpegImage30, jpegImage40, jpegImage50, jpegImage60, jpegImage70, jpegImage80, jpegImage90, jpegImage100, jpegImage110,
-                          jpegImage120, jpegImage130, jpegImage140, jpegImage150, jpegImage160, jpegImage170, jpegImage180, jpegImage190, jpegImage200, jpegImage210, jpegImage220, jpegImage230,
-                          jpegImage240, jpegImage250, jpegImage260, jpegImage270, jpegImage280, jpegImage290, jpegImage300, jpegImage310, jpegImage320, jpegImage340,
-                          jpegImage340, jpegImage350, jpegImage10]
-       ]
-       ++
-       --read in the 0 degree image again as the 360 degree image, to ensure they are exactly the same.
-       case jpegImage0 of
-            Left err -> [(SingleDegreeRadii 360 [Radius 0])] 
-            Right (ImageYCbCr8 jpegImage0') -> [(SingleDegreeRadii 360 (map (Radius) (getRedLaserLineSingleImage jpegImage0')))]
-        
-      multiDegreeRadii = MultiDegreeRadii "theName" singleDegreeRadiiList
-  BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
-  putStrLn "done"
-  
-  where setSingleDegreeRadii imageAsRead currDegree =
-           case imageAsRead of
-             Left err -> (SingleDegreeRadii currDegree [Radius 0]) 
-             Right (ImageYCbCr8 jpegImage) -> (SingleDegreeRadii currDegree (map (Radius) (getRedLaserLineSingleImage jpegImage)))
-
-        readImage' fileName = readImage $ filePathBuilder fileName
-
-
 ===========================================================================================================
 This version uses Control.Monad to try to automate things, but always get the Left err msg out of the monad.
 Should try to write the json from within the monad, to see it it works ok.
@@ -342,34 +218,12 @@ processMultiDegreeImagesToRedLaserLine = do
         readImage' fileName = readImage $ filePathBuilder fileName
 
 -}
---TargetValue
-getRedLaserLineSingleImage :: TargetValue ->       (Image  PixelYCbCr8) -> [TargetValueIndex]
-getRedLaserLineSingleImage    laserLineTargetValue jpegImage = 
-  processSingleImageToReducedEachRowToTargetValueIndex jpegImage (extractCR) (averageValueOf) (indicesOfThePixelValuesGTE) laserLineTargetValue
+
+
+
+    
     
 
-{-
-Works, but it should have the redLaserLIne TargetValue passed in.
-getRedLaserLineSingleImage :: (Image  PixelYCbCr8) -> [TargetValueIndex]
-getRedLaserLineSingleImage jpegImage = 
-  processSingleImageToReducedEachRowToTargetValueIndex jpegImage (extractCR) (averageValueOf) (indicesOfThePixelValuesGTE) redLaserLine
-===========================================================================
-getRedLaserLineSingleImage :: (Image  PixelYCbCr8) -> [TargetValueIndex]
-getRedLaserLineSingleImage jpegImage = 
-  processSingleImageToReducedEachRowToTargetValueIndex jpegImage (extractCR) (averageValueOf) (indicesOfThePixelValuesGTE) redLaserLine
-====================================================================================
-getRedLaserLineSingleImage :: FilePath -> IO ()
-getRedLaserLineSingleImage filePath = do
-  jpegImage <-   readImage filePath
-  case jpegImage of
-    Left err -> putStrLn err
-    Right (ImageYCbCr8 jpegImage') -> print $ show $ processSingleImageToReducedEachRowToTargetValueIndex jpegImage' (extractCR) (averageValueOf) (indicesOfThePixelValuesGTE) redLaserLine
-    otherwise -> putStrLn "another format"
-===========================================
-getRedLaserLineSingleImage :: FilePath -> IO ()
-getRedLaserLineSingleImage filePath =
-  print $ show $ processSingleImageToReducedEachRowToTargetValueIndex filePath (extractCR) (averageValueOf) (indicesOfThePixelValuesGTE) redLaserLine
--}
 
 filePathBuilder :: FilePath -> FilePath
 filePathBuilder fileName = "src/Data/scanImages/" ++ fileName ++ ".JPG"
@@ -490,12 +344,7 @@ averageValueOf :: [Int] -> Double
 averageValueOf list =
   (fromIntegral $ L.sum list)  / (fromIntegral $ length list)
   
-type RedValue = Word8
-type AvgIndexPosition = Double
-type TargetValueIndex = Double
-type RowIndex = Int
-type TargetValue = Word8
-type ColumnIndex = Int
+
 
 redLaserLine :: TargetValue
 redLaserLine = 190
