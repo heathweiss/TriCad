@@ -6,10 +6,10 @@ module CornerPoints.HorizontalFaces(
   createBottomFacesWithVariableSlope,
   
   )where
-import CornerPoints.Create( Slope(..), Point(..), Origin(..), createCornerPoint, Angle(..),
-                       Radius(..))
+import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, Angle(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
-
+import CornerPoints.Points(Point(..))
+import CornerPoints.Radius(Radius(..))
 
 {- |Create a single CornerPoints.BottomRightLine, and add it to the head of [BottomLeftLine]. This will give a BottomFace.
 Then add the next BottomLeftLine to this BottomFace to get the next BottomFace. Continue through the [BottomLeftLine] till

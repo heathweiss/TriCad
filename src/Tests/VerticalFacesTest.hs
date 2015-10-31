@@ -3,8 +3,10 @@ module Tests.VerticalFacesTest(verticalFacesTestDo)where
 import Test.HUnit
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createHorizontallyAlignedCubes, createLeftFacesMultiColumns,
                                   SingleDegreeRadii(..), MultiDegreeRadii(..), TransposeFactor)
-import CornerPoints.Create(Slope(..), Point(..), Origin(..), createCornerPoint, Angle(..), Degree(..), Radius(..), flatXSlope, flatYSlope)
+import CornerPoints.Create(Slope(..), Origin(..), createCornerPoint, Angle(..), Degree(..), flatXSlope, flatYSlope)
 import CornerPoints.CornerPoints(CornerPoints(..))
+import CornerPoints.Points(Point(..))
+import CornerPoints.Radius(Radius(..))
 
 verticalFacesTestDo = do
   runTestTT createRightFacesTest

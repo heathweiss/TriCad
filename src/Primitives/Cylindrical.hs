@@ -7,19 +7,13 @@ Includes:
 
 module Primitives.Cylindrical(hello, cylinderHollow, cylinderSolid) where
 
-import CornerPoints.Create(
-  slopeAdjustedForVerticalAngle,
-  Slope(..),
-  Radius(..),
-  Angle(..),
-  flatXSlope,
-  flatYSlope,
-  )
+import CornerPoints.Create(slopeAdjustedForVerticalAngle, Slope(..), Angle(..), flatXSlope, flatYSlope)
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import CornerPoints.FaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace )
 import CornerPoints.FaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine)
+import CornerPoints.Radius(Radius(..))
 
 hello = do
   putStrLn "hello from cylindrical"

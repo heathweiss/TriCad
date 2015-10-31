@@ -1,7 +1,7 @@
 module Tests.TransformTest() where
 import Test.HUnit
 import Scan.Transform(pixelIndicesOfPixelValuesLTE, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
-import qualified CornerPoints.Create as MP ( Radius(..))
+import qualified CornerPoints.Radius as MP ( Radius(..))
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString as B
 import qualified  Data.ByteString.Char8 as BC (pack) 

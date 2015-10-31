@@ -7,9 +7,11 @@ module CornerPoints.VerticalFaces(
   SingleDegreeRadii(..),
   MultiDegreeRadii(..),
   TransposeFactor(..)) where
-import CornerPoints.Create(Slope(..), Point(..), Origin(..), createCornerPoint, Angle(..), Degree(..), Radius(..))
+import CornerPoints.Create(Slope(..), Origin(..), createCornerPoint, Angle(..), Degree(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import CornerPoints.Transpose (transposeZ)
+import CornerPoints.Points(Point(..))
+import CornerPoints.Radius(Radius(..))
                            
 
 

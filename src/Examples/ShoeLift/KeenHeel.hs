@@ -1,13 +1,6 @@
 module Examples.ShoeLift.KeenHeel where
 
-import CornerPoints.Create(
-  slopeAdjustedForVerticalAngle,
-  Slope(..),
-  Radius(..),
-  Angle(..),
-  flatXSlope,
-  flatYSlope,
-  )
+import CornerPoints.Create(slopeAdjustedForVerticalAngle, Slope(..), Angle(..), flatXSlope, flatYSlope )
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..),(+++>>))
@@ -19,7 +12,7 @@ import CornerPoints.FaceConversions(lowerFaceFromUpperFace, backBottomLineFromBo
                                           bottomFrontLineFromBackBottomLine, lowerFaceFromUpperFace)
 import CornerPoints.Transpose ( transposeZ, transposeX, transposeY)
 import CornerPoints.Debug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
-
+import CornerPoints.Radius(Radius(..))
 
 -------------------------------------------------------------------------- tread attachment and adaptor ----------------------------------------
 {-

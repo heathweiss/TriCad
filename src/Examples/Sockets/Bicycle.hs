@@ -1,13 +1,6 @@
 module Examples.Sockets.Bicycle (bicycleSocketDebug, bicycleSocketStlFile ) where
-import CornerPoints.Create(
-  slopeAdjustedForVerticalAngle,
-  createCornerPoint,
-  Slope(..),
-  Radius(..),
-  Angle(..),
-  flatXSlope,
-  flatYSlope,
-  )
+import CornerPoints.Create(slopeAdjustedForVerticalAngle, createCornerPoint, Slope(..), 
+  Angle(..), flatXSlope, flatYSlope)
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
@@ -17,6 +10,7 @@ import CornerPoints.FaceExtraction ( extractTopFace, extractBottomFrontLine, ext
 import CornerPoints.FaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine)
 import CornerPoints.Transpose ( transposeZ, transposeX)
 import CornerPoints.Debug((+++^?), CubeName(..), CubeDebug(..), CubeDebugs(..))
+import CornerPoints.Radius(Radius(..))
 
 bicycleSocketDebug = v0CubesDebug
 

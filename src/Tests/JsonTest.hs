@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Tests.JsonTest where
 import Test.HUnit
-import CornerPoints.Create(Radius(..))
+import CornerPoints.Radius(Radius(..))
 import Scan.Json
 import Data.Aeson
 import qualified Data.ByteString.Lazy as BS

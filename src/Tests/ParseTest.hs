@@ -7,7 +7,7 @@ import Control.Applicative
 import Data.Char
 import Data.Word
 import Control.Applicative
-import qualified CornerPoints.Create as MP (Radius(..))
+import qualified CornerPoints.Radius as MP (Radius(..))
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import qualified  Data.ByteString.Char8 as BC (pack) 
 import GHC.Word (Word8)

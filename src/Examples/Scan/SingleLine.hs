@@ -1,13 +1,7 @@
 module Examples.Scan.SingleLine() where
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.List.Split as LS
-import CornerPoints.Create(
-  Slope(..),
-  Radius(..),
-  flatXSlope,
-  flatYSlope,
-  
-  )
+import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope)
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), (++:), Faces(..))
 import Stl.StlCornerPoints((+++^))

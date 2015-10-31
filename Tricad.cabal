@@ -20,6 +20,7 @@ library
                    CornerPoints.Create, CornerPoints.FaceConversions,
                    CornerPoints.FaceExtraction,  CornerPoints.Transpose,
                    CornerPoints.VerticalFaces, CornerPoints.HorizontalFaces,
+                   CornerPoints.Radius
                    --math
                    Math.Trigonometry,
                    --stl

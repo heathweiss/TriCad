@@ -4,11 +4,9 @@ module CornerPoints.Create(
   adjustRadiusForSlope,
   createCornerPoint,
   Slope(..),
-  Radius(..),
   flatXSlope,
   flatYSlope,
   Degree(..),
-  Point(..),
   Origin(..),
   Angle(..),
   ) where
@@ -16,6 +14,7 @@ import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import Math.Trigonometry(sinDegrees, cosDegrees)
 import CornerPoints.Transpose (transposeZ)
+import CornerPoints.Radius(Radius(..))
 
 {--------------------overview----------------------------------------
 Creates a radial shape using polar cood's.
@@ -146,13 +145,7 @@ type Origin = Point
 
  
 
-{-|
-Represents a radius of a circular shape, which is what all shapes in math polar are created from.
--}
-data Radius = Radius {radius :: Double}
-             | DownRadius {radius :: Double} -- | Radius slopes down from origin z-axis. 
-             | UpRadius {radius :: Double}
-   deriving (Show, Eq)
+
 
 {-
 There are 4 quadrants to work with therfore the Quadarant1/2/3/4Angle

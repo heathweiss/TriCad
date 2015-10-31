@@ -6,7 +6,6 @@ import CornerPoints.Points(Point(..))
 import CornerPoints.Create(
   slopeAdjustedForVerticalAngle,
   adjustRadiusForSlope,
-  Radius(..),
   createCornerPoint,
   Slope(..),
   Angle(..),
@@ -14,7 +13,7 @@ import CornerPoints.Create(
   flatYSlope,
   )
 import Math.Trigonometry(sinDegrees,cosDegrees)
-
+import CornerPoints.Radius(Radius(..))
 
 
 mathPolarTestDo = do

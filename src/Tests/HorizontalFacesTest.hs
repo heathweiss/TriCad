@@ -3,7 +3,9 @@ module Tests.HorizontalFacesTest (horizontalFacesTestDo) where
 import Test.HUnit
 import CornerPoints.HorizontalFaces(createBottomFaces, createBottomFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.CornerPoints(CornerPoints(..), (+++))
-import CornerPoints.Create(Point(..),flatXSlope,flatYSlope, Slope(..), Angle(..), Radius(..))
+import CornerPoints.Create(flatXSlope,flatYSlope, Slope(..), Angle(..))
+import CornerPoints.Points(Point(..))
+import CornerPoints.Radius(Radius(..))
 
 horizontalFacesTestDo = do
     --------------------bottom/top faces------------------
