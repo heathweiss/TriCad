@@ -1,7 +1,8 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE ParallelListComp #-}
-module Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii,  TargetValueIndex(..), ofThe, forThe, andThen,
-                        getThePixelsRightOfCenter, removeLeftOfCenterPixels, getRedLaserLineSingleImage) where
+module Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii,  TargetValueIndex(..), ofThe, forThe, andThen, 
+                        getThePixelsRightOfCenter, removeLeftOfCenterPixels, getRedLaserLineSingleImage, convertPixelsToMillmeters,
+                        calculateMillimetersFromPixelsRightOfCenter) where
 import Codec.Picture.Jpg
 import Codec.Picture
 import Codec.Picture.Types
@@ -17,6 +18,7 @@ import Control.Monad
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Scan.Json
 import Data.Aeson
+import Math.Trigonometry(sinDegrees )
 
 
 type RedValue = Word8
@@ -27,13 +29,24 @@ type RowIndex = Int
 type TargetValue = Word8
 type ColumnIndex = Int
 type AdjustmentFactor = Double
+type NumberOfPixels = Double
+type PixelToMillmeterConversionFactor = Double
+type Millimeters = Double
+type Angle = Double
 
 --ToDo: Create a DSL module, perhaps in a helper folder, for DSL helpers like this.
 ofThe = id
 forThe = id
 andThen = id
 
+calculateMillimetersFromPixelsRightOfCenter :: PixelToMillmeterConversionFactor ->  NumberOfPixels -> Angle ->  Millimeters
+calculateMillimetersFromPixelsRightOfCenter    conversionFactor                    pixelCount        angle  =
+  convertPixelsToMillmeters (pixelCount / (sinDegrees angle)) conversionFactor
 
+{- | Convert pixels to millimeters give pixels/millimeter.-}
+convertPixelsToMillmeters ::  NumberOfPixels -> PixelToMillmeterConversionFactor             -> Millimeters
+convertPixelsToMillmeters     pixels    pixelsPerMillimeter =
+  pixels / pixelsPerMillimeter
 
 removeLeftOfCenterPixels :: CenterIndex -> CenterIndex -> RowIndex -> RowIndex -> AdjustmentFactor
 removeLeftOfCenterPixels    btmCenterIndex topCenterIndex totalRows   currentRow =

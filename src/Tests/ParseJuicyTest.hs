@@ -1,14 +1,35 @@
 module Tests.ParseJuicyTest (parseJuicyTestDo) where
 import Test.HUnit
-import Scan.ParseJuicy( getThePixelsRightOfCenter,
+import Scan.ParseJuicy( getThePixelsRightOfCenter, convertPixelsToMillmeters, calculateMillimetersFromPixelsRightOfCenter,
                        removeLeftOfCenterPixels, TargetValueIndex(..), ofThe, forThe, andThen)
 
 parseJuicyTestDo = do
-
-  --adjust index of radius
+  runTestTT calculateRadiusFromPixelsRightOfCenterTest
   
+  runTestTT calculateMillimetersTest
+  --get pixels right of center
   runTestTT adjustPixelIndexForLeftSlopeTestRedo
+
+{-
+calculateMillimetersFromPixelsRightOfCenter :: PixelToMillmeterConversionFactor -> NumberOfPixels -> Angle ->  Millimeters
+calculateMillimetersFromPixelsRightOfCenter    conversionFactor                    pixelCount        angle  =
+  (pixelCount / (sinDegrees angle)) * conversionFactor
+
+-}
+calculateRadiusFromPixelsRightOfCenterTest = TestCase $ assertEqual
+  ("calculate Radius From Pixels Right Of Center Test")
+  (2)
+  (let pixelsPerMillemter = 100/1
+   in  calculateMillimetersFromPixelsRightOfCenter pixelsPerMillemter 100 30
+       
+  )
   
+calculateMillimetersTest = TestCase $ assertEqual
+  ("calculate millimeters from pixels")
+  (1)
+  (let pixelsPerMillemter = 100/1
+   in  convertPixelsToMillmeters 100 pixelsPerMillemter
+  )
   
 
 {-
