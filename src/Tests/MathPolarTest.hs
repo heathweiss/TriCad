@@ -30,7 +30,7 @@ mathPolarTestDo = do
 
 
   
- 
+  {-
   putStrLn "adjust radius for slope"
   runTestTT adjustRadiusForSlopeTestRad10PosX10PosY0XY10
   runTestTT adjustRadiusForSlopeTestRad10PosX0PosY10XY10
@@ -51,7 +51,8 @@ mathPolarTestDo = do
   runTestTT adjustRadiusForSlopeTestRad10PosX1PosY10XY350
   runTestTT adjustRadiusForSlopeTestRad10PosX10NegY1XY190
   runTestTT adjustRadiusForSlopeTestRad10PosX1NegY1oXY190
-
+  -}
+  
   {-Have a look at the bottom front right corner first, as this is the first corner gen'd.-}
   putStrLn "\n\n"
   putStrLn "createCornerPoint tests"
@@ -405,6 +406,7 @@ adjustRadiusForSlope :: Radius -> Slope  -> Radius
 =====================================================================================================================================
                                           non- exhaustive pattern
 -}
+{-
 adjustRadiusForSlopeTestRad10PosX10PosY0XY10 = TestCase $ assertEqual 
   "adjustRadiusForSlopeTestRad10PosX10PosY0XY10" (DownRadius 9.857785663826117) (adjustRadiusForSlope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (Angle 10)))
 
@@ -573,7 +575,7 @@ adjustedRadius = Rad * cos(xySlope) = 10 * cos(10.021725707787) = 9.84741837408 
 adjustRadiusForSlopeTestRad10PosX1PosY10XY350 = TestCase $ assertEqual 
   "adjustRadiusForSlopeTestRad10PosX1PosY10XY350" (DownRadius 9.84741837407899) (adjustRadiusForSlope (Radius 10) (slopeAdjustedForVerticalAngle (PosXSlope 1) (PosYSlope 10) (Angle 350)))
 
-
+-}
 {--------------------------------------------Create CornerPonts and test them.----------------------------------------------------------}
 
 {-This is a bottom front right corner with no z-slope.

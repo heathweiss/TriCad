@@ -2,7 +2,7 @@
 {-# LANGUAGE ParallelListComp #-}
 module Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii,  TargetValueIndex(..), ofThe, forThe, andThen, 
                         getThePixelsRightOfCenter, removeLeftOfCenterPixels, getRedLaserLineSingleImage, convertPixelsToMillmeters,
-                        calculateMillimetersFromPixelsRightOfCenter) where
+                        calculateRadiusFromPixelsRightOfCenter) where
 import Codec.Picture.Jpg
 import Codec.Picture
 import Codec.Picture.Types
@@ -30,23 +30,29 @@ type TargetValue = Word8
 type ColumnIndex = Int
 type AdjustmentFactor = Double
 type NumberOfPixels = Double
-type PixelToMillmeterConversionFactor = Double
+type PixelsPerMillimeter = Double
 type Millimeters = Double
-type Angle = Double
+type CameraAngle = Double
 
 --ToDo: Create a DSL module, perhaps in a helper folder, for DSL helpers like this.
 ofThe = id
 forThe = id
 andThen = id
 
-calculateMillimetersFromPixelsRightOfCenter :: PixelToMillmeterConversionFactor ->  NumberOfPixels -> Angle ->  Millimeters
-calculateMillimetersFromPixelsRightOfCenter    conversionFactor                    pixelCount        angle  =
-  convertPixelsToMillmeters (pixelCount / (sinDegrees angle)) conversionFactor
+{- |Calculate the Radius, which is the hypotenuse, of angle created by a CameraAngle, and the number of pixels right of center.
+This is the actual radius of the scanned object for the current degree.
+-}
+calculateRadiusFromPixelsRightOfCenter :: PixelsPerMillimeter ->  NumberOfPixels -> CameraAngle ->  Radius
+calculateRadiusFromPixelsRightOfCenter    pixelsPerMillimeter     numberOfPixels    cameraAngle  =
+  let convertPixelsToMillmetersForThe = convertPixelsToMillmeters pixelsPerMillimeter
+      numberOfRadiusPixels = (numberOfPixels / (sinDegrees cameraAngle))
+  in  Radius $ convertPixelsToMillmetersForThe  numberOfRadiusPixels
 
-{- | Convert pixels to millimeters give pixels/millimeter.-}
-convertPixelsToMillmeters ::  NumberOfPixels -> PixelToMillmeterConversionFactor             -> Millimeters
-convertPixelsToMillmeters     pixels    pixelsPerMillimeter =
+{- | Convert pixels to millimeters given the  pixels/millimeter and the number of pixels.-}
+convertPixelsToMillmeters ::   PixelsPerMillimeter  -> NumberOfPixels -> Millimeters
+convertPixelsToMillmeters      pixelsPerMillimeter     pixels         =
   pixels / pixelsPerMillimeter
+
 
 removeLeftOfCenterPixels :: CenterIndex -> CenterIndex -> RowIndex -> RowIndex -> AdjustmentFactor
 removeLeftOfCenterPixels    btmCenterIndex topCenterIndex totalRows   currentRow =

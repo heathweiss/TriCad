@@ -310,8 +310,12 @@ Shorten the radius on the xy plane, for the changes in the z plane.
 As per standard 3D polar to cartesian conversion methods.
 -}
 adjustRadiusForSlope :: Radius -> Slope -> Radius 
+--adjustRadiusForSlope (Radius radius) (PosSlope xySlope) = UpRadius $ radius * (cosDegrees (xySlope))
+adjustRadiusForSlope (Radius radius) xySlope = Radius $ radius * (cosDegrees (slope xySlope))
+{-
+adjustRadiusForSlope :: Radius -> Slope -> Radius 
 adjustRadiusForSlope (Radius radius) (PosSlope xySlope) = UpRadius $ radius * (cosDegrees (xySlope))
 adjustRadiusForSlope (Radius radius) (NegSlope xySlope) = DownRadius $ radius * (cosDegrees (xySlope))
-
+-}
 
   
