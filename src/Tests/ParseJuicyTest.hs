@@ -1,7 +1,7 @@
 module Tests.ParseJuicyTest (parseJuicyTestDo) where
 import Test.HUnit
-import Scan.ParseJuicy( getThePixelsRightOfCenter, convertPixelsToMillmeters, calculateRadiusFromPixelsRightOfCenter,
-                       removeLeftOfCenterPixels, TargetValueIndex(..), ofThe, forThe, andThen)
+import Scan.ParseJuicy( getThePixelsRightOfCenter, convertPixelsToMillmeters, calculateRadiusFrom,
+                       removeLeftOfCenterPixels, TargetValueIndex(..), ofThe, forThe, andThen, adjustedFor, andThe)
 import CornerPoints.Radius(Radius(..))
 
 parseJuicyTestDo = do
@@ -19,9 +19,11 @@ calculateMillimetersFromPixelsRightOfCenter    conversionFactor                 
 -}
 calculateRadiusFromPixelsRightOfCenterTest = TestCase $ assertEqual
   ("calculate Radius From Pixels Right Of Center Test")
-  (Radius 2)
+  (Radius 4)
   (let pixelsPerMillemter = 100/1
-   in  calculateRadiusFromPixelsRightOfCenter pixelsPerMillemter 100 30
+       pixelsRightOfCenter = 200
+       cameraAngle = 30
+   in  calculateRadiusFrom  pixelsRightOfCenter (adjustedFor pixelsPerMillemter) $ andThe cameraAngle
        
   )
   
