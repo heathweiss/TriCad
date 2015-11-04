@@ -14,6 +14,7 @@ import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope)
 import Stl.StlCornerPoints((+++^))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
+import Scan.Filter(runningAverage, runningAvgSingleDegreeRadii)
 
 writeStlFileFromScanWrapper :: IO ()
 writeStlFileFromScanWrapper = do
@@ -32,11 +33,12 @@ will need to change the number of of center front triangles
 This is a support function, not to be called directly.
 -}
 writeStlFileFromScan :: MultiDegreeRadii -> IO ()
-writeStlFileFromScan scan = 
-  let origin = (Point{x_axis=0, y_axis=0, z_axis=50})
+writeStlFileFromScan (MultiDegreeRadii name' degrees') = 
+  let smoothedScan = MultiDegreeRadii name' (map (runningAvgSingleDegreeRadii 10) degrees')
+      origin = (Point{x_axis=0, y_axis=0, z_axis=50})
       heightPerPixel = 1/pixelsPerMMVertical
-      leftFaces = createLeftFacesMultiColumns origin (tail $ degrees scan) flatXSlope flatYSlope [0,heightPerPixel..]
-      rightFaces = createRightFaces origin (head $ degrees scan) flatXSlope flatYSlope [0,heightPerPixel..]
+      leftFaces = createLeftFacesMultiColumns origin (tail $ degrees smoothedScan) flatXSlope flatYSlope [0,heightPerPixel..]
+      rightFaces = createRightFaces origin (head $ degrees smoothedScan) flatXSlope flatYSlope [0,heightPerPixel..]
       frontTriangles = [FaceFront | x <- [1..]]
       triangles =
        zipWith  (+++^)

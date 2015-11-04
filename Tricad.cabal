@@ -29,7 +29,7 @@ library
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.HorizontalFacesTest,
                    Tests.TransformTest, Tests.JsonTest, Tests.ParseTest,
-                   Tests.VerticalFacesTest, Tests.ParseJuicyTest
+                   Tests.VerticalFacesTest, Tests.ParseJuicyTest, Tests.ScanFilterTest
                    --Examples
                    -- Example ShoeLifts
                    Examples.ShoeLift.KeenToe, Examples.ShoeLift.KeenHeel
@@ -50,7 +50,7 @@ library
                    --Shapes
                    Primitives.Cylindrical, Primitives.Cubical
                    --Scanning
-                   Scan.Transform,
+                   Scan.Transform, Scan.Filter,
                    Scan.Json, Scan.Parse, Scan.ParseJuicy
   -- other-modules:       
   -- other-extensions:    

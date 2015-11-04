@@ -9,6 +9,7 @@ import Tests.ParseTest(parseTestDo)
 import Tests.HorizontalFacesTest (horizontalFacesTestDo)
 import Tests.VerticalFacesTest(verticalFacesTestDo)
 import Tests.ParseJuicyTest (parseJuicyTestDo)
+import Tests.ScanFilterTest (scanFilterTestDo)
 
 runAllTestsDo = do
   putStrLn "corner points debug test"
@@ -29,4 +30,6 @@ runAllTestsDo = do
   verticalFacesTestDo
   putStrLn "parseJuicy test"
   parseJuicyTestDo
+  putStrLn "scan.filter test"
+  scanFilterTestDo
   
