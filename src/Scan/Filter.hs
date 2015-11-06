@@ -1,7 +1,7 @@
 module Scan.Filter(runningAverage, averageValueOf, runningAvgSingleDegreeRadii) where
-import CornerPoints.Radius(Radius(..))
+import CornerPoints.Radius(SingleDegreeRadii(..),Radius(..))
 import qualified Data.List as L
-import CornerPoints.VerticalFaces(SingleDegreeRadii(..))
+--import CornerPoints.VerticalFaces(SingleDegreeRadii(..))
 
 type NumberOfRadius = Double
 {-

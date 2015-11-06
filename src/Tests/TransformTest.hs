@@ -1,7 +1,7 @@
 module Tests.TransformTest() where
 import Test.HUnit
 import Scan.Transform(pixelIndicesOfPixelValuesLTE, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
-import qualified CornerPoints.Radius as MP ( Radius(..))
+import qualified CornerPoints.Radius as MP (SingleDegreeRadii(..), Radius(..))
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString as B
 import qualified  Data.ByteString.Char8 as BC (pack) 
@@ -9,7 +9,7 @@ import GHC.Word (Word8)
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import Data.Attoparsec.Char8
 import Scan.Parse(SingleDegreePixelValues(..), parseCSVPixelValues, MultiDegreePixelValues(..),  )
-import qualified CornerPoints.VerticalFaces as VF (SingleDegreeRadii(..), MultiDegreeRadii(..))
+import qualified CornerPoints.VerticalFaces as VF ( MultiDegreeRadii(..))
 
 
 transformTest = do
@@ -54,8 +54,8 @@ reduceRowsSimpleTest = TestCase $ assertEqual
 
 reduceScanRowsTest = TestCase $ assertEqual
   "get a Scan from a RawScan"
-  (Right(VF.MultiDegreeRadii {VF.name = "myScan", VF.degrees = [VF.SingleDegreeRadii {VF.degree = 1.0, VF.radii = [MP.Radius {MP.radius = 0.5}]},
-                                     VF.SingleDegreeRadii {VF.degree = 2.0, VF.radii = [MP.Radius {MP.radius = 0.0}]}]}))
+  (Right(VF.MultiDegreeRadii {VF.name = "myScan", VF.degrees = [MP.SingleDegreeRadii {MP.degree = 1.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},
+                                     MP.SingleDegreeRadii {MP.degree = 2.0, MP.radii = [MP.Radius {MP.radius = 0.0}]}]}))
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseCSVPixelValues)
         scan = multiDegreePixelValuesToMultiDegreeRadii  "myScan" (pixelIndicesAverageToRadius . pixelIndicesOfPixelValuesLTE 2) rawScan
     in  scan >>= reduceScanRows 2 

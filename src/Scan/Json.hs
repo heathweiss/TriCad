@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Scan.Json() where
-import CornerPoints.Radius(Radius(..))
-import CornerPoints.VerticalFaces(SingleDegreeRadii(..), MultiDegreeRadii(..))
+import CornerPoints.Radius(SingleDegreeRadii(..), Radius(..))
+import CornerPoints.VerticalFaces( MultiDegreeRadii(..))
 import Data.Aeson
 import Control.Applicative
 import Control.Monad

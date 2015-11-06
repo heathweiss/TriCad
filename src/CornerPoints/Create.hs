@@ -6,7 +6,6 @@ module CornerPoints.Create(
   Slope(..),
   flatXSlope,
   flatYSlope,
-  Degree(..),
   Origin(..),
   Angle(..),
   ) where
@@ -19,7 +18,7 @@ import CornerPoints.Radius(Radius(..))
 {--------------------overview----------------------------------------
 Creates a radial shape using polar cood's.
 
-0 degrees is as the max neg y axis, and rotates clockwise into the pos x axis.
+ degrees is as the max neg y axis, and rotates clockwise into the pos x axis.
 
 For some reason, it has a slight drift. Eg: At 90 degrees, the y axis should be 0,
 but it drifts off the y-axis.
@@ -136,8 +135,6 @@ Functions for calculating the current x and y values adjusted for xy degrees
 flatXSlope = PosXSlope 0 
 flatYSlope = PosYSlope 0
 
--- |Degree of a circle.
-type Degree = Double
   
 -- |The center of a radial shape.
 type Origin = Point

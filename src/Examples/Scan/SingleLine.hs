@@ -17,7 +17,8 @@ import Data.Aeson
 import Scan.Json()
 import qualified Scan.Parse as PA  ( MultiDegreePixelValues(..), parseCSVPixelValues)
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createHorizontallyAlignedCubes,
-                           SingleDegreeRadii(..), MultiDegreeRadii(..))
+                            MultiDegreeRadii(..))
+import CornerPoints.Radius(SingleDegreeRadii(..))
 import Scan.Transform (reduceScanRows)
 --create a [Word8] for: Right(B.pack $ strToWord8s)
 --which gets a bytstring of word8

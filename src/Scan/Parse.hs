@@ -17,9 +17,9 @@ import Data.Attoparsec.ByteString.Char8
 import Control.Applicative
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BS
-import qualified CornerPoints.Create as MP (Degree)
-import CornerPoints.VerticalFaces(SingleDegreeRadii(..))
---import CornerPoints.Radius(Radius(..))
+--import qualified CornerPoints.Create as MP (Degree)
+--import CornerPoints.VerticalFaces()
+import CornerPoints.Radius as MP (Degree)
 
 --used to remvove leading/trailing spaces.
 --need testing in place, then see if '\t' can be removed.
