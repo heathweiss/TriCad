@@ -11,7 +11,7 @@ import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftF
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), (++:), Faces(..))
 import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope)
-import Stl.StlCornerPoints((+++^))
+import Stl.StlCornerPoints((+++^), (++++^))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
 import Scan.Filter(runningAverage, runningAvgSingleDegreeRadii)
@@ -21,31 +21,24 @@ import CornerPoints.FaceConversions(backFaceFromFrontFace)
 import CornerPoints.Transpose (transposeZ)
 {-
 read in the Multidegree json file, which has valid Radii,
-and process it into stl -}
-reducedMultiDegreeRadiiRowsAndWriteStlWrapper :: IO ()
-reducedMultiDegreeRadiiRowsAndWriteStlWrapper = do
+and process it into stl using whatever function required for the current shape. -}
+loadMDRAndPassToProcessor :: IO ()
+loadMDRAndPassToProcessor = do
   contents <- BL.readFile "src/Data/scanFullData.json"
-  
+  let removeDefectiveTopRow :: MultiDegreeRadii -> MultiDegreeRadii
+      removeDefectiveTopRow (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' [(SingleDegreeRadii degree'' (tail radii''))  | (SingleDegreeRadii degree'' radii'') <- degrees']
+      rowReductionFactor = 100
+     
   case (decode contents) of
    
       Just (MultiDegreeRadii name' degrees') ->
-        reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl (MultiDegreeRadii name' degrees')
-        --getAnExtension (MultiDegreeRadii name' degrees')
+        reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
+        
       Nothing                                ->
         putStrLn "File not decoded"
-getAnExtension :: MultiDegreeRadii -> IO ()
-getAnExtension multiDegreeRadii =
-  let frontAndBackTriangles = [FacesBackFront | x <- [1..]]
-      reducedScanBack = reduceScan rowReductionFactor multiDegreeRadii
-      reducedScanFront = transpose (+2) reducedScanBack
-      rowReductionFactor = 100
-      getTopCubes =  (head cubes) ++++ (map (transposeZ (+500). extractTopFace)  (head cubes)) 
-      cubes = createMainSocketCubesFromFrontAndBackFaces reducedScanFront reducedScanBack
-      
-      
-  in
-      print $ show $ getTopCubes
-        
+
+
+
 {-
 reduce the rows of the MulitiDegreeRadii by a factor of 100
 chop of the top layer as it has an error,
@@ -54,61 +47,74 @@ output to stl
 --do not call directly.
 --called via reducedRowsMultiDegreeScanWrapper as it reads the json file-}
 reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl :: MultiDegreeRadii -> IO ()
-reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl (MultiDegreeRadii name' degrees') =
-  let multiDegreeRadii = MultiDegreeRadii name' [(SingleDegreeRadii degree'' (tail radii''))  | (SingleDegreeRadii degree'' radii'') <- degrees']
-      frontAndBackTriangles = [FacesBackFront | x <- [1..]]
-      getRidOfDefectiveTopRow = [FacesNada | x <- [1..]]
-      --topOfSocket = [FacesBackFrontTop | x <- [1..]]
-      --topOfSocket =  [FacesBackFrontTop | x <- [0..1]] ++ [FacesNada | x <- [1..26]] ++ [FacesBackFrontTop | x <- [1..]]
-      topOfSocket = [FacesBackFrontLeftTop] ++ [FacesNada | x <- [2..30]] ++ [FacesBackFrontRightTop]   ++  [FacesBackFrontTop | x <- [31..]]
-      --openUpOneSide =  [frontAndBackTriangles | x <- [1..5]]
-      openUpOneSide =  [openOneSideSingleLayer| x <- [1..6]]
-      --openOneSideSingleLayer = [FacesBackFrontRight]   [FacesBackFront | x <- [0..1]] ++ [FacesNada | x <- [1..24]] ] -- ++ [FacesBackFrontLeft | x <- [1..]
-      openOneSideSingleLayer = [FacesBackFrontLeft] ++ [FacesNada | x <- [2..30]] ++ [FacesBackFrontRight]   ++  [FacesBackFront | x <- [31..]]
-      topOfMainBodyOfSocket =  (FacesBackFront : [FacesBackFrontTop | x <- [2..30]]) ++ [FacesBackFront] ++ [FacesBackFront | x <- [32..]]
-      mainBodyOfSocket = [frontAndBackTriangles | x <- [1..8]]
-      btmOfSocket = [FacesBackBottomFront | x <- [1..]]
-      reducedScanBack = reduceScan rowReductionFactor multiDegreeRadii
-      reducedScanFront = transpose (+2) reducedScanBack
-      rowReductionFactor = 100
-      --getTopCubes =  (map (transposeZ (+30). extractTopFace)  (head  cubes)) ++++ (head cubes)
-      extendTopCubes = (map (transposeZ (+30). extractTopFace)  (head  cubes)) ++++ (map ( extractBottomFace)  (head  cubes))
-      cubes = createMainSocketCubesFromFrontAndBackFaces reducedScanFront reducedScanBack
+reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl innerMDR =
+  let extensionFaceBuilder :: (Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]
+      extensionFaceBuilder leftFace emptyFaces rightFace fillerFaces =
+        [leftFace] ++ [emptyFaces | x <- [2..30]] ++ [rightFace]   ++  [fillerFaces | x <- [31..]]
+
+      topOfExtension = extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)
+      bodyOfExtension = [
+                        extensionFaceBuilder (FacesBackFrontLeft)(FacesNada)(FacesBackFrontRight)(FacesBackFront)
+                        | x <- [1..6]
+                      ]
+      topOfMainBody = extensionFaceBuilder (FacesBackFront) (FacesBackFrontTop) (FacesBackFront) (FacesBackFront)
+      mainBody = [
+                           [FacesBackFront | x <- [1..]]
+                           | x <- [1..8]
+                         ] 
+      btmOfMainBody = [FacesBackBottomFront | x <- [1..]]
+
+
+      outerMDR = transpose (+2) innerMDR
+      mainBodyCubes = createMainSocketCubesFromFrontAndBackFaces outerMDR innerMDR
+      extensionCubes = (map (transposeZ (+30). extractTopFace)  (head  mainBodyCubes)) ++++ (map ( extractBottomFace)  (head  mainBodyCubes))
       
+
       triangles =
-       zipWith  (+++^)
-        (   topOfSocket : (  mainBodyOfSocket ++: topOfMainBodyOfSocket ++ openUpOneSide )   ++:  btmOfSocket) 
-        ( extendTopCubes : tail cubes)
-      stlFile = newStlShape "walker socket" $ concat triangles
+        (   topOfExtension : (  mainBody ++: topOfMainBody ++ bodyOfExtension )   ++:  btmOfMainBody)
+        ++++^
+        ( extensionCubes : tail mainBodyCubes)
+
+      stlFile = newStlShape "walker socket" triangles
   in
       writeStlToFile stlFile
 {-
 reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl :: MultiDegreeRadii -> IO ()
-reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl multiDegreeRadii =
-  let frontAndBackTriangles = [FacesBackFront | x <- [1..]]
+reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl innerMDR =
+  let extensionFaceBuilder :: (Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]
+      extensionFaceBuilder leftFace emptyFaces rightFace fillerFaces =
+        [leftFace] ++ [emptyFaces | x <- [2..30]] ++ [rightFace]   ++  [fillerFaces | x <- [31..]]
+
+      topOfExtension = extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)
+      bodyOfExtension = [
+                        extensionFaceBuilder (FacesBackFrontLeft)(FacesNada)(FacesBackFrontRight)(FacesBackFront)
+                        | x <- [1..6]
+                      ]
+      topOfMainBody = extensionFaceBuilder (FacesBackFront) (FacesBackFrontTop) (FacesBackFront) (FacesBackFront)
+      mainBody = [
+                           [FacesBackFront | x <- [1..]]
+                           | x <- [1..8]
+                         ] 
+      btmOfMainBody = [FacesBackBottomFront | x <- [1..]]
+
+
+      outerMDR = transpose (+2) innerMDR
+      mainBodyCubes = createMainSocketCubesFromFrontAndBackFaces outerMDR innerMDR
+      extensionCubes = (map (transposeZ (+30). extractTopFace)  (head  mainBodyCubes)) ++++ (map ( extractBottomFace)  (head  mainBodyCubes))
       
-      getRidOfDefectiveTopRow = [FacesNada | x <- [1..]]
-      --topOfSocket = [FacesBackFrontTop | x <- [1..]]
-      topOfSocket =  [FacesBackFrontTop | x <- [0..1]] ++ [FacesNada | x <- [1..26]] ++ [FacesBackFrontTop | x <- [1..]]
-      --openUpOneSide =  [frontAndBackTriangles | x <- [1..5]]
-      openUpOneSide =  [openOneSideSingleLayer| x <- [1..5]]
-      openOneSideSingleLayer = [FacesBackFront | x <- [0..1]] ++ [FacesNada | x <- [1..26]] ++ [FacesBackFront | x <- [1..]]
-      mainBodyOfSocket = [frontAndBackTriangles | x <- [1..10]]
-      btmOfSocket = [FacesBackBottomFront | x <- [1..]]
-      reducedScanBack = reduceScan rowReductionFactor multiDegreeRadii
-      reducedScanFront = transpose (+2) reducedScanBack
-      rowReductionFactor = 100
-      
-      cubes = createMainSocketCubesFromFrontAndBackFaces reducedScanFront reducedScanBack
+
       triangles =
-       zipWith  (+++^)
-        (getRidOfDefectiveTopRow :  topOfSocket : (  mainBodyOfSocket ++ openUpOneSide) ++:  btmOfSocket) 
-        (cubes)
-      stlFile = newStlShape "walker socket" $ concat triangles
+        (   topOfExtension : (  mainBody ++: topOfMainBody ++ bodyOfExtension )   ++:  btmOfMainBody)
+        ++++^
+        ( extensionCubes : tail mainBodyCubes)
+      stlFile = newStlShape "walker socket" triangles
   in
       writeStlToFile stlFile
 
 -}
+
+
+
 createMainSocketCubesFromFrontAndBackFaces ::  MultiDegreeRadii ->   MultiDegreeRadii -> [[CornerPoints]]
 createMainSocketCubesFromFrontAndBackFaces multiDegreeRadiiOuter multiDegreeRadiiInner =
   [
