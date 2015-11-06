@@ -5,12 +5,12 @@ transposeY
 ) where
 import CornerPoints.CornerPoints
 import CornerPoints.Points(Point(..), transposeZ)
-import CornerPoints.Transposable(Transpose, transposeX, transposeY, transposeZ)
+import CornerPoints.Transposable(TransposePoint, transposeX, transposeY, transposeZ)
 ------------------------------------- transposing cubes/points ----------------------------------------------
 {-
 Used for: changing points by adding values, as opposed to mulipling with the scalePoints
 -}
-instance Transpose CornerPoints where
+instance TransposePoint CornerPoints where
  
   ---------------- z-axis ----------------------
 

@@ -22,7 +22,8 @@ the use of TriCad.MathPolar module.
 -}
 
 
-module Scan.Transform(pixelIndicesOfPixelValuesLTE, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, RowReductionFactor(..), multiDegreePixelValuesToMultiDegreeRadii ) where
+module Scan.Transform(pixelIndicesOfPixelValuesLTE, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, reduceScan ,
+                     RowReductionFactor(..), multiDegreePixelValuesToMultiDegreeRadii ) where
 import qualified Data.List as L
 import CornerPoints.Radius( Radius(..))
 import qualified  Scan.Parse as PA  (MultiDegreePixelValues(..), PixelValue(..),SingleDegreePixelValues(..))
@@ -92,7 +93,13 @@ reduceScanRows reduceFactor scan
   | otherwise =
      let degreesReduced = [ SingleDegreeRadii {degree=(degree x),  radii = (reduceRows reduceFactor $ radii x)} | x <- degrees scan]
      in  Right $  scan {degrees=degreesReduced}
-        
+
+reduceScan :: Int -> MultiDegreeRadii -> MultiDegreeRadii
+reduceScan reduceFactor scan =
+  
+     let degreesReduced = [ SingleDegreeRadii {degree=(degree x),  radii = (reduceRows reduceFactor $ radii x)} | x <- degrees scan]
+     in  scan {degrees=degreesReduced}
+
 {- Take every xth element from a list.
 Used for: reduce rows from the raw source data, as the usual 480 rows from an
 image, is probably overkill for a 3D printer.

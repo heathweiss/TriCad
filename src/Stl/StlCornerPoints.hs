@@ -176,6 +176,12 @@ getTriangles (FacesBackFront) c = concat
   (getTriangles FaceFront c)
  ] 
 
+getTriangles (FacesBackFrontLeft) c = concat
+ [(getTriangles FaceBack c),
+  (getTriangles FaceLeft c),
+  (getTriangles FaceFront c)
+ ]
+
 getTriangles (FacesBackFrontLeftRight) c = concat
  [(getTriangles FaceBack c),
   (getTriangles FaceLeft c),
@@ -196,6 +202,12 @@ getTriangles (FacesBackFrontLeftTop) c = concat
   (getTriangles FaceLeft c),
   (getTriangles FaceFront c),
   (getTriangles FaceTop c)
+ ]
+
+getTriangles (FacesBackFrontRight) c = concat
+ [(getTriangles FaceBack c),
+  (getTriangles FaceRight c),
+  (getTriangles FaceFront c)
  ]
 
 getTriangles (FacesBackFrontTop) c = concat

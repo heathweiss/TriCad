@@ -1,5 +1,5 @@
 module CornerPoints.Points (Point(..), transposeZ) where
-import CornerPoints.Transposable(Transpose, transposeX, transposeY, transposeZ)
+import CornerPoints.Transposable(TransposePoint, transposeX, transposeY, transposeZ)
 {-------------------------- Point------------------------------
 Points in 3D geometry.
 
@@ -41,7 +41,7 @@ instance Eq Point where
       | otherwise = False
 
 
-instance Transpose Point where
+instance TransposePoint Point where
   transposeZ f (Point x y z) = Point x y (f z)
   transposeX f (Point x y z) = Point (f x) y z
   transposeY f (Point x y z) = Point x (f y) z

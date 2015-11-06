@@ -7,7 +7,7 @@ import qualified Data.ByteString.Lazy as BL
 import Data.Aeson
 import CornerPoints.Radius(Radius(..))
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createHorizontallyAlignedCubes,
-                           SingleDegreeRadii(..), MultiDegreeRadii(..))
+                           SingleDegreeRadii(..), MultiDegreeRadii(..), transpose)
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), (++:), Faces(..))
 import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope)
@@ -15,15 +15,158 @@ import Stl.StlCornerPoints((+++^))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
 import Scan.Filter(runningAverage, runningAvgSingleDegreeRadii)
-
-writeStlFileFromScanWrapper :: IO ()
-writeStlFileFromScanWrapper = do
+import Scan.Transform(reduceScanRows, reduceRows, reduceScan )
+import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBottomFace)
+import CornerPoints.FaceConversions(backFaceFromFrontFace)
+import CornerPoints.Transpose (transposeZ)
+{-
+read in the Multidegree json file, which has valid Radii,
+and process it into stl -}
+reducedMultiDegreeRadiiRowsAndWriteStlWrapper :: IO ()
+reducedMultiDegreeRadiiRowsAndWriteStlWrapper = do
   contents <- BL.readFile "src/Data/scanFullData.json"
   
   case (decode contents) of
    
       Just (MultiDegreeRadii name' degrees') ->
-        writeStlFileFromScan (MultiDegreeRadii name' degrees')
+        reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl (MultiDegreeRadii name' degrees')
+        --getAnExtension (MultiDegreeRadii name' degrees')
+      Nothing                                ->
+        putStrLn "File not decoded"
+getAnExtension :: MultiDegreeRadii -> IO ()
+getAnExtension multiDegreeRadii =
+  let frontAndBackTriangles = [FacesBackFront | x <- [1..]]
+      reducedScanBack = reduceScan rowReductionFactor multiDegreeRadii
+      reducedScanFront = transpose (+2) reducedScanBack
+      rowReductionFactor = 100
+      getTopCubes =  (head cubes) ++++ (map (transposeZ (+500). extractTopFace)  (head cubes)) 
+      cubes = createMainSocketCubesFromFrontAndBackFaces reducedScanFront reducedScanBack
+      
+      
+  in
+      print $ show $ getTopCubes
+        
+{-
+reduce the rows of the MulitiDegreeRadii by a factor of 100
+chop of the top layer as it has an error,
+output to stl
+
+--do not call directly.
+--called via reducedRowsMultiDegreeScanWrapper as it reads the json file-}
+reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl :: MultiDegreeRadii -> IO ()
+reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl (MultiDegreeRadii name' degrees') =
+  let multiDegreeRadii = MultiDegreeRadii name' [(SingleDegreeRadii degree'' (tail radii''))  | (SingleDegreeRadii degree'' radii'') <- degrees']
+      frontAndBackTriangles = [FacesBackFront | x <- [1..]]
+      getRidOfDefectiveTopRow = [FacesNada | x <- [1..]]
+      --topOfSocket = [FacesBackFrontTop | x <- [1..]]
+      --topOfSocket =  [FacesBackFrontTop | x <- [0..1]] ++ [FacesNada | x <- [1..26]] ++ [FacesBackFrontTop | x <- [1..]]
+      topOfSocket = [FacesBackFrontLeftTop] ++ [FacesNada | x <- [2..30]] ++ [FacesBackFrontRightTop]   ++  [FacesBackFrontTop | x <- [31..]]
+      --openUpOneSide =  [frontAndBackTriangles | x <- [1..5]]
+      openUpOneSide =  [openOneSideSingleLayer| x <- [1..6]]
+      --openOneSideSingleLayer = [FacesBackFrontRight]   [FacesBackFront | x <- [0..1]] ++ [FacesNada | x <- [1..24]] ] -- ++ [FacesBackFrontLeft | x <- [1..]
+      openOneSideSingleLayer = [FacesBackFrontLeft] ++ [FacesNada | x <- [2..30]] ++ [FacesBackFrontRight]   ++  [FacesBackFront | x <- [31..]]
+      topOfMainBodyOfSocket =  (FacesBackFront : [FacesBackFrontTop | x <- [2..30]]) ++ [FacesBackFront] ++ [FacesBackFront | x <- [32..]]
+      mainBodyOfSocket = [frontAndBackTriangles | x <- [1..8]]
+      btmOfSocket = [FacesBackBottomFront | x <- [1..]]
+      reducedScanBack = reduceScan rowReductionFactor multiDegreeRadii
+      reducedScanFront = transpose (+2) reducedScanBack
+      rowReductionFactor = 100
+      --getTopCubes =  (map (transposeZ (+30). extractTopFace)  (head  cubes)) ++++ (head cubes)
+      extendTopCubes = (map (transposeZ (+30). extractTopFace)  (head  cubes)) ++++ (map ( extractBottomFace)  (head  cubes))
+      cubes = createMainSocketCubesFromFrontAndBackFaces reducedScanFront reducedScanBack
+      
+      triangles =
+       zipWith  (+++^)
+        (   topOfSocket : (  mainBodyOfSocket ++: topOfMainBodyOfSocket ++ openUpOneSide )   ++:  btmOfSocket) 
+        ( extendTopCubes : tail cubes)
+      stlFile = newStlShape "walker socket" $ concat triangles
+  in
+      writeStlToFile stlFile
+{-
+reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl :: MultiDegreeRadii -> IO ()
+reducedMultiDegreeRadiiRowsAndWriteMainSocketCubesStl multiDegreeRadii =
+  let frontAndBackTriangles = [FacesBackFront | x <- [1..]]
+      
+      getRidOfDefectiveTopRow = [FacesNada | x <- [1..]]
+      --topOfSocket = [FacesBackFrontTop | x <- [1..]]
+      topOfSocket =  [FacesBackFrontTop | x <- [0..1]] ++ [FacesNada | x <- [1..26]] ++ [FacesBackFrontTop | x <- [1..]]
+      --openUpOneSide =  [frontAndBackTriangles | x <- [1..5]]
+      openUpOneSide =  [openOneSideSingleLayer| x <- [1..5]]
+      openOneSideSingleLayer = [FacesBackFront | x <- [0..1]] ++ [FacesNada | x <- [1..26]] ++ [FacesBackFront | x <- [1..]]
+      mainBodyOfSocket = [frontAndBackTriangles | x <- [1..10]]
+      btmOfSocket = [FacesBackBottomFront | x <- [1..]]
+      reducedScanBack = reduceScan rowReductionFactor multiDegreeRadii
+      reducedScanFront = transpose (+2) reducedScanBack
+      rowReductionFactor = 100
+      
+      cubes = createMainSocketCubesFromFrontAndBackFaces reducedScanFront reducedScanBack
+      triangles =
+       zipWith  (+++^)
+        (getRidOfDefectiveTopRow :  topOfSocket : (  mainBodyOfSocket ++ openUpOneSide) ++:  btmOfSocket) 
+        (cubes)
+      stlFile = newStlShape "walker socket" $ concat triangles
+  in
+      writeStlToFile stlFile
+
+-}
+createMainSocketCubesFromFrontAndBackFaces ::  MultiDegreeRadii ->   MultiDegreeRadii -> [[CornerPoints]]
+createMainSocketCubesFromFrontAndBackFaces multiDegreeRadiiOuter multiDegreeRadiiInner =
+  [
+    currBackFace ++++ currFrontFace
+    | currFrontFace <- createMainSocketFrontFaces 100 multiDegreeRadiiOuter
+    | currBackFace <- createMainSocketBackFaces 100 multiDegreeRadiiInner
+  ]
+  
+
+createMainSocketFrontFacesTestWrapper = do
+  contents <- BL.readFile "src/Data/scanFullData.json"
+  
+  case (decode contents) of
+   
+      Just (MultiDegreeRadii name' degrees') ->
+        let rowReductionFactor = 100
+            reducedScanBack = reduceScan rowReductionFactor (MultiDegreeRadii name' degrees')
+            reducedScanFront = transpose (+2) reducedScanBack
+        --in  print $ show $ length $ createMainSocketFrontFaces rowReductionFactor reducedScanFront
+        --in  print $ show $ length $ createMainSocketBackFaces rowReductionFactor reducedScanBack
+        in print $ show $ length $ createMainSocketCubesFromFrontAndBackFaces reducedScanFront reducedScanBack
+      Nothing                                ->
+        putStrLn "nothing"
+
+
+
+
+createMainSocketFrontFaces :: Int         ->  MultiDegreeRadii -> [[CornerPoints]]
+createMainSocketFrontFaces    rowReductionFactor multiDegreeRadii =
+  let leftFaces = createLeftFacesMultiColumns origin (tail $ degrees reducedScan) flatXSlope flatYSlope [0,heightPerPixel..]
+      rightFaces = createRightFaces origin (head $ degrees reducedScan) flatXSlope flatYSlope [0,heightPerPixel..]
+      origin = (Point{x_axis=0, y_axis=0, z_axis=50})
+      pixelsPerMM' = pixelsPerMM 
+      reducedScan = transpose (+2)  multiDegreeRadii
+      heightPerPixel = 1/pixelsPerMM' * (fromIntegral rowReductionFactor)
+  in 
+      [map (extractFrontFace) currRow  | currRow  <- (createHorizontallyAlignedCubes rightFaces leftFaces)]
+
+createMainSocketBackFaces :: Int ->          MultiDegreeRadii -> [[CornerPoints]]
+createMainSocketBackFaces    rowReductionFactor multiDegreeRadii  =
+  let --outerFacesMultiDegreeRaddi = transpose (+2) multiDegreeRadii
+      leftFaces = createLeftFacesMultiColumns origin (tail $ degrees multiDegreeRadii) flatXSlope flatYSlope [0,heightPerPixel..]
+      rightFaces = createRightFaces origin (head $ degrees multiDegreeRadii) flatXSlope flatYSlope [0,heightPerPixel..]
+      origin = (Point{x_axis=0, y_axis=0, z_axis=50})
+      pixelsPerMM' = pixelsPerMM 
+      heightPerPixel = 1/pixelsPerMM' * (fromIntegral rowReductionFactor)
+  in 
+      [map (backFaceFromFrontFace . extractFrontFace) currRow  | currRow  <- (createHorizontallyAlignedCubes rightFaces leftFaces)]
+
+
+writeStlFileFromRawScanWrapper :: IO ()
+writeStlFileFromRawScanWrapper = do
+  contents <- BL.readFile "src/Data/scanFullData.json"
+  
+  case (decode contents) of
+   
+      Just (MultiDegreeRadii name' degrees') ->
+        writeStlFileFromRawScan (MultiDegreeRadii name' degrees')
       Nothing                                ->
         putStrLn "File not decoded"
 {-
@@ -32,11 +175,11 @@ will need to change the number of of center front triangles
 
 This is a support function, not to be called directly.
 -}
-writeStlFileFromScan :: MultiDegreeRadii -> IO ()
-writeStlFileFromScan (MultiDegreeRadii name' degrees') = 
+writeStlFileFromRawScan :: MultiDegreeRadii -> IO ()
+writeStlFileFromRawScan (MultiDegreeRadii name' degrees') = 
   let smoothedScan = MultiDegreeRadii name' (map (runningAvgSingleDegreeRadii 10) degrees')
       origin = (Point{x_axis=0, y_axis=0, z_axis=50})
-      heightPerPixel = 1/pixelsPerMMVertical
+      heightPerPixel = 1/pixelsPerMM
       leftFaces = createLeftFacesMultiColumns origin (tail $ degrees smoothedScan) flatXSlope flatYSlope [0,heightPerPixel..]
       rightFaces = createRightFaces origin (head $ degrees smoothedScan) flatXSlope flatYSlope [0,heightPerPixel..]
       frontTriangles = [FaceFront | x <- [1..]]
@@ -129,7 +272,7 @@ processSingleDegreeRadii    (SingleDegreeRadii degree' radii')    =
          [
           let currLaserLineIndex = round $ radius currDegree
               rightOfCenterPixelDistanceOfLaser = adjustForCenter  (forThe currLaserLineIndex ) (ofThe currRow)
-              radius'' = calculateRadiusFrom  rightOfCenterPixelDistanceOfLaser (adjustedFor pixelsPerMMHorizontal) $ andThe cameraAngle
+              radius'' = calculateRadiusFrom  rightOfCenterPixelDistanceOfLaser (adjustedFor pixelsPerMM) $ andThe cameraAngle
               
           in radius''
          | currDegree <- radii'
@@ -155,19 +298,19 @@ processImagesToRedLaserLineAsPixelsRightOfLHS = process10DegreeImagesToMultiDegr
 
 
 --as calculated by the calibration picture center.JPG
-pixelsPerMMHorizontal = 620/38 -- 620 pixels / 38 mm
-pixelsPerMMVertical = 520/38   -- 520 pixels / 38 mm
+pixelsPerMM = 696/38 -- 620 pixels / 38 mm
+--pixelsPerMMVertical = 704.2/38   -- 520 pixels / 38 mm
 
 --ToDo: Find these 2 values from a centering image using
-topCenterIndex = 1472
-btmCenterIndex = 1444
+topCenterIndex = 1591
+btmCenterIndex = 1563.5
 imageWidth = 2592
 imageHeight = 1944
 --pixelsPerMillimeter = 38/623 -- 623/38
 cameraAngle = 30
 
 
---182 fails at degree 310
+--180 fails at degree 340
 type TargetValue = Word8
 redLaserLine :: TargetValue
-redLaserLine = 180
+redLaserLine = 175

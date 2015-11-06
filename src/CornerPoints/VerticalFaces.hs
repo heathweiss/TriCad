@@ -6,12 +6,13 @@ module CornerPoints.VerticalFaces(
   createLeftFacesMultiColumns,
   SingleDegreeRadii(..),
   MultiDegreeRadii(..),
-  TransposeFactor(..)) where
+  TransposeFactor(..), transpose) where
 import CornerPoints.Create(Slope(..), Origin(..), createCornerPoint, Angle(..), Degree(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import CornerPoints.Transpose (transposeZ)
 import CornerPoints.Points(Point(..))
 import CornerPoints.Radius(Radius(..))
+import CornerPoints.Transposable( TransposeLength, transpose)
                            
 
 
@@ -170,6 +171,9 @@ Store the processed raw data as json, so the processing only has to be done once
 data SingleDegreeRadii = SingleDegreeRadii {degree::Degree, radii::[Radius]}
      deriving (Show, Eq)
 
+instance TransposeLength SingleDegreeRadii  where
+  transpose f (SingleDegreeRadii degree' radii') = SingleDegreeRadii degree' (map (transpose f) radii')
+
 {- |
 Contains all the filtered data from a scan.
 Is a [SingleDegreeRadii] and an assoc'd name.
@@ -181,3 +185,5 @@ It can be read to/from json, so that all the processing of scan data, can be sav
 data MultiDegreeRadii = MultiDegreeRadii {name::String, degrees::[SingleDegreeRadii]}
           deriving (Show, Eq)
 
+instance TransposeLength MultiDegreeRadii  where
+  transpose f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (transpose f) degrees')

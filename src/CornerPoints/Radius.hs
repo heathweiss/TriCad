@@ -1,5 +1,5 @@
 module CornerPoints.Radius(Radius(..)) where
-
+import CornerPoints.Transposable( TransposeLength, transpose)
 
 
 {-|
@@ -19,9 +19,6 @@ instance Eq Radius where
       | (radiusEqual rad rad') = True 
       | otherwise = False
 
-{-
-data Radius = Radius {radius :: Double}
-               | DownRadius {radius :: Double} -- | Radius slopes down from origin z-axis. 
-               | UpRadius {radius :: Double}
-   deriving (Show, Eq)
--}
+
+instance TransposeLength Radius where
+  transpose f (Radius a) = Radius $ f a

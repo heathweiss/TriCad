@@ -375,7 +375,7 @@ showAverageOfIndicesOfLaserLineValuesForEachRow  = do
            pixel8ToWord8 cr
 
          filePath :: FilePath
-         filePath = "src/Data/scanImages/310.JPG"
+         filePath = "src/Data/scanImages/140.JPG"
 
          --redLaserLine :: TargetValue
          --redLaserLine = 160
@@ -450,7 +450,7 @@ averageValueOf list =
 
 
 redLaserLine :: TargetValue
-redLaserLine = 182
+redLaserLine = 175
 
 extractCR :: (PixelYCbCr8) -> Word8
 extractCR (PixelYCbCr8 _ _ cr) =  pixel8ToWord8 cr

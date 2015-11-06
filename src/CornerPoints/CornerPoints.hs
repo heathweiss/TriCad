@@ -333,6 +333,9 @@ but
 (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) +++ (TopFace b2t f2t b3t f3t) =
    (BottomFace {b1=b2, b4=b3, f1=f2, f4=f3}) +++ (TopFace b2t f2t b3t f3t)
 
+(TopFace b2t f2t b3t f3t) +++ (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) =
+   CubePoints {b1=b2, b2=b2t, b3=b3t, b4=b3, f1=f2, f2=f2t, f3=f3t, f4=f3}
+
 (LeftFace b1t b2t f1t f2t) +++ (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) =
   CubePoints {b1=b1t, b4=b1, b2=b2t, b3=b2, f1=f1t, f2=f2t, f3=f2, f4=f1}
 
@@ -550,6 +553,10 @@ data Faces =
  | FacesBackBottomLeft
  | FacesBackBottomLeftRight
  | FacesBackBottomTop
+
+ | FacesBackFrontLeft
+ | FacesBackFrontRight
+   
  | FacesBackFront
  | FacesBackFrontLeftRight
  | FacesBackFrontLeftRightTop
