@@ -25,10 +25,12 @@ library
                    Math.Trigonometry,
                    --stl
                    Stl.StlBase, Stl.StlCornerPoints, Stl.StlFileWriter,
+                   --helpers
+                   Helpers.List
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.HorizontalFacesTest,
-                   Tests.JsonTest,
+                   Tests.JsonTest, Tests.ListHelpersTest
                    Tests.VerticalFacesTest, Tests.ParseJuicyTest, Tests.ScanFilterTest
                    --Examples
                    -- Example ShoeLifts

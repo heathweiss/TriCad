@@ -5,7 +5,6 @@ CornerPoints(..),
 (++++),
 (++>),
 (+++>>),
-(++:),
 scaleCornerPoints,
 scaleCornerPointsZ,
 --transposePointZ,
@@ -19,7 +18,6 @@ import    Control.Applicative
 
 infix 7 +++
 infix 6 +++$
-infix 6 ++:
 infix 5 +++>> 
 infix 5 ++>
 infix 4 ++++
@@ -525,16 +523,9 @@ scalePointZ :: Point -> Double -> Point
 scalePointZ (Point x y z) scaleFactor = Point {x_axis=x, y_axis=y, z_axis=z*scaleFactor}
 
 ------------------------------------------ Faces ----------------------------------------
--- |Appends a list onto a list of lists.
--- Known uses: building up a list of Faces to be zipped to list of Cornerpoints using (+++^) for createing stl output
- 
-(++:) :: [[a]] -> [a] -> [[a]]
-multiList ++: singleList = reverse $ singleList : multiList
-{-
+{- |
 Known uses: 
 zip together with a [CornerPoints] to output stl triangles
-
-
 -}
 data Faces =
    FacesNada

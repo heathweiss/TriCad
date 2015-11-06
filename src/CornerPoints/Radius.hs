@@ -1,4 +1,5 @@
-module CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..)) where
+module CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..),
+                          extractSingle, extractList) where
 import CornerPoints.Transposable( TransposeLength, transpose)
 
 {-|
@@ -57,3 +58,16 @@ data MultiDegreeRadii = MultiDegreeRadii {name::String, degrees::[SingleDegreeRa
 
 instance TransposeLength MultiDegreeRadii  where
   transpose f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (transpose f) degrees')
+
+
+class ExtractableRadius a  where
+  extractList :: ([Radius] -> [Radius]) -> a -> a
+  extractSingle :: ([Radius] -> Radius) -> a -> a
+
+instance ExtractableRadius SingleDegreeRadii where
+  extractSingle f (SingleDegreeRadii degree' radii') = SingleDegreeRadii degree' [(f radii')]
+  extractList   f (SingleDegreeRadii degree' radii') = SingleDegreeRadii degree' (f radii')
+  
+instance ExtractableRadius MultiDegreeRadii where
+  extractSingle f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (extractSingle f) degrees')
+  extractList f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (extractList f) degrees')
