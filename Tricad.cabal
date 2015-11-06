@@ -28,7 +28,7 @@ library
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.HorizontalFacesTest,
-                   Tests.TransformTest, Tests.JsonTest, Tests.ParseTest,
+                   Tests.JsonTest,
                    Tests.VerticalFacesTest, Tests.ParseJuicyTest, Tests.ScanFilterTest
                    --Examples
                    -- Example ShoeLifts
@@ -40,7 +40,7 @@ library
                    -- Sockets
                    Examples.Sockets.Bicycle
                    -- scanned shapes
-                   Examples.Scan.SingleLine, Examples.Scan.WalkerSocket
+                   Examples.Scan.WalkerSocket
                    -- Misc Shapes
                    Examples.MiscShapes.RvVentCaps
                    -- Primitives
@@ -50,8 +50,8 @@ library
                    --Shapes
                    Primitives.Cylindrical, Primitives.Cubical
                    --Scanning
-                   Scan.Transform, Scan.Filter,
-                   Scan.Json, Scan.Parse, Scan.ParseJuicy
+                   Scan.Filter,
+                   Scan.Json,  Scan.ParseJuicy
   -- other-modules:       
   -- other-extensions:    
   build-depends:       HUnit >=1.2.5.2

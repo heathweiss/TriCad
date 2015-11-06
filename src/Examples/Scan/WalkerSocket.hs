@@ -1,6 +1,6 @@
 {-# LANGUAGE ParallelListComp #-}
 module Examples.Scan.WalkerSocket() where
-import Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii, getRedLaserLineSingleImage, removeLeftOfCenterPixels, getThePixelsRightOfCenter,
+import Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii, getRedLaserLineSingleImage, removeLeftOfCenterPixels, getThePixelsRightOfCenter,  reduceScanRows, reduceRows, reduceScan,
                       andThen, forThe, ofThe, adjustedFor, andThe, calculateRadiusFrom)
 import Data.Word(Word8)
 import qualified Data.ByteString.Lazy as BL
@@ -15,7 +15,7 @@ import Stl.StlCornerPoints((+++^), (++++^))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
 import Scan.Filter(runningAverage, runningAvgSingleDegreeRadii)
-import Scan.Transform(reduceScanRows, reduceRows, reduceScan )
+--import Scan.Transform(reduceScanRows, reduceRows, reduceScan )
 import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBottomFace)
 import CornerPoints.FaceConversions(backFaceFromFrontFace)
 import CornerPoints.Transpose (transposeZ)

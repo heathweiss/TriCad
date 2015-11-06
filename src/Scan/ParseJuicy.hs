@@ -2,12 +2,12 @@
 {-# LANGUAGE ParallelListComp #-}
 module Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii,  TargetValueIndex(..), ofThe, forThe, andThen, adjustedFor, andThe,
                         getThePixelsRightOfCenter, removeLeftOfCenterPixels, getRedLaserLineSingleImage, convertPixelsToMillmeters,
-                        calculateRadiusFrom) where
+                        calculateRadiusFrom, reduceScanRows, reduceRows, reduceScan) where
 import Codec.Picture.Jpg
 import Codec.Picture
 import Codec.Picture.Types
 --import Scan.Transform(pixelIndicesOfPixelValuesLTE)
-import Scan.Parse (PixelValue(..))
+--import Scan.Parse (PixelValue(..))
 --import Data.Convertible.Instances.Num(safeConvert)
 import qualified Data.List as L
 import Data.Word(Word8)
@@ -453,3 +453,42 @@ redLaserLine = 175
 
 extractCR :: (PixelYCbCr8) -> Word8
 extractCR (PixelYCbCr8 _ _ cr) =  pixel8ToWord8 cr
+
+
+reduceScanRows :: Int -> MultiDegreeRadii -> Either String MultiDegreeRadii
+reduceScanRows 0 _ = Left "Can't use 0 for row reduction"
+reduceScanRows reduceFactor scan
+  | reduceFactor > (length $ radii $ head $ degrees scan)  = Left "reduction factor > number of rows"
+  | otherwise =
+     let degreesReduced = [ SingleDegreeRadii {degree=(degree x),  radii = (reduceRows reduceFactor $ radii x)} | x <- degrees scan]
+     in  Right $  scan {degrees=degreesReduced}
+
+reduceScan :: Int -> MultiDegreeRadii -> MultiDegreeRadii
+reduceScan reduceFactor scan =
+  
+     let degreesReduced = [ SingleDegreeRadii {degree=(degree x),  radii = (reduceRows reduceFactor $ radii x)} | x <- degrees scan]
+     in  scan {degrees=degreesReduced}
+
+{- Take every xth element from a list.
+Used for: reduce rows from the raw source data, as the usual 480 rows from an
+image, is probably overkill for a 3D printer.
+
+ (mod counter factor == 0) is saying: divide the current row index by the reduction factor, and if there is no
+ remainder, include the row.
+
+Starts of with a row index of 1, which is passed into reduceRows' to do the actual recursive work.
+
+Must be something in Data.List such as scanl or foldl that would do this same thing.
+-}
+reduceRows :: RowReductionFactor -> [a] -> [a]
+reduceRows factor x = reduceRows' factor 1 x
+
+reduceRows' :: RowReductionFactor -> Int ->[a] -> [a]
+reduceRows' _ _ [] = []
+reduceRows' 0 _ _ = []
+reduceRows' factor counter (x:xs)
+        | (mod counter factor == 0) = x : reduceRows' factor (counter + 1) xs
+        | otherwise            = reduceRows' factor (counter + 1) xs
+
+-- |Factor by which to reduce rows.
+type RowReductionFactor = Int
