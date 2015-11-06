@@ -16,9 +16,8 @@ import GHC.Word (Word8)
 import Data.Aeson
 import Scan.Json()
 import qualified Scan.Parse as PA  ( MultiDegreePixelValues(..), parseCSVPixelValues)
-import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createHorizontallyAlignedCubes,
-                            MultiDegreeRadii(..))
-import CornerPoints.Radius(SingleDegreeRadii(..))
+import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createHorizontallyAlignedCubes)
+import CornerPoints.Radius(SingleDegreeRadii(..), MultiDegreeRadii(..))
 import Scan.Transform (reduceScanRows)
 --create a [Word8] for: Right(B.pack $ strToWord8s)
 --which gets a bytstring of word8

@@ -5,9 +5,9 @@ import Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii, getRedLaserLineS
 import Data.Word(Word8)
 import qualified Data.ByteString.Lazy as BL
 import Data.Aeson
-import CornerPoints.Radius(SingleDegreeRadii(..), Radius(..))
+import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(..))
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createHorizontallyAlignedCubes,
-                            MultiDegreeRadii(..), transpose)
+                             transpose)
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), (++:), Faces(..))
 import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope)

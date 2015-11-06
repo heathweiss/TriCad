@@ -12,8 +12,7 @@ import Scan.Parse (PixelValue(..))
 import qualified Data.List as L
 import Data.Word(Word8)
 import qualified Data.ByteString as BS
-import CornerPoints.VerticalFaces(MultiDegreeRadii(..))
-import CornerPoints.Radius(SingleDegreeRadii(..), Radius(..))
+import CornerPoints.Radius(SingleDegreeRadii(..), Radius(..), MultiDegreeRadii(..))
 import Control.Monad
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Scan.Json

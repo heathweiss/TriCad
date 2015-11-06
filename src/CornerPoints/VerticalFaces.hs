@@ -4,8 +4,6 @@ module CornerPoints.VerticalFaces(
   createLeftFaces,
   createHorizontallyAlignedCubes,
   createLeftFacesMultiColumns,
-  
-  MultiDegreeRadii(..),
   TransposeFactor(..), transpose) where
 import CornerPoints.Create(Slope(..), Origin(..), createCornerPoint, Angle(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
@@ -157,16 +155,3 @@ createHorizontallyAlignedCubes (x:xs) (ys) =
 type TransposeFactor = Double
 
 
-{- |
-Contains all the filtered data from a scan.
-Is a [SingleDegreeRadii] and an assoc'd name.
-
-Known uses:
-Raw scan image data is processed into this, which is the last ADT, before being turned in CornerPoints.
-It can be read to/from json, so that all the processing of scan data, can be saved to file.
--}
-data MultiDegreeRadii = MultiDegreeRadii {name::String, degrees::[SingleDegreeRadii]}
-          deriving (Show, Eq)
-
-instance TransposeLength MultiDegreeRadii  where
-  transpose f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (transpose f) degrees')

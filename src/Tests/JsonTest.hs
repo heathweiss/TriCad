@@ -1,11 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Tests.JsonTest where
 import Test.HUnit
-import CornerPoints.Radius(SingleDegreeRadii(..), Radius(..))
+import CornerPoints.Radius(SingleDegreeRadii(..), Radius(..), MultiDegreeRadii(..))
 import Scan.Json
 import Data.Aeson
 import qualified Data.ByteString.Lazy as BS
-import CornerPoints.VerticalFaces (MultiDegreeRadii(..))
 
 
 jsonTestDo = do

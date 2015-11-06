@@ -7,12 +7,11 @@ import Control.Applicative
 import Data.Char
 import Data.Word
 import Control.Applicative
-import qualified CornerPoints.Radius as MP (Radius(..), SingleDegreeRadii(..))
+import qualified CornerPoints.Radius as MP (Radius(..), SingleDegreeRadii(..), MultiDegreeRadii(..))
 import qualified  Data.ByteString.Internal as BI (unpackBytes)
 import qualified  Data.ByteString.Char8 as BC (pack) 
 import GHC.Word (Word8)
 import Scan.Transform(pixelIndicesOfPixelValuesLTE, pixelIndicesAverageToRadius, reduceRows, reduceScanRows, multiDegreePixelValuesToMultiDegreeRadii)
-import qualified CornerPoints.VerticalFaces as VF (MultiDegreeRadii(..))
 
 --create a [Word8] for: Right(B.pack $ strToWord8s)
 --which gets a bytstring of word8.
@@ -38,8 +37,8 @@ getACompleteRawScan = TestCase $ assertEqual
 
 getAScanFromARawScan = TestCase $ assertEqual
   "get a Scan from a RawScan"
-  (Right(VF.MultiDegreeRadii { VF.name="myScan",
-                            VF.degrees=[(MP.SingleDegreeRadii {MP.degree=1, MP.radii= [MP.Radius 0.5,MP.Radius 0.5]}),
+  (Right(MP.MultiDegreeRadii { MP.name="myScan",
+                            MP.degrees=[(MP.SingleDegreeRadii {MP.degree=1, MP.radii= [MP.Radius 0.5,MP.Radius 0.5]}),
                             (MP.SingleDegreeRadii {MP.degree=2, MP.radii= [MP.Radius 0.5,MP.Radius 0.0]})
                              ]}))
   ( let rawScan = (Right (B.pack $strToWord8s "1 1 2 3;1 2 3$2 1 2 3;1 3 3")  >>=  parseCSVPixelValues)
@@ -53,7 +52,7 @@ create a 2 row raw scan the same as from my scan raw project to see what is goin
 reduceScanRowsTest = TestCase $ assertEqual
   "get a Scan from a RawScan and use ReduceScanRows on it"
   
-  (Right (VF.MultiDegreeRadii {VF.name = "myScan", VF.degrees = [MP.SingleDegreeRadii {MP.degree = 0.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 90.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 180.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 270.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 360.0, MP.radii = [MP.Radius {MP.radius = 0.5}]}]}))
+  (Right (MP.MultiDegreeRadii {MP.name = "myScan", MP.degrees = [MP.SingleDegreeRadii {MP.degree = 0.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 90.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 180.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 270.0, MP.radii = [MP.Radius {MP.radius = 0.5}]},MP.SingleDegreeRadii {MP.degree = 360.0, MP.radii = [MP.Radius {MP.radius = 0.5}]}]}))
   
   ( let rawScan = (Right (B.pack $strToWord8s "0 1 2 3;1 2 3;1 2 3$90 1 2 3;1 2 3;1 2 3$180 1 2 3;1 2 3;1 2 3$270 1 2 3;1 2 3;1 2 3$360 1 2 3;1 2 3;1 2 3")  >>=  parseCSVPixelValues)
     in  multiDegreePixelValuesToMultiDegreeRadii "myScan" (pixelIndicesAverageToRadius . pixelIndicesOfPixelValuesLTE 2) rawScan  >>= reduceScanRows 2
