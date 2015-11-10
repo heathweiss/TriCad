@@ -9,17 +9,18 @@ import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(.
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createHorizontallyAlignedCubes,
                              transpose)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
-import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope)
+import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..), (+++>>), (++++>>))
+import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope, Angle(..))
 import Stl.StlCornerPoints((+++^), (++++^))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
 import Scan.Filter(runningAverage, runningAvgSingleDegreeRadii)
 --import Scan.Transform(reduceScanRows, reduceRows, reduceScan )
 import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBottomFace)
-import CornerPoints.FaceConversions(backFaceFromFrontFace)
+import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
 import CornerPoints.Transpose (transposeZ)
 import Helpers.List((++:))
+import CornerPoints.HorizontalFaces(createBottomFaces, createTopFaces)
 {-
 read in the Multidegree json file, which has valid Radii,
 and process it into stl using whatever function required for the current shape. -}
@@ -29,25 +30,138 @@ loadMDRAndPassToProcessor = do
   let removeDefectiveTopRow :: MultiDegreeRadii -> MultiDegreeRadii
       removeDefectiveTopRow (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' [(SingleDegreeRadii degree'' (tail radii''))  | (SingleDegreeRadii degree'' radii'') <- degrees']
       rowReductionFactor = 100
-     
+      extensionHeight = 30
+
+      createMainSocketBackFaces :: Origin -> MultiDegreeRadii -> [[CornerPoints]]
+      createMainSocketBackFaces    origin    multiDegreeRadii  =
+        let leftFaces = createLeftFacesMultiColumns origin (tail $ degrees multiDegreeRadii) flatXSlope flatYSlope [0,heightPerPixel..]
+            rightFaces = createRightFaces origin (head $ degrees multiDegreeRadii) flatXSlope flatYSlope [0,heightPerPixel..]
+            pixelsPerMM' = pixelsPerMM 
+            heightPerPixel = 1/pixelsPerMM' * (fromIntegral rowReductionFactor)
+        in  [map (backFaceFromFrontFace . extractFrontFace) currRow  | currRow  <- (createHorizontallyAlignedCubes rightFaces leftFaces)]
+
+      createMainSocketFrontFaces :: Origin ->  MultiDegreeRadii -> [[CornerPoints]]
+      createMainSocketFrontFaces    origin     multiDegreeRadii =
+        let leftFaces = createLeftFacesMultiColumns origin (tail $ degrees reducedScan) flatXSlope flatYSlope [0,heightPerPixel..]
+            rightFaces = createRightFaces origin (head $ degrees reducedScan) flatXSlope flatYSlope [0,heightPerPixel..]
+            --origin = (Point{x_axis=0, y_axis=0, z_axis=50})
+            pixelsPerMM' = pixelsPerMM 
+            reducedScan = transpose (+2)  multiDegreeRadii
+            heightPerPixel = 1/pixelsPerMM' * (fromIntegral rowReductionFactor)
+        in  [map (extractFrontFace) currRow  | currRow  <- (createHorizontallyAlignedCubes rightFaces leftFaces)]   
+         
+      extensionFaceBuilder :: (Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]
+      extensionFaceBuilder leftFace emptyFaces rightFace fillerFaces =
+        [leftFace] ++ [emptyFaces | x <- [2..30]] ++ [rightFace]   ++  [fillerFaces | x <- [31..]]
   case (decode contents) of
    
       Just (MultiDegreeRadii name' degrees') ->
-        mainSocketStl $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
-        
+        let innerSleeveMDR = reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
+            outerSleeveMDR = transpose (+2) innerSleeveMDR
+        in  mainSocketStl innerSleeveMDR outerSleeveMDR createMainSocketBackFaces createMainSocketFrontFaces extensionFaceBuilder extensionHeight
+            --basePlateStl outerSleeveMDR createMainSocketBackFaces createMainSocketFrontFaces extensionFaceBuilder extensionHeight
       Nothing                                ->
         putStrLn "File not decoded"
+{-
 
+-}
 
-basePlateStl :: MultiDegreeRadii -> IO ()
-basePlateStl innerMDR =
-  let centerMDR = transpose (+2) innerMDR
-      outerMDR = transpose (+5) centerMDR
-      innerTopRadii =   extractSingle (head) innerMDR
-      centerTopRaddi = extractSingle (head) centerMDR
-      outerTopRaddi = extractSingle (head) outerMDR 
-  in  putStrLn "temp"
+basePlateStl :: MultiDegreeRadii -> (Origin -> MultiDegreeRadii -> [[CornerPoints]]) -> (Origin -> MultiDegreeRadii -> [[CornerPoints]])
+                -> ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) -> ExtensionHeight -> IO ()
+basePlateStl outerSleeveMDR createMainSocketBackFaces createMainSocketFrontFaces extensionFaceBuilder extensionHeight  =
+  let plateRadius = 30
+      conOuterMDR = transpose (+2) outerSleeveMDR
+      conTopOrigin = (Point (-10) (-15) 20)
+      topRowOfSleeveCubes = concat
+       [
+        currBackFace ++++ currFrontFace
+        | currFrontFace <- createMainSocketFrontFaces conTopOrigin $  extractList (take 2)  conOuterMDR
+        | currBackFace <- createMainSocketBackFaces conTopOrigin  $  extractList (take 2) outerSleeveMDR
+       ]
 
+      conCubes = plateToConCubes ++++>> ((transposeZ (+extensionHeight)) . extractTopFace )
+      conTriangles = (extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)) +++^  conCubes
+
+      plateToConTopFaces = [extractTopFace currCube | currCube <- topRowOfSleeveCubes]
+      plateToConCubes = plateToConTopFaces ++++ (map (lowerFaceFromUpperFace . extractTopFace) plateUpperCubes)
+      plateToConTriangles = (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)) +++^  plateToConCubes
+      
+      plateUpperCubes =  map (+++>> ((transposeZ (+5)) . extractTopFace)) plateOuterCubes
+      plateUpperTriangles = (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)) +++^  plateUpperCubes
+
+      plateOuterBtmFaces =  createBottomFaces (Point 0 0 0) (map (Radius) [(plateRadius + 2),(plateRadius+2)..]) (map (Angle) [0,10..360]) flatXSlope flatYSlope
+      plateOuterCubesTemp = plateOuterBtmFaces ++++>> (upperFaceFromLowerFace . (transposeZ (+3)))
+      plateOuterFrontFaces = [ (extractFrontFace) currCube    |currCube <- plateOuterCubesTemp]
+      plateOuterBackFaces = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- plateInnerCubes]
+      plateOuterCubes = plateOuterBackFaces ++++ plateOuterFrontFaces
+      plateOuterTriangles = (extensionFaceBuilder (FacesBottomFront) (FacesBottomFrontTop) (FacesBottomFront) (FacesBottomFront)) +++^  plateOuterCubes
+
+      plateInnerBtmFaces = createBottomFaces (Point 0 0 0) (map (Radius) [plateRadius,plateRadius..]) (map (Angle) [0,10..360]) flatXSlope flatYSlope
+      plateInnerCubes = plateInnerBtmFaces ++++>> (upperFaceFromLowerFace . (transposeZ (+3)))
+      plateInnerTriangles = (extensionFaceBuilder (FacesBottomTop) (FacesBottomTop) (FacesBottomTop) (FacesBottomTop)) +++^  plateInnerCubes
+
+      
+      
+      plateCubesStl = newStlShape "walker base plate" $    plateInnerTriangles ++ plateOuterTriangles ++
+                                                           plateUpperTriangles ++ plateToConTriangles ++
+                                                           conTriangles 
+      
+  in  --putStrLn "temp"
+      --writeStlToFile conCubesStl
+      writeStlToFile plateCubesStl
+      
+{-
+basePlateStl :: MultiDegreeRadii -> (Origin -> MultiDegreeRadii -> [[CornerPoints]]) -> (Origin -> MultiDegreeRadii -> [[CornerPoints]])
+                -> ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) -> ExtensionHeight -> IO ()
+basePlateStl outerSleeveMDR createMainSocketBackFaces createMainSocketFrontFaces extensionFaceBuilder extensionHeight  =
+  let plateRadius = 30
+      conOuterMDR = transpose (+2) outerSleeveMDR
+      conTopOrigin = (Point (-10) (-15) 20)
+      topRowOfSleeveCubes = concat
+       [
+        currBackFace ++++ currFrontFace
+        | currFrontFace <- createMainSocketFrontFaces conTopOrigin $  extractList (take 2)  conOuterMDR
+        | currBackFace <- createMainSocketBackFaces conTopOrigin  $  extractList (take 2) outerSleeveMDR
+       ]
+
+      conCubes = plateToConCubes ++++>> ((transposeZ (+extensionHeight)) . extractTopFace )
+      conTriangles = (extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)) +++^  conCubes
+
+      plateToConTopFaces = [extractTopFace currCube | currCube <- topRowOfSleeveCubes]
+      --temp just too look at it.
+      --need to add conTopFaces to the plate top faces
+      --conCubes = conTopFaces ++++>> ((transposeZ (+(-10))) . lowerFaceFromUpperFace )
+      plateToConCubes = plateToConTopFaces ++++ (map (lowerFaceFromUpperFace . extractTopFace) plateUpperCubes)
+      plateToConTriangles = (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)) +++^  plateToConCubes
+      --conCubesStl = newStlShape "walker base plate" $ [FacesBackFrontTop | x <- [1..]] +++^  conCubes
+
+      plateUpperCubes =  map (+++>> ((transposeZ (+5)) . extractTopFace)) plateOuterCubes
+      plateUpperTriangles = (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)) +++^  plateUpperCubes
+
+      
+
+      plateOuterBtmFaces =  createBottomFaces (Point 0 0 0) (map (Radius) [(plateRadius + 2),(plateRadius+2)..]) (map (Angle) [0,10..360]) flatXSlope flatYSlope
+      plateOuterCubesTemp = plateOuterBtmFaces ++++>> (upperFaceFromLowerFace . (transposeZ (+3)))
+      plateOuterFrontFaces = [ (extractFrontFace) currCube    |currCube <- plateOuterCubesTemp]
+      plateOuterBackFaces = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- plateInnerCubes]
+      plateOuterCubes = plateOuterBackFaces ++++ plateOuterFrontFaces
+      plateOuterTriangles = (extensionFaceBuilder (FacesBottomFront) (FacesBottomFrontTop) (FacesBottomFront) (FacesBottomFront)) +++^  plateOuterCubes
+
+      plateInnerBtmFaces = createBottomFaces (Point 0 0 0) (map (Radius) [plateRadius,plateRadius..]) (map (Angle) [0,10..360]) flatXSlope flatYSlope
+      plateInnerCubes = plateInnerBtmFaces ++++>> (upperFaceFromLowerFace . (transposeZ (+3)))
+      plateInnerTriangles = (extensionFaceBuilder (FacesBottomTop) (FacesBottomTop) (FacesBottomTop) (FacesBottomTop)) +++^  plateInnerCubes
+      --plateCubesStl = newStlShape "walker base plate" plateInnerTriangles
+
+      
+      plateCubesStl = newStlShape "walker base plate" $    plateInnerTriangles ++ plateOuterTriangles ++
+                                                           plateUpperTriangles ++ plateToConTriangles ++
+                                                           conTriangles
+      
+  in  --putStrLn "temp"
+      --writeStlToFile conCubesStl
+      writeStlToFile plateCubesStl
+
+-}
 {-
 reduce the rows of the MulitiDegreeRadii by a factor of 100
 chop of the top layer as it has an error,
@@ -55,9 +169,20 @@ output to stl
 
 --do not call directly.
 --called via reducedRowsMultiDegreeScanWrapper as it reads the json file-}
-mainSocketStl :: MultiDegreeRadii -> IO ()
-mainSocketStl innerMDR =
+mainSocketStl :: MultiDegreeRadii -> MultiDegreeRadii -> (Origin -> MultiDegreeRadii -> [[CornerPoints]]) -> (Origin -> MultiDegreeRadii -> [[CornerPoints]])
+                 -> ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) -> ExtensionHeight  -> IO ()
+mainSocketStl    innerSleeveMDR      outerSleeveMDR      createMainSocketBackFaces  createMainSocketFrontFaces extensionFaceBuilder extensionHeight                                            =
   let 
+      
+      origin = (Point{x_axis=0, y_axis=0, z_axis=50})
+      createMainSocketCubesFromFrontAndBackFaces ::  MultiDegreeRadii ->   MultiDegreeRadii -> [[CornerPoints]]
+      createMainSocketCubesFromFrontAndBackFaces multiDegreeRadiiOuter multiDegreeRadiiInner =
+       [
+        currBackFace ++++ currFrontFace
+        | currFrontFace <- createMainSocketFrontFaces origin multiDegreeRadiiOuter
+        | currBackFace <- createMainSocketBackFaces origin multiDegreeRadiiInner
+       ]
+
       topOfExtension = extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)
       bodyOfExtension = [
                         extensionFaceBuilder (FacesBackFrontLeft)(FacesNada)(FacesBackFrontRight)(FacesBackFront)
@@ -66,31 +191,64 @@ mainSocketStl innerMDR =
       topOfMainBody = extensionFaceBuilder (FacesBackFront) (FacesBackFrontTop) (FacesBackFront) (FacesBackFront)
       mainBody = [
                            [FacesBackFront | x <- [1..]]
-                           | x <- [1..8]
-                         ] 
-      btmOfMainBody = [FacesBackBottomFront | x <- [1..]]
-
-
-      outerMDR = transpose (+2) innerMDR
-      mainBodyCubes = createMainSocketCubesFromFrontAndBackFaces outerMDR innerMDR
-      extensionCubes = (map (transposeZ (+30). extractTopFace)  (head  mainBodyCubes)) ++++ (map ( extractBottomFace)  (head  mainBodyCubes))
+                           | x <- [1..9]
+                 ] 
+      --btmOfMainBody = [FacesBackBottomFront | x <- [1..10]]  ++  [FacesBackBottom | x <- [1..]]
+      btmOfMainBody = [FacesBackBottomFront | x <- [1..3]]   ++
+                      [FacesBackBottom | x <- [1..5]] ++
+                      [FacesBackBottomFront | x <- [1..15]] ++
+                      [FacesBackBottom | x <- [1..5 ]] ++
+                      [FacesBackBottomFront | x <- [1.. ]]
+      
+      tieDownMDR = transpose (+20) outerSleeveMDR
+      tieDownCubes = tail $ createMainSocketCubesFromFrontAndBackFaces tieDownMDR outerSleeveMDR
+      noShowTieDownFaces = [
+                           [FacesNada | x <- [1..]]
+                           | x <- [1..16]
+                 ]
+      showTieDownFaces = [ [FacesNada | x <- [1..3]] ++
+                           [FacesBottomFrontRightTop] ++
+                           [FacesBottomFrontTop | x <- [1..3]] ++
+                           [FacesBottomFrontLeftTop] ++
+                           [FacesNada | x <- [1..15]] ++
+                           [FacesBottomFrontRightTop] ++
+                           [FacesBottomFrontTop | x <- [1..3]] ++
+                           [FacesBottomFrontLeftTop] ++
+                           [FacesNada | x <- [1..]]
+                           | x <- [1..]
+                 ]
+      tieDownTriangles = (noShowTieDownFaces ++ showTieDownFaces) ++++^ tieDownCubes
+      -- ((topOfExtension : bodyOfExtension) ++  (topOfMainBody : mainBody ))   ++:  btmOfMainBody
+                  
+      mainBodyCubes = createMainSocketCubesFromFrontAndBackFaces outerSleeveMDR innerSleeveMDR
+      extensionCubes = (map (transposeZ (+extensionHeight). extractTopFace)  (head  mainBodyCubes)) ++++ (map ( extractBottomFace)  (head  mainBodyCubes))
       
 
       triangles =
-        --(   topOfExtension : (  mainBody ++: topOfMainBody ++ bodyOfExtension )   ++:  btmOfMainBody)
         (
           ((topOfExtension : bodyOfExtension) ++  (topOfMainBody : mainBody ))   ++:  btmOfMainBody
         )
         ++++^
         ( extensionCubes : tail mainBodyCubes)
 
-      stlFile = newStlShape "walker socket" triangles
+      sleeveStlFile = newStlShape "walker sleeve" $ triangles ++ tieDownTriangles
   in
-      writeStlToFile stlFile
+      writeStlToFile sleeveStlFile
 {-
-mainSocketStl :: MultiDegreeRadii -> IO ()
-mainSocketStl innerMDR =
+mainSocketStl :: MultiDegreeRadii -> MultiDegreeRadii -> (Origin -> MultiDegreeRadii -> [[CornerPoints]]) -> (Origin -> MultiDegreeRadii -> [[CornerPoints]])
+                 -> ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) -> ExtensionHeight  -> IO ()
+mainSocketStl    innerSleeveMDR      outerSleeveMDR      createMainSocketBackFaces  createMainSocketFrontFaces extensionFaceBuilder extensionHeight                                            =
   let 
+      
+      origin = (Point{x_axis=0, y_axis=0, z_axis=50})
+      createMainSocketCubesFromFrontAndBackFaces ::  MultiDegreeRadii ->   MultiDegreeRadii -> [[CornerPoints]]
+      createMainSocketCubesFromFrontAndBackFaces multiDegreeRadiiOuter multiDegreeRadiiInner =
+       [
+        currBackFace ++++ currFrontFace
+        | currFrontFace <- createMainSocketFrontFaces origin multiDegreeRadiiOuter
+        | currBackFace <- createMainSocketBackFaces origin multiDegreeRadiiInner
+       ]
+
       topOfExtension = extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)
       bodyOfExtension = [
                         extensionFaceBuilder (FacesBackFrontLeft)(FacesNada)(FacesBackFrontRight)(FacesBackFront)
@@ -103,76 +261,27 @@ mainSocketStl innerMDR =
                          ] 
       btmOfMainBody = [FacesBackBottomFront | x <- [1..]]
 
-
-      outerMDR = transpose (+2) innerMDR
-      mainBodyCubes = createMainSocketCubesFromFrontAndBackFaces outerMDR innerMDR
-      extensionCubes = (map (transposeZ (+30). extractTopFace)  (head  mainBodyCubes)) ++++ (map ( extractBottomFace)  (head  mainBodyCubes))
+      
+      mainBodyCubes = createMainSocketCubesFromFrontAndBackFaces outerSleeveMDR innerSleeveMDR
+      extensionCubes = (map (transposeZ (+extensionHeight). extractTopFace)  (head  mainBodyCubes)) ++++ (map ( extractBottomFace)  (head  mainBodyCubes))
       
 
       triangles =
-        (   topOfExtension : (  mainBody ++: topOfMainBody ++ bodyOfExtension )   ++:  btmOfMainBody)
+        (
+          ((topOfExtension : bodyOfExtension) ++  (topOfMainBody : mainBody ))   ++:  btmOfMainBody
+        )
         ++++^
         ( extensionCubes : tail mainBodyCubes)
 
-      stlFile = newStlShape "walker socket" triangles
+      sleeveStlFile = newStlShape "walker sleeve" triangles
   in
-      writeStlToFile stlFile
+      writeStlToFile sleeveStlFile
+
 
 -}
 
-extensionFaceBuilder :: (Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]
-extensionFaceBuilder leftFace emptyFaces rightFace fillerFaces =
-        [leftFace] ++ [emptyFaces | x <- [2..30]] ++ [rightFace]   ++  [fillerFaces | x <- [31..]]
 
 
-createMainSocketCubesFromFrontAndBackFaces ::  MultiDegreeRadii ->   MultiDegreeRadii -> [[CornerPoints]]
-createMainSocketCubesFromFrontAndBackFaces multiDegreeRadiiOuter multiDegreeRadiiInner =
-  [
-    currBackFace ++++ currFrontFace
-    | currFrontFace <- createMainSocketFrontFaces 100 multiDegreeRadiiOuter
-    | currBackFace <- createMainSocketBackFaces 100 multiDegreeRadiiInner
-  ]
-  
-
-createMainSocketFrontFacesTestWrapper = do
-  contents <- BL.readFile "src/Data/scanFullData.json"
-  
-  case (decode contents) of
-   
-      Just (MultiDegreeRadii name' degrees') ->
-        let rowReductionFactor = 100
-            reducedScanBack = reduceScan rowReductionFactor (MultiDegreeRadii name' degrees')
-            reducedScanFront = transpose (+2) reducedScanBack
-        --in  print $ show $ length $ createMainSocketFrontFaces rowReductionFactor reducedScanFront
-        --in  print $ show $ length $ createMainSocketBackFaces rowReductionFactor reducedScanBack
-        in print $ show $ length $ createMainSocketCubesFromFrontAndBackFaces reducedScanFront reducedScanBack
-      Nothing                                ->
-        putStrLn "nothing"
-
-
-
-
-createMainSocketFrontFaces :: Int         ->  MultiDegreeRadii -> [[CornerPoints]]
-createMainSocketFrontFaces    rowReductionFactor multiDegreeRadii =
-  let leftFaces = createLeftFacesMultiColumns origin (tail $ degrees reducedScan) flatXSlope flatYSlope [0,heightPerPixel..]
-      rightFaces = createRightFaces origin (head $ degrees reducedScan) flatXSlope flatYSlope [0,heightPerPixel..]
-      origin = (Point{x_axis=0, y_axis=0, z_axis=50})
-      pixelsPerMM' = pixelsPerMM 
-      reducedScan = transpose (+2)  multiDegreeRadii
-      heightPerPixel = 1/pixelsPerMM' * (fromIntegral rowReductionFactor)
-  in 
-      [map (extractFrontFace) currRow  | currRow  <- (createHorizontallyAlignedCubes rightFaces leftFaces)]
-
-createMainSocketBackFaces :: Int ->          MultiDegreeRadii -> [[CornerPoints]]
-createMainSocketBackFaces    rowReductionFactor multiDegreeRadii  =
-  let --outerFacesMultiDegreeRaddi = transpose (+2) multiDegreeRadii
-      leftFaces = createLeftFacesMultiColumns origin (tail $ degrees multiDegreeRadii) flatXSlope flatYSlope [0,heightPerPixel..]
-      rightFaces = createRightFaces origin (head $ degrees multiDegreeRadii) flatXSlope flatYSlope [0,heightPerPixel..]
-      origin = (Point{x_axis=0, y_axis=0, z_axis=50})
-      pixelsPerMM' = pixelsPerMM 
-      heightPerPixel = 1/pixelsPerMM' * (fromIntegral rowReductionFactor)
-  in 
-      [map (backFaceFromFrontFace . extractFrontFace) currRow  | currRow  <- (createHorizontallyAlignedCubes rightFaces leftFaces)]
 
 
 writeStlFileFromRawScanWrapper :: IO ()
@@ -330,3 +439,7 @@ cameraAngle = 30
 type TargetValue = Word8
 redLaserLine :: TargetValue
 redLaserLine = 175
+
+type RowReductionFactor = Int
+type Origin = Point
+type ExtensionHeight = Double

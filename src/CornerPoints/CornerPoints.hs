@@ -5,6 +5,7 @@ CornerPoints(..),
 (++++),
 (++>),
 (+++>>),
+(++++>>),
 scaleCornerPoints,
 scaleCornerPointsZ,
 --transposePointZ,
@@ -296,11 +297,15 @@ Without the lower infix +++$ this would have tried to add the BackTopLine to the
 (+++$) :: CornerPoints -> CornerPoints -> CornerPoints
 (+++$) = (+++)
 
-{-A monadic style +++
+{- |A monadic style +++ that adds the result of f input to input.
 -}
 (+++>>) :: CornerPoints -> (CornerPoints -> CornerPoints) -> CornerPoints
 (BottomFace b1 f1 b4 f4) +++>> f = (BottomFace b1 f1 b4 f4) +++ (f (BottomFace b1 f1 b4 f4))
+(CubePoints f1 f2 f3 f4 b1 b2 b3 b4) +++>> f = (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) +++ (f (CubePoints f1 f2 f3 f4 b1 b2 b3 b4))
+(TopFace b2 f2 b3 f3) +++>> f = (TopFace b2 f2 b3 f3) +++ (f (TopFace b2 f2 b3 f3))
 
+(++++>>) :: [CornerPoints] -> (CornerPoints -> CornerPoints) -> [CornerPoints]
+faces ++++>> f = [ x +++>> f |  x <- faces]
 
 {-Add CornerPoints together.
 Must follow all the rules of adding.
@@ -535,6 +540,9 @@ data Faces =
  | FacesAllButFront
  | FacesAllButLeft
  | FacesAllButRight
+
+ | FacesBackBottom
+   
  | FacesBackBottomFront
  | FacesBackBottomFrontLeft
  | FacesBackBottomFrontLeftTop
@@ -544,10 +552,8 @@ data Faces =
  | FacesBackBottomLeft
  | FacesBackBottomLeftRight
  | FacesBackBottomTop
-
  | FacesBackFrontLeft
  | FacesBackFrontRight
-   
  | FacesBackFront
  | FacesBackFrontLeftRight
  | FacesBackFrontLeftRightTop
@@ -561,6 +567,7 @@ data Faces =
  | FacesBottomFrontLeftTop
  | FacesBottomFrontLeftRightTop
  | FacesBottomFrontRight
+ | FacesBottomFrontRightTop
  | FacesBottomFrontTop
  | FacesBottomLeft
  | FacesBottomLeftRight 
