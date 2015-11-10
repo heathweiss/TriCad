@@ -1,15 +1,15 @@
 {-# LANGUAGE ParallelListComp #-}
 module CornerPoints.VerticalFaces(
-  createRightFaces,
-  createLeftFaces,
-  createHorizontallyAlignedCubes,
-  createLeftFacesMultiColumns,
+  createRightFaces, createRightFacesNoSlope,
+  createLeftFaces, createLeftFacesNoSlope,
+  createHorizontallyAlignedCubes, createHorizontallyAlignedCubesNoSlope,
+  createLeftFacesMultiColumns, createLeftFacesMultiColumnsNoSlope,
   TransposeFactor(..)) where
-import CornerPoints.Create(Slope(..), Origin(..), createCornerPoint, Angle(..))
+import CornerPoints.Create(Slope(..), Origin(..), createCornerPoint, Angle(..), flatXSlope, flatYSlope)
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import CornerPoints.Transpose (transposeZ)
 import CornerPoints.Points(Point(..))
-import CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..))
+import CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..))
 import CornerPoints.Transposable( TransposeLength, transpose)
                            
 
@@ -116,12 +116,19 @@ createRightFaces :: Origin -> SingleDegreeRadii -> Slope -> Slope -> [TransposeF
 createRightFaces origin singleDegreeRadii xSlope ySlope zTransposeFactor  =
   createVerticalFaces origin singleDegreeRadii xSlope ySlope zTransposeFactor (F3) (B3) (F4) (B4)
 
+createRightFacesNoSlope :: Origin -> SingleDegreeRadii -> [TransposeFactor] -> [CornerPoints]
+createRightFacesNoSlope origin singleDegreeRadii zTransposeFactor  =
+  createVerticalFaces origin singleDegreeRadii flatXSlope flatYSlope zTransposeFactor (F3) (B3) (F4) (B4)
+
 
 -- |Create a column of LeftFace 
 createLeftFaces :: Origin -> SingleDegreeRadii -> Slope -> Slope -> [TransposeFactor] -> [CornerPoints]
 createLeftFaces origin singleDegreeRadii xSlope ySlope zTransposeFactor  =
   createVerticalFaces origin singleDegreeRadii xSlope ySlope zTransposeFactor (F2) (B2) (F1) (B1)
 
+createLeftFacesNoSlope :: Origin -> SingleDegreeRadii -> [TransposeFactor] -> [CornerPoints]
+createLeftFacesNoSlope origin singleDegreeRadii zTransposeFactor  =
+  createVerticalFaces origin singleDegreeRadii flatXSlope flatYSlope zTransposeFactor (F2) (B2) (F1) (B1)
 
 
 {-
@@ -134,6 +141,12 @@ createLeftFacesMultiColumns _ [] _ _ _ = []
 createLeftFacesMultiColumns topOrigin (d:ds) xSlope ySlope zTransposeFactor =
   (createLeftFaces topOrigin d xSlope ySlope zTransposeFactor ) :
     (createLeftFacesMultiColumns topOrigin ds xSlope ySlope zTransposeFactor)
+
+createLeftFacesMultiColumnsNoSlope ::  Origin -> [SingleDegreeRadii] -> [TransposeFactor] -> [[CornerPoints]]
+createLeftFacesMultiColumnsNoSlope _ [] _ = []
+createLeftFacesMultiColumnsNoSlope topOrigin (d:ds) zTransposeFactor =
+  (createLeftFacesNoSlope topOrigin d zTransposeFactor ) :
+    (createLeftFacesMultiColumnsNoSlope topOrigin ds zTransposeFactor)
 
 
 
@@ -149,6 +162,14 @@ createHorizontallyAlignedCubes ([]) _ = []
 createHorizontallyAlignedCubes (x:xs) (ys) =
   let headOfLeftFaces = map (head) ys
   in (x ++> headOfLeftFaces) : (createHorizontallyAlignedCubes xs (map (tail) ys) )
+
+
+createHorizontallyAlignedCubesNoSlope :: Origin -> MultiDegreeRadii -> [TransposeFactor] -> [[CornerPoints]]
+createHorizontallyAlignedCubesNoSlope origin (MultiDegreeRadii name' degrees') transposeFactors =
+  let leftFaces = createLeftFacesMultiColumnsNoSlope origin (tail degrees') transposeFactors
+      rightFaces = createRightFacesNoSlope origin (head degrees' )  transposeFactors
+  in  createHorizontallyAlignedCubes rightFaces leftFaces
+
 
 
 -- Amount used to transpose a point
