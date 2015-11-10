@@ -4,7 +4,7 @@ module CornerPoints.VerticalFaces(
   createLeftFaces,
   createHorizontallyAlignedCubes,
   createLeftFacesMultiColumns,
-  TransposeFactor(..), transpose) where
+  TransposeFactor(..)) where
 import CornerPoints.Create(Slope(..), Origin(..), createCornerPoint, Angle(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
 import CornerPoints.Transpose (transposeZ)

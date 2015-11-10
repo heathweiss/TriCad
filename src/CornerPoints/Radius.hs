@@ -1,3 +1,4 @@
+
 module CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..),
                           extractSingle, extractList) where
 import CornerPoints.Transposable( TransposeLength, transpose)
@@ -71,3 +72,7 @@ instance ExtractableRadius SingleDegreeRadii where
 instance ExtractableRadius MultiDegreeRadii where
   extractSingle f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (extractSingle f) degrees')
   extractList f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (extractList f) degrees')
+
+
+
+

@@ -6,8 +6,7 @@ import Data.Word(Word8)
 import qualified Data.ByteString.Lazy as BL
 import Data.Aeson
 import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(..),extractSingle, extractList)
-import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createHorizontallyAlignedCubes,
-                             transpose)
+import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createHorizontallyAlignedCubes)
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..), (+++>>), (++++>>))
 import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope, Angle(..))
@@ -21,6 +20,7 @@ import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFac
 import CornerPoints.Transpose (transposeZ)
 import Helpers.List((++:))
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFaces)
+import CornerPoints.Transposable(transpose)
 {-
 read in the Multidegree json file, which has valid Radii,
 and process it into stl using whatever function required for the current shape. -}
