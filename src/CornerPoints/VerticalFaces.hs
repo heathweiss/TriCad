@@ -3,7 +3,7 @@ module CornerPoints.VerticalFaces(
   createRightFaces, createRightFacesNoSlope,
   createLeftFaces, createLeftFacesNoSlope,
   createHorizontallyAlignedCubes, createHorizontallyAlignedCubesNoSlope,
-  createLeftFacesMultiColumns, createLeftFacesMultiColumnsNoSlope,
+  createLeftFacesMultiColumns, createLeftFacesMultiColumnsNoSlope, createVerticalWalls,
   TransposeFactor(..)) where
 import CornerPoints.Create(Slope(..), Origin(..), createCornerPoint, Angle(..), flatXSlope, flatYSlope)
 import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
@@ -11,7 +11,8 @@ import CornerPoints.Transpose (transposeZ)
 import CornerPoints.Points(Point(..))
 import CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..))
 import CornerPoints.Transposable( TransposeLength, transpose)
-                           
+import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBottomFace)
+import CornerPoints.FaceConversions(backFaceFromFrontFace)                           
 
 
 
@@ -170,6 +171,15 @@ createHorizontallyAlignedCubesNoSlope origin (MultiDegreeRadii name' degrees') t
       rightFaces = createRightFacesNoSlope origin (head degrees' )  transposeFactors
   in  createHorizontallyAlignedCubes rightFaces leftFaces
 
+
+{- |Create a vertical shape with walls based on an inner and outer MultiDegreeRadii-}
+createVerticalWalls ::  MultiDegreeRadii ->   MultiDegreeRadii ->      Origin -> [TransposeFactor] -> [[CornerPoints]]
+createVerticalWalls     multiDegreeRadiiInner    multiDegreeRadiiOuter origin    transposeFactors =
+       [
+        currBackFace ++++ currFrontFace
+        | currFrontFace <- [map (extractFrontFace) currRow  | currRow  <- createHorizontallyAlignedCubesNoSlope origin multiDegreeRadiiOuter transposeFactors] 
+        | currBackFace <- [ map (backFaceFromFrontFace . extractFrontFace) currRow | currRow  <- (createHorizontallyAlignedCubesNoSlope origin multiDegreeRadiiInner transposeFactors ) ]
+       ]
 
 
 -- Amount used to transpose a point

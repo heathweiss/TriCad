@@ -4,12 +4,16 @@ module CornerPoints.HorizontalFaces(
   createBottomFaces,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
-  
+  cylinderWallsNoSlope,
+  cylinderSolidNoSlope
   )where
-import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, Angle(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, Angle(..),  flatXSlope, flatYSlope,)
+import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..), (+++>>), (++++>>))
 import CornerPoints.Points(Point(..))
 import CornerPoints.Radius(Radius(..))
+import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBottomFace)
+import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
+import CornerPoints.Transpose (transposeZ)
 
 {- |Create a single CornerPoints.BottomRightLine, and add it to the head of [BottomLeftLine]. This will give a BottomFace.
 Then add the next BottomLeftLine to this BottomFace to get the next BottomFace. Continue through the [BottomLeftLine] till
@@ -134,3 +138,32 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
        | currYSlope <- tail ySlope
     ]
 
+
+cylinderWallsNoSlope :: Radius -> Thickness ->  Origin -> [Angle] -> Height -> [CornerPoints]
+cylinderWallsNoSlope    innerRadius    wallThickness origin    angles     height =
+        let  --innerCubes = createBottomFaces origin (map (Radius) [innerRadius,innerRadius..]) angles flatXSlope flatYSlope
+             innerCubes = createBottomFaces origin [innerRadius | x <-  [1..]] angles flatXSlope flatYSlope
+                         ++++>>
+                         (upperFaceFromLowerFace . (transposeZ (+height)))
+
+             outerCubes = --createBottomFaces origin (map (Radius) [(innerRadius + wallThickness),(innerRadius + wallThickness)..]) angles flatXSlope flatYSlope
+                         createBottomFaces origin [Radius ((radius innerRadius) + wallThickness) |x <- [1..]] angles flatXSlope flatYSlope
+                         ++++>>
+                         (upperFaceFromLowerFace . (transposeZ (+height)))
+             cylinderCubes = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- innerCubes]
+                             ++++
+                             [ (extractFrontFace) currCube    |currCube <- outerCubes]
+               --outerFrontFaces = [ (extractFrontFace) currCube    |currCube <- outerCubesTemp]
+               --outerBackFaces = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- innerCubes]
+               --outerCubes = outerBackFaces ++++ outerFrontFaces
+        in  cylinderCubes
+
+cylinderSolidNoSlope :: Radius -> Origin -> [Angle] -> Height -> [CornerPoints]
+cylinderSolidNoSlope    radius    origin    angles     height  =
+  createBottomFaces origin [radius | x <- [1..]] angles flatXSlope flatYSlope
+  ++++>>
+  (upperFaceFromLowerFace . (transposeZ (+height)))
+
+
+type Thickness = Double
+type Height = Double
