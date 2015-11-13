@@ -1,6 +1,6 @@
 module Tests.CornerPointsTest(cornerPointsTestDo ) where
 import Test.HUnit
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++>), (++++), CornerPointsBuilder(..), (+++>>>), (++++>>), (+++>>))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (+++>), (++++), CornerPointsBuilder(..), (+++>>>), (++++>>), (+++>>))
 import CornerPoints.Points (Point(..))
 import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
 import CornerPoints.Transpose (transposeZ)
@@ -206,15 +206,15 @@ bottomFrontLinePlusPlusPlusbackBottomLineTest = TestCase $ assertEqual
 
 --As everything is 1's, values don't matter. Is just testing for inexhaustive pattern matching.
 topRightLineRolledIntoTopLeftLinesTest = TestCase $ assertEqual
-  "TopRightLine ++> [TopLeftLine, TopLeftLine] = [TopFace, TopFace]"
+  "TopRightLine +++> [TopLeftLine, TopLeftLine] = [TopFace, TopFace]"
   ([(TopFace (Point 1 1 1) (Point 1 1 1) (Point 1 1 1) (Point 1 1 1)), (TopFace (Point 1 1 1) (Point 1 1 1) (Point 1 1 1) (Point 1 1 1)) ]) 
-  ((TopRightLine (Point 1 1 1) (Point 1 1 1)) ++>  [(TopLeftLine (Point 1 1 1) (Point 1 1 1)), (TopLeftLine (Point 1 1 1) (Point 1 1 1))] )
+  ((TopRightLine (Point 1 1 1) (Point 1 1 1)) +++>  [(TopLeftLine (Point 1 1 1) (Point 1 1 1)), (TopLeftLine (Point 1 1 1) (Point 1 1 1))] )
 
 --As everything is 1's, values don't matter. Is just testing for inexhaustive patter matching.
 bottomRightLineRolledIntobottomLeftLinesTest = TestCase $ assertEqual
-  "bottomRightLine ++> [bottomLeftLine, bottomLeftLine] = [TopFace, TopFace]"
+  "bottomRightLine +++> [bottomLeftLine, bottomLeftLine] = [TopFace, TopFace]"
   ([(BottomFace (Point 1 1 1) (Point 1 1 1) (Point 1 1 1) (Point 1 1 1)), (BottomFace (Point 1 1 1) (Point 1 1 1) (Point 1 1 1) (Point 1 1 1)) ]) 
-  ((BottomRightLine (Point 1 1 1) (Point 1 1 1)) ++>  [(BottomLeftLine (Point 1 1 1) (Point 1 1 1)), (BottomLeftLine (Point 1 1 1) (Point 1 1 1))] )
+  ((BottomRightLine (Point 1 1 1) (Point 1 1 1)) +++>  [(BottomLeftLine (Point 1 1 1) (Point 1 1 1)), (BottomLeftLine (Point 1 1 1) (Point 1 1 1))] )
 
 {-
 Combine the above 2 tests using ++++
@@ -226,17 +226,17 @@ topRightLineRolledIntoTopLeftLinesTestP4bottomRightLineRolledIntobottomLeftLines
    ]
   ) 
   (
-   (TopRightLine (Point 1 1 1) (Point 1 1 1)) ++>  [(TopLeftLine (Point 1 1 1) (Point 1 1 1)), (TopLeftLine (Point 1 1 1) (Point 1 1 1))] 
+   (TopRightLine (Point 1 1 1) (Point 1 1 1)) +++>  [(TopLeftLine (Point 1 1 1) (Point 1 1 1)), (TopLeftLine (Point 1 1 1) (Point 1 1 1))] 
    ++++
-   (BottomRightLine (Point 1 1 1) (Point 1 1 1)) ++>  [(BottomLeftLine (Point 1 1 1) (Point 1 1 1)), (BottomLeftLine (Point 1 1 1) (Point 1 1 1))] 
+   (BottomRightLine (Point 1 1 1) (Point 1 1 1)) +++>  [(BottomLeftLine (Point 1 1 1) (Point 1 1 1)), (BottomLeftLine (Point 1 1 1) (Point 1 1 1))] 
   )
 
 
 {-
-Test infix ordering of +++ vs ++>
+Test infix ordering of +++ vs +++>
 -}
 f2PlusPlusPlusB2PlusPlusFwdF3PlusPlusPlusB3 = TestCase $ assertEqual
-  "F2 +++ B2 ++> [F3 +++ B3]"
+  "F2 +++ B2 +++> [F3 +++ B3]"
   [(TopFace (Point 2 2 2) (Point 2 2 2) (Point 2 2 2) (Point 2 2 2))]
-  ( (F2 (Point 2 2 2)) +++ (B2 (Point 2 2 2)) ++>  [(F3 (Point 2 2 2)) +++ (B3 (Point 2 2 2))])
+  ( (F2 (Point 2 2 2)) +++ (B2 (Point 2 2 2)) +++>  [(F3 (Point 2 2 2)) +++ (B3 (Point 2 2 2))])
 

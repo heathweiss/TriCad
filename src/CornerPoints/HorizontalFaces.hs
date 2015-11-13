@@ -8,7 +8,7 @@ module CornerPoints.HorizontalFaces(
   cylinderSolidNoSlope
   )where
 import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, Angle(..),  flatXSlope, flatYSlope,)
-import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..), (+++>>), (++++>>))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (++++), Faces(..), (+++>>), (++++>>))
 import CornerPoints.Points(Point(..))
 import CornerPoints.Radius(Radius(..))
 import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBottomFace)
@@ -35,7 +35,7 @@ createBottomFaces inOrigin radii angles xSlope ySlope  =
     ) 
     +++
     B4 inOrigin
-    ++>
+    +++>
     [(createCornerPoint
       (F1)
       inOrigin
@@ -63,7 +63,7 @@ createBottomFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
     ) 
     +++
     B4 inOrigin
-    ++>
+    +++>
     [(createCornerPoint
       (F1)
       inOrigin
@@ -93,7 +93,7 @@ createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
     ) 
     +++
     B3 inOrigin
-    ++>
+    +++>
     [(createCornerPoint
       (F2)
       inOrigin
@@ -121,7 +121,7 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
     ) 
     +++
     B3 inOrigin
-    ++>
+    +++>
     [(createCornerPoint
       (F2)
       inOrigin

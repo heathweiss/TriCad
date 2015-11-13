@@ -4,7 +4,7 @@ import CornerPoints.Create(slopeAdjustedForVerticalAngle, createCornerPoint, Slo
   Angle(..), flatXSlope, flatYSlope )
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++++), Faces(..))
 import Stl.StlCornerPoints((+++^))
 import Stl.StlBase (StlShape(..), newStlShape, stlShapeToText)
 import Stl.StlFileWriter(writeStlToFile)

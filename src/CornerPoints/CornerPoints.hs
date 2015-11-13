@@ -3,7 +3,7 @@ CornerPoints(..),
 (+++),
 (+++$),
 (++++),
-(++>),
+(+++>),
 (+++>>),
 (+++>>>),
 (++++>>),
@@ -20,7 +20,7 @@ import    Control.Applicative
 infix 7 +++
 infix 6 +++$
 infix 5 +++>> 
-infix 5 ++>
+infix 5 +++>
 infix 4 ++++
 --infix 3 +++^
 data CornerPoints =
@@ -318,6 +318,16 @@ data CornerPointsBuilder  = CornerPointsBuilder {getCornerPoints :: [[CornerPoin
 (+++>>>>) :: CornerPointsBuilder -> ([CornerPoints] -> [CornerPoints]  -> [CornerPoints] ) -> CornerPointsBuilder
 (CornerPointsBuilder cornerPoints) +++>>>> f = CornerPointsBuilder (        (f (head $ tail cornerPoints) (head cornerPoints))  : cornerPoints)
 
+-- |Do a scanl on a list of cornerponts, using +++.
+-- Ex: pass a RightFace into a list of LeftFaces, resulting in a list of CubePoints
+(+++>) :: CornerPoints -> [CornerPoints] -> [CornerPoints]
+a +++> bs =
+     tail $ scanl (+++) a bs
+{-
+(++>) :: CornerPoints -> [CornerPoints] -> [CornerPoints]
+a ++> bs =
+     tail $ scanl (+++) a bs
+-}
 
 {-Add CornerPoints together.
 Must follow all the rules of adding.
@@ -490,10 +500,6 @@ but
 (FrontTopLine _ _) +++ (FrontTopLine _ _) = CornerPointsError "illegal FrontTopLine +++ FrontTopLine operation"
 
 a +++ b = CornerPointsError "illegal +++ operation"
------------------------------------- ++> ------------------------------------------
-(++>) :: CornerPoints -> [CornerPoints] -> [CornerPoints]
-a ++> bs =
-     tail $ scanl (+++) a bs
 
 ----------------------------------------------- scale cubes/points ------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------

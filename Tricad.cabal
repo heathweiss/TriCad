@@ -40,7 +40,6 @@ library
                      --Have not been redone for changes to MathPolar.
                      --Leave in until sure I will not need them further for printing shoe lifts
                    -- Sockets
-                   Examples.Sockets.Bicycle
                    -- scanned shapes
                    Examples.Scan.WalkerSocket
                    -- Misc Shapes

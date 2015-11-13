@@ -9,7 +9,7 @@ import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(.
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalWalls,
                                   createHorizontallyAlignedCubesNoSlope, createHorizontallyAlignedCubes)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..), (+++>>), (++++>>), (+++>>>), (+++>>>>), CornerPointsBuilder(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++++), Faces(..), (+++>>), (++++>>), (+++>>>), (+++>>>>), CornerPointsBuilder(..))
 import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope, Angle(..))
 import Stl.StlCornerPoints((+++^), (++++^))
 import Stl.StlBase (StlShape(..), newStlShape)

@@ -1,6 +1,6 @@
 module Tests.CornerPointsDebugTest(cornerPointsDebugTestDo) where
 import Test.HUnit
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++>), (++++))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++++))
 import CornerPoints.Points (Point(..)) 
 import CornerPoints.Debug((+++^?), (++^?), CubeName(..), CubeDebug(..), CubeDebugs(..), showDebugMsg)
 

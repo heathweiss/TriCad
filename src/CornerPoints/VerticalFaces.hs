@@ -6,7 +6,7 @@ module CornerPoints.VerticalFaces(
   createLeftFacesMultiColumns, createLeftFacesMultiColumnsNoSlope, createVerticalWalls,
   TransposeFactor(..)) where
 import CornerPoints.Create(Slope(..), Origin(..), createCornerPoint, Angle(..), flatXSlope, flatYSlope)
-import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (++++), Faces(..))
 import CornerPoints.Transpose (transposeZ)
 import CornerPoints.Points(Point(..))
 import CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..))
@@ -40,7 +40,7 @@ Scanning is done vertically, so it would be best to build the model that way, in
 to fit the horizontal model supplied by 'createBottomFaces'/'createTopFaces'
 
 Create a set of right faces, which will be used as the initial faces, to which all the subsequent left
-faces will be added via ++>. This is used to build both right/left faces.
+faces will be added via +++>. This is used to build both right/left faces.
 
 Create in a top down direction, as that is the way the openCV data is supplied.
 
@@ -108,7 +108,7 @@ createVerticalFaces origin (SingleDegreeRadii degree' radii') xSlope ySlope zTra
        
    in  
        topLine
-       ++>
+       +++>
        bottomLines
    
 
@@ -156,13 +156,13 @@ createLeftFacesMultiColumnsNoSlope topOrigin (d:ds) zTransposeFactor =
     Results in [[CornerPoints]] where each inner list represents horizontal layer..-}
 {-
 
-Normally: RightFace ++> [LeftFaces], instead of  [RightFace] ++> [[LeftFace]],  so need recursion to work through the extra level of lists.
+Normally: RightFace +++> [LeftFaces], instead of  [RightFace] +++> [[LeftFace]],  so need recursion to work through the extra level of lists.
 -}
 createHorizontallyAlignedCubes :: [CornerPoints] -> [[CornerPoints]] -> [[CornerPoints]]
 createHorizontallyAlignedCubes ([]) _ = []
 createHorizontallyAlignedCubes (x:xs) (ys) =
   let headOfLeftFaces = map (head) ys
-  in (x ++> headOfLeftFaces) : (createHorizontallyAlignedCubes xs (map (tail) ys) )
+  in (x +++> headOfLeftFaces) : (createHorizontallyAlignedCubes xs (map (tail) ys) )
 
 
 createHorizontallyAlignedCubesNoSlope :: Origin -> MultiDegreeRadii -> [TransposeFactor] -> [[CornerPoints]]
