@@ -10,7 +10,7 @@ module Primitives.Cylindrical(hello, cylinderHollow, cylinderSolid) where
 import CornerPoints.Create(slopeAdjustedForVerticalAngle, Slope(..), Angle(..), flatXSlope, flatYSlope)
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++++), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..))
 import CornerPoints.FaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace )
 import CornerPoints.FaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine)
 import CornerPoints.Radius(Radius(..))
@@ -33,11 +33,11 @@ Need to go back and visit TriCad.MathPolar and work on the tapered vs non-tapere
 Till then, no point in doing anything with slopes.
 -}
 ringBase btmOrigin btmInnerRadius btmOuterRadius topOrigin topInnerRadius topOuterRadius angles  =
-  topFaces ++++ btmFaces
+  topFaces |+++| btmFaces
    where
      topFaces =
        (map (extractFrontTopLine) (createTopFaces topOrigin topOuterRadius (map (Angle) angles) flatXSlope flatYSlope))
-       ++++
+       |+++|
        (map
         (backTopLineFromFrontTopLine . extractFrontTopLine)
         (createTopFaces topOrigin topInnerRadius (map (Angle) angles) flatXSlope flatYSlope)
@@ -46,7 +46,7 @@ ringBase btmOrigin btmInnerRadius btmOuterRadius topOrigin topInnerRadius topOut
      btmFaces =
        (map (extractBottomFrontLine)
             (createBottomFaces btmOrigin btmOuterRadius (map (Angle) angles) flatXSlope flatYSlope))
-       ++++
+       |+++|
        (map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
             (createBottomFaces btmOrigin btmInnerRadius (map (Angle) angles) flatXSlope flatYSlope)
        )

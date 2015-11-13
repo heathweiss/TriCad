@@ -1,6 +1,6 @@
 module Tests.CornerPointsDebugTest(cornerPointsDebugTestDo) where
 import Test.HUnit
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++++))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|))
 import CornerPoints.Points (Point(..)) 
 import CornerPoints.Debug((+++^?), (++^?), CubeName(..), CubeDebug(..), CubeDebugs(..), showDebugMsg)
 
@@ -50,7 +50,7 @@ backBottomLinesPlusBackBottomLines = TestCase $ assertEqual
    ([CubeName "BackBottomLines" | x <- [1..]])
    +++^?
    ([(BackBottomLine (Point 11 11 11) (Point 11 11 11)), (BackBottomLine (Point 11 11 11) (Point 11 11 11))]
-    ++++ 
+    |+++| 
    [(BackBottomLine (Point 11 11 11) (Point 11 11 11)), (BackBottomLine (Point 11 11 11) (Point 11 11 11))])
   )
 
@@ -68,7 +68,7 @@ backBottomLinesPlusBackBottomLineFrontBottomLine = TestCase $ assertEqual
    ([CubeName "BackBottomLines" | x <- [1..]])
    +++^?
    ([(BackBottomLine (Point 11 11 11) (Point 11 11 11)), (BackBottomLine (Point 11 11 11) (Point 11 11 11))]
-    ++++ 
+    |+++| 
    [(BackBottomLine (Point 11 11 11) (Point 11 11 11)), (BottomFrontLine (Point 11 11 11) (Point 11 11 11))])
   )
 

@@ -6,7 +6,7 @@ module CornerPoints.VerticalFaces(
   createLeftFacesMultiColumns, createLeftFacesMultiColumnsNoSlope, createVerticalWalls,
   TransposeFactor(..)) where
 import CornerPoints.Create(Slope(..), Origin(..), createCornerPoint, Angle(..), flatXSlope, flatYSlope)
-import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (++++), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (|+++|), Faces(..))
 import CornerPoints.Transpose (transposeZ)
 import CornerPoints.Points(Point(..))
 import CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..))
@@ -176,7 +176,7 @@ createHorizontallyAlignedCubesNoSlope origin (MultiDegreeRadii name' degrees') t
 createVerticalWalls ::  MultiDegreeRadii ->   MultiDegreeRadii ->      Origin -> [TransposeFactor] -> [[CornerPoints]]
 createVerticalWalls     multiDegreeRadiiInner    multiDegreeRadiiOuter origin    transposeFactors =
        [
-        currBackFace ++++ currFrontFace
+        currBackFace |+++| currFrontFace
         | currFrontFace <- [map (extractFrontFace) currRow  | currRow  <- createHorizontallyAlignedCubesNoSlope origin multiDegreeRadiiOuter transposeFactors] 
         | currBackFace <- [ map (backFaceFromFrontFace . extractFrontFace) currRow | currRow  <- (createHorizontallyAlignedCubesNoSlope origin multiDegreeRadiiInner transposeFactors ) ]
        ]

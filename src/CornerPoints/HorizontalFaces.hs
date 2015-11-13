@@ -8,7 +8,7 @@ module CornerPoints.HorizontalFaces(
   cylinderSolidNoSlope
   )where
 import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, Angle(..),  flatXSlope, flatYSlope,)
-import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (++++), Faces(..), (+++>>), (++++>>))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (|+++|), Faces(..), (+++>>), (++++>>))
 import CornerPoints.Points(Point(..))
 import CornerPoints.Radius(Radius(..))
 import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBottomFace)
@@ -151,11 +151,11 @@ cylinderWallsNoSlope    innerRadius    wallThickness origin    angles     height
                          ++++>>
                          (upperFaceFromLowerFace . (transposeZ (+height)))
              cylinderCubes = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- innerCubes]
-                             ++++
+                             |+++|
                              [ (extractFrontFace) currCube    |currCube <- outerCubes]
                --outerFrontFaces = [ (extractFrontFace) currCube    |currCube <- outerCubesTemp]
                --outerBackFaces = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- innerCubes]
-               --outerCubes = outerBackFaces ++++ outerFrontFaces
+               --outerCubes = outerBackFaces |+++| outerFrontFaces
         in  cylinderCubes
 
 cylinderSolidNoSlope :: Radius -> Origin -> [Angle] -> Height -> [CornerPoints]

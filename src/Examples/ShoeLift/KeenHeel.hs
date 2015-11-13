@@ -3,7 +3,7 @@ module Examples.ShoeLift.KeenHeel where
 import CornerPoints.Create(slopeAdjustedForVerticalAngle, Slope(..), Angle(..), flatXSlope, flatYSlope )
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++++), Faces(..),(+++>>))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..),(+++>>))
 import Stl.StlCornerPoints((+++^))
 import Stl.StlBase (StlShape(..), newStlShape, stlShapeToText)
 import Stl.StlFileWriter(writeStlToFile)
@@ -42,10 +42,10 @@ treadTopCubes =
   --front line
     (
       map (extractFrontTopLine) (createTopFaces treadTopOrigin soleRadius angles flatXSlope flatYSlope)
-      ++++
+      |+++|
       --back line
       map (backTopLineFromFrontTopLine . extractFrontTopLine) (createTopFaces treadTopOrigin keyWayRadius angles flatXSlope flatYSlope))
-      ++++
+      |+++|
      --the top faces of the btm cubes
     (
       map (lowerFaceFromUpperFace .  extractTopFace) treadBtmCubes
@@ -54,7 +54,7 @@ treadTopCubes =
 
 treadBtmCubes  =
   map ((transposeZ (+ 10)) . upperFaceFromLowerFace  ) treadBtmFaces
-  ++++
+  |+++|
   treadBtmFaces
 
 
@@ -62,7 +62,7 @@ treadBtmFaces =
   --front line
   map (extractBottomFrontLine)
       (createBottomFaces treadBtmOrigin treadRadius angles flatXSlope flatYSlope)
-  ++++
+  |+++|
   --back line
   map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
       (createBottomFaces treadBtmOrigin keyWayRadius angles flatXSlope flatYSlope)
@@ -100,13 +100,13 @@ adaptorDebug =
    +++^?
    adaptorCubes
 
-adaptorCubes = adaptorTopFaces ++++ adaptorBtmFaces
+adaptorCubes = adaptorTopFaces |+++| adaptorBtmFaces
 
 ----------- top faces
 adaptorTopFaces =
   --front line
     map (extractFrontTopLine) (createTopFaces adaptorTopOrigin soleRadius angles flatXSlope adaptorSlope)
-    ++++
+    |+++|
     --back line
     map (backTopLineFromFrontTopLine . extractFrontTopLine) (createTopFaces adaptorTopOrigin keyWayRadius angles flatXSlope adaptorSlope)
 
@@ -115,7 +115,7 @@ adaptorBtmFaces =
   --front line
   map (extractBottomFrontLine)
       (createBottomFaces adaptorBtmOrigin soleRadius angles flatXSlope flatYSlope)
-  ++++
+  |+++|
   --back line
   map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
       (createBottomFaces adaptorBtmOrigin keyWayRadius angles flatXSlope flatYSlope)
@@ -152,7 +152,7 @@ keyDebug =
 
 keyCubes =
  createTopFaces topKeyOrigin keyRadius angles flatXSlope flatYSlope
- ++++
+ |+++|
  createBottomFaces btmKeyOrigin keyRadius angles flatXSlope flatYSlope
 
 topKeyOrigin = (Point{x_axis=0, y_axis=(0), z_axis=20})

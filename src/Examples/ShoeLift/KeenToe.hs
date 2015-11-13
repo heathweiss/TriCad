@@ -4,7 +4,7 @@ import CornerPoints.Create(slopeAdjustedForVerticalAngle, createCornerPoint, Slo
   Angle(..), flatXSlope, flatYSlope )
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++++), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..))
 import Stl.StlCornerPoints((+++^))
 import Stl.StlBase (StlShape(..), newStlShape, stlShapeToText)
 import Stl.StlFileWriter(writeStlToFile)
@@ -35,7 +35,7 @@ solePlateDebug = [CubeName "solePlateCube" | x <- [1..]]
    +++^?
    solePlateCubes
 
-solePlateCubes = solePlateTopFaces ++++ solePlateBtmFaces
+solePlateCubes = solePlateTopFaces |+++| solePlateBtmFaces
 
 solePlateTopFaces = map ((transposeZ (+30)) .  upperFaceFromLowerFace) solePlateBtmFaces
 
@@ -62,7 +62,7 @@ adaptorCubesDebug =
    +++^?
    adaptorCubes
 
-adaptorCubes = adaptorTopFaces ++++ adaptorBtmFaces
+adaptorCubes = adaptorTopFaces |+++| adaptorBtmFaces
 
 ----------- top faces
 adaptorTopFacesDebug =
@@ -73,7 +73,7 @@ adaptorTopFacesDebug =
 adaptorTopFaces =
      --front line
     map (extractFrontTopLine) (createTopFaces adaptorTopOrigin soleRadius angles flatXSlope flatYSlope)
-    ++++
+    |+++|
     --back line
     map (backTopLineFromFrontTopLine . extractFrontTopLine) (createTopFaces adaptorTopOrigin keyRadius angles flatXSlope flatYSlope)   
 
@@ -89,7 +89,7 @@ adaptorBtmFaces =
   --front line
   (map (extractBottomFrontLine)
       (createBottomFaces adaptorBtmOrigin treadRadius angles flatXSlope flatYSlope))
-  ++++
+  |+++|
   --back line
   map (backBottomLineFromBottomFrontLine . extractBottomFrontLine)
       (createBottomFaces adaptorBtmOrigin keyRadius angles flatXSlope flatYSlope)
@@ -111,7 +111,7 @@ keyDebug =
 
 keyCubes =
  createTopFaces topKeyOrigin keyRadius angles flatXSlope flatYSlope
- ++++
+ |+++|
  createBottomFaces btmKeyOrigin keyRadius angles flatXSlope flatYSlope
 
 topKeyOrigin = (Point{x_axis=0, y_axis=(0), z_axis=25})

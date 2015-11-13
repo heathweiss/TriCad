@@ -9,7 +9,7 @@ import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(.
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalWalls,
                                   createHorizontallyAlignedCubesNoSlope, createHorizontallyAlignedCubes)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++++), Faces(..), (+++>>), (++++>>), (+++>>>), (+++>>>>), CornerPointsBuilder(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..), (+++>>), (++++>>), (+++>>>), CornerPointsBuilder(..))
 import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope, Angle(..))
 import Stl.StlCornerPoints((+++^), (++++^))
 import Stl.StlBase (StlShape(..), newStlShape)
@@ -79,7 +79,7 @@ pushPlateStl    outerSleeveMDR       extensionFaceBuilder                       
           cylinderSolidNoSlope (Radius plateRadius) plateOrigin (map (Angle) [0,10..360]) plateHeight ] --inner cubes
         )
         +++>>> (++++>> ((transposeZ (+5)) . extractTopFace)) --riser cubes
-        +++>>>  ( ++++ [extractTopFace currCube | currCube <- topRowOfSocketCubes]) -- riser to joiner cubes
+        +++>>>  ( |+++| [extractTopFace currCube | currCube <- topRowOfSocketCubes]) -- riser to joiner cubes
         +++>>> (++++>> ((transposeZ (+extensionHeight)) . extractTopFace )) --joiner cubes
       
       cubesTriangles = zipWith (+++^)
@@ -117,7 +117,7 @@ pushPlateStl    outerSleeveMDR       extensionFaceBuilder                       
 
 
       riserToJoinerCubes = [extractTopFace currCube | currCube <- topRowOfSocketCubes]
-                        ++++
+                        |+++|
                         (map (lowerFaceFromUpperFace . extractTopFace) riserCubes)
       riserToJoinerTriangles = (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront))
                             +++^
@@ -187,7 +187,7 @@ mainSocketStl    innerSleeveMDR      outerSleeveMDR      extensionFaceBuilder ex
       tieDownTriangles = (noShowTieDownFaces ++ showTieDownFaces) ++++^ tieDownCubes
                   
       mainBodyCubes = createVerticalWalls  innerSleeveMDR outerSleeveMDR origin transposeFactors
-      extensionCubes = (map (transposeZ (+extensionHeight). extractTopFace)  (head  mainBodyCubes)) ++++ (map ( extractBottomFace)  (head  mainBodyCubes))
+      extensionCubes = (map (transposeZ (+extensionHeight). extractTopFace)  (head  mainBodyCubes)) |+++| (map ( extractBottomFace)  (head  mainBodyCubes))
       
 
       triangles =
@@ -212,7 +212,7 @@ mainSocketStl    innerSleeveMDR      outerSleeveMDR      extensionFaceBuilder ex
       createMainSocketCubesFromFrontAndBackFaces ::  MultiDegreeRadii ->   MultiDegreeRadii -> [[CornerPoints]]
       createMainSocketCubesFromFrontAndBackFaces multiDegreeRadiiOuter multiDegreeRadiiInner =
        [
-        currBackFace ++++ currFrontFace
+        currBackFace |+++| currFrontFace
         | currFrontFace <- [map (extractFrontFace) currRow  | currRow  <- createHorizontallyAlignedCubesNoSlope origin multiDegreeRadiiOuter transposeFactors] 
         | currBackFace <- [ map (backFaceFromFrontFace . extractFrontFace) currRow | currRow  <- (createHorizontallyAlignedCubesNoSlope origin multiDegreeRadiiInner transposeFactors ) ]
        ]
@@ -251,7 +251,7 @@ mainSocketStl    innerSleeveMDR      outerSleeveMDR      extensionFaceBuilder ex
       -- ((topOfExtension : bodyOfExtension) ++  (topOfMainBody : mainBody ))   ++:  btmOfMainBody
                   
       mainBodyCubes = createMainSocketCubesFromFrontAndBackFaces outerSleeveMDR innerSleeveMDR
-      extensionCubes = (map (transposeZ (+extensionHeight). extractTopFace)  (head  mainBodyCubes)) ++++ (map ( extractBottomFace)  (head  mainBodyCubes))
+      extensionCubes = (map (transposeZ (+extensionHeight). extractTopFace)  (head  mainBodyCubes)) |+++| (map ( extractBottomFace)  (head  mainBodyCubes))
       
 
       triangles =

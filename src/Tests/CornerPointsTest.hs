@@ -1,6 +1,6 @@
 module Tests.CornerPointsTest(cornerPointsTestDo ) where
 import Test.HUnit
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (+++>), (++++), CornerPointsBuilder(..), (+++>>>), (++++>>), (+++>>))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (+++>), (|+++|), CornerPointsBuilder(..), (+++>>>), (++++>>), (+++>>))
 import CornerPoints.Points (Point(..))
 import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
 import CornerPoints.Transpose (transposeZ)
@@ -81,7 +81,7 @@ cornerPointsBldrTest2 = TestCase $ assertEqual
                        ]
   )
   (CornerPointsBuilder [[cubePoints]] +++>>>
-   (++++ [(TopFace (Point 0 0 2) (Point 0 1 2) (Point 1 0 2) (Point 1 1 2))]) 
+   (|+++| [(TopFace (Point 0 0 2) (Point 0 1 2) (Point 1 0 2) (Point 1 1 2))]) 
   )
 ------------------------ equality tests ------------------------------
 shouldBeEqualPoints = TestCase $ assertEqual
@@ -217,7 +217,7 @@ bottomRightLineRolledIntobottomLeftLinesTest = TestCase $ assertEqual
   ((BottomRightLine (Point 1 1 1) (Point 1 1 1)) +++>  [(BottomLeftLine (Point 1 1 1) (Point 1 1 1)), (BottomLeftLine (Point 1 1 1) (Point 1 1 1))] )
 
 {-
-Combine the above 2 tests using ++++
+Combine the above 2 tests using |+++|
 -}
 topRightLineRolledIntoTopLeftLinesTestP4bottomRightLineRolledIntobottomLeftLinesTest = TestCase $ assertEqual
   "add a list of TopFaces to a list of BottomFaces"
@@ -227,7 +227,7 @@ topRightLineRolledIntoTopLeftLinesTestP4bottomRightLineRolledIntobottomLeftLines
   ) 
   (
    (TopRightLine (Point 1 1 1) (Point 1 1 1)) +++>  [(TopLeftLine (Point 1 1 1) (Point 1 1 1)), (TopLeftLine (Point 1 1 1) (Point 1 1 1))] 
-   ++++
+   |+++|
    (BottomRightLine (Point 1 1 1) (Point 1 1 1)) +++>  [(BottomLeftLine (Point 1 1 1) (Point 1 1 1)), (BottomLeftLine (Point 1 1 1) (Point 1 1 1))] 
   )
 
