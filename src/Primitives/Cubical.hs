@@ -3,7 +3,7 @@ For creating hexahedrons such as cubes, rectangular cubes, etc.
 -}
 
 module Primitives.Cubical(rectangularCube) where
-import CornerPoints.CornerPoints(CornerPoints(..),(+++),(+++$),(+++>>))
+import CornerPoints.CornerPoints(CornerPoints(..),(+++),(+++-),(@+++#@))
 import CornerPoints.Points (Point(..))
 import CornerPoints.Transpose (transposeZ,transposeX,transposeY)
 import CornerPoints.FaceConversions(
@@ -37,11 +37,11 @@ rectangularCube height width length =
     (transposeX (+ width) (B4 b1Point))
     +++
     (B1 b1Point)
-    +++$  
+    +++-  
     (transposeY (+ length) ( transposeX (+ width) (F4 b1Point)))
     +++   
     (transposeY (+ length) (F1 b1Point))
-    +++>>
+    @+++#@
     --top face
     (\btmFace -> (upperFaceFromLowerFace  ( transposeZ (+ height) btmFace)))
   

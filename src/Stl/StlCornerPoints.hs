@@ -1,24 +1,23 @@
-module Stl.StlCornerPoints((+++^), (++++^)) where
+module Stl.StlCornerPoints((|+++^|), (||+++^||)) where
 
 import CornerPoints.CornerPoints (CornerPoints(..), Faces(..))
 import Stl.StlBase (Triangle(..), newVertex)
 import Control.Applicative
 
 
+-- | Create triangles for a single CornerPoints
+(+++^) :: Faces -> CornerPoints -> [Triangle]
+face +++^ cornerPoints = getTriangles face cornerPoints
 
-(++^) :: Faces -> CornerPoints -> [Triangle]
-face ++^ cornerPoints = getTriangles face cornerPoints
+-- |Create triangles for a [CornerPoints], usually when dealing with a single layer.
+(|+++^|) :: [Faces] -> [CornerPoints] -> [Triangle]
+infix 3 |+++^|
+faces |+++^| cornerPoints = concat $ zipWith (+++^) faces cornerPoints
 
--- |Create triangle for a [CornerPoints] when dealing with single layers.
-(+++^) :: [Faces] -> [CornerPoints] -> [Triangle]
-infix 3 +++^
-faces +++^ cornerPoints = concat $ zipWith (++^) faces cornerPoints
-
--- |Create triangles for the [[CornerPoints]] used for scanning.
-(++++^) :: [[Faces]] -> [[CornerPoints]] -> [Triangle]
-infix 3 ++++^
-faces ++++^ cornerpoints = concat $ zipWith (+++^) faces cornerpoints
-
+-- |Create triangles for a [[CornerPoints]] such as all the CornerPoints used used to build up a shape.
+(||+++^||) :: [[Faces]] -> [[CornerPoints]] -> [Triangle]
+faces ||+++^|| cornerpoints = concat $ zipWith (|+++^|) faces cornerpoints
+infix 3 ||+++^||
  
 
 getTriangles :: Faces -> CornerPoints -> [Triangle]

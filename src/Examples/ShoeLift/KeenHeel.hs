@@ -3,8 +3,8 @@ module Examples.ShoeLift.KeenHeel where
 import CornerPoints.Create(slopeAdjustedForVerticalAngle, Slope(..), Angle(..), flatXSlope, flatYSlope )
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..),(+++>>))
-import Stl.StlCornerPoints((+++^))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..))
+import Stl.StlCornerPoints((|+++^|))
 import Stl.StlBase (StlShape(..), newStlShape, stlShapeToText)
 import Stl.StlFileWriter(writeStlToFile)
 import CornerPoints.FaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace ) 
@@ -28,13 +28,13 @@ treadStlFile = newStlShape "KeenHeelTread"  $  treadTriangles
 treadTriangles =
    (
    [FacesBackFrontTop | x <- [1,2..36]]
-   +++^
+   |+++^|
    treadTopCubes
   )
   ++
   (
    [FacesBackBottomFront | x <- [1,2..36]]
-   +++^
+   |+++^|
    treadBtmCubes
   )
 
@@ -92,7 +92,7 @@ adaptorStlFile = newStlShape "KeenHeelAdaptor"  $  adaptorTriangles
 
 adaptorTriangles =
    [FacesBackBottomFrontTop | x <- [1,2..36]]
-   +++^
+   |+++^|
    adaptorCubes
 
 adaptorDebug = 
@@ -142,7 +142,7 @@ writeKeyToStlFile  =  writeFile "src/Data/temp.stl" $ stlShapeToText keyStlFile
 keyStlFile = newStlShape "KeenToeKey"  $  keyTriangles
 
 keyTriangles = [FacesBottomFrontTop | x <- [1,2..36]]
- +++^
+ |+++^|
  keyCubes
 
 keyDebug = 

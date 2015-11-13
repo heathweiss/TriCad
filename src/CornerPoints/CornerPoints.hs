@@ -1,12 +1,12 @@
 module CornerPoints.CornerPoints(
 CornerPoints(..),
 (+++),
-(+++$),
+(+++-),
 (|+++|),
 (+++>),
-(+++>>),
-(+++>>>),
-(++++>>),
+(@+++#@),
+(&+++#@),
+(|@+++#@|),
 scaleCornerPoints,
 scaleCornerPointsZ,
 CornerPointsBuilder(..),
@@ -17,8 +17,8 @@ import    Control.Applicative
 
 
 infix 7 +++
-infix 6 +++$
-infix 5 +++>> 
+infix 6 +++-
+infix 5 @+++#@ 
 infix 5 +++>
 infix 4 |+++|
 --infix 3 +++^
@@ -279,47 +279,41 @@ instance Eq CornerPoints where
 ----------------------------------------------------------------------------------------------------------------------
 -- || between to lines means done to a list
 -- @ is a cornerpoint
+-- & is a CornerPointsBuilder 
 -- # is a function
 
-{-Add a line, face, or cube to another.
-
-Known uses:
-Creating single or chains of faces by adding lines together.
-Creating single or chains of cubes by adding faces together.
+{- |Add [CornerPoints] to [CornerPoints].
 -}
--- |+++|
 (|+++|) :: [CornerPoints] -> [CornerPoints] -> [CornerPoints]
 c1 |+++| c2 = zipWith (+++) c1 c2
 
-{--with a lower infix than +++. Usefull for chaining together +++
+{-- |A lower infix version of +++. Usefull for chaining together +++
 Ex: BackBottomLine +++ BottomFrontLine +++$ BackTopLine +++ FrontTopLine
-               BottomFace              +++$         TopFace
-                                CubePoints
-Without the lower infix +++$ this would have tried to add the BackTopLine to the BottomFace. NFG.
 -}
-(+++$) :: CornerPoints -> CornerPoints -> CornerPoints
-(+++$) = (+++)
+--ToDo: Consider getting rid of it as it is rarely used.
+(+++-) :: CornerPoints -> CornerPoints -> CornerPoints
+(+++-) = (+++)
 
 {- |A monadic style +++ that adds the result of f input to input.
 -}
--- @+++#@
-(+++>>) :: CornerPoints -> (CornerPoints -> CornerPoints) -> CornerPoints
-(BottomFace b1 f1 b4 f4) +++>> f = (BottomFace b1 f1 b4 f4) +++ (f (BottomFace b1 f1 b4 f4))
-(CubePoints f1 f2 f3 f4 b1 b2 b3 b4) +++>> f = (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) +++ (f (CubePoints f1 f2 f3 f4 b1 b2 b3 b4))
-(TopFace b2 f2 b3 f3) +++>> f = (TopFace b2 f2 b3 f3) +++ (f (TopFace b2 f2 b3 f3))
+-- +++>>   
+(@+++#@) :: CornerPoints -> (CornerPoints -> CornerPoints) -> CornerPoints
+(BottomFace b1 f1 b4 f4) @+++#@ f = (BottomFace b1 f1 b4 f4) +++ (f (BottomFace b1 f1 b4 f4))
+(CubePoints f1 f2 f3 f4 b1 b2 b3 b4) @+++#@ f = (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) +++ (f (CubePoints f1 f2 f3 f4 b1 b2 b3 b4))
+(TopFace b2 f2 b3 f3) @+++#@ f = (TopFace b2 f2 b3 f3) +++ (f (TopFace b2 f2 b3 f3))
 
--- |@+++#@|
-(++++>>) :: [CornerPoints] -> (CornerPoints -> CornerPoints) -> [CornerPoints]
-faces ++++>> f = [ x +++>> f |  x <- faces]
+-- |@+++#@| ++++>>
+-- |Apply @+++#@ to a [CornerPoints].
+(|@+++#@|) :: [CornerPoints] -> (CornerPoints -> CornerPoints) -> [CornerPoints]
+faces |@+++#@| f = [ x @+++#@ f |  x <- faces]
 
--- ToDo: Get this to be an instance of Monad. Getting it to compile is the big problem.
 -- |Building up a shape usually involves [[CornerPoints]]. This allow use of infix operators
---  to build up the shape in an monadic way.
+--  to build up the shape in an monadic way, along with the use of &+++#@.
 data CornerPointsBuilder  = CornerPointsBuilder {getCornerPoints :: [[CornerPoints]]}
   deriving (Eq, Show)
 -- |The infix operator to go along with CornerPointsBuilder for building up shapes as [[CornerPoints]]
-(+++>>>) :: CornerPointsBuilder -> ([CornerPoints] -> [CornerPoints]) -> CornerPointsBuilder
-(CornerPointsBuilder cornerPoints) +++>>> f = CornerPointsBuilder ( (f $ head cornerPoints) : cornerPoints)
+(&+++#@) :: CornerPointsBuilder -> ([CornerPoints] -> [CornerPoints]) -> CornerPointsBuilder
+(CornerPointsBuilder cornerPoints) &+++#@ f = CornerPointsBuilder ( (f $ head cornerPoints) : cornerPoints)
 
 -- |Do a scanl on a list of cornerponts, using +++.
 -- Ex: pass a RightFace into a list of LeftFaces, resulting in a list of CubePoints

@@ -12,7 +12,7 @@ Neither slic3r or netfabb are showing errors
 module Examples.MiscShapes.RvVentCaps(hello, debug, stlFile, writeRvCapStlFile) where
       
 import CornerPoints.Create(slopeAdjustedForVerticalAngle, createCornerPoint, Slope(..), flatXSlope, flatYSlope)
-import Stl.StlCornerPoints((+++^))
+import Stl.StlCornerPoints((|+++^|))
 import Stl.StlFileWriter(writeStlToFile)
 import Stl.StlBase (StlShape(..), newStlShape)
 import CornerPoints.Points(Point(..), transposeZ)
@@ -78,7 +78,7 @@ dripCapFrontRadius =  map (\(Radius x) -> Radius (x + 3)) outerPlateFrontRadius
 {-------------------- drip cap -------------------------}
 dripCapTriangles =
    [FacesBackBottomFront | x <- [1..36]]
-  +++^
+  |+++^|
   dripCapCubes
   
 dripCapCubes =
@@ -95,7 +95,7 @@ the part of the top plate that joins the drip cap to the rest of the top plate
 --}
 dripCapJoinerTriangles =
   [FacesFrontTop | x <- [1..36]]
-  +++^
+  |+++^|
   dripCapJoinerCubes
   
   
@@ -115,7 +115,7 @@ Section between the riser joiner and the drip cap joiner
 -}
 outerPlateTriangles =
    [FacesBottomTop | x <- [1..36]]
-   +++^
+   |+++^|
    outerPlateCubes
 
 outerPlateCubes =
@@ -133,7 +133,7 @@ The section of the top plate that is inside of the inner riser ring.
 Left a small hole in the middle, so slic3r does not have to repair it.
 -}
 innerPlateTriangles =  [FacesBackBottomTop | x <- [1..36]]
-                                 +++^
+                                 |+++^|
                                  innerPlateCubes
 
 innerPlateCubes = cylinderSolid
@@ -185,7 +185,7 @@ riserJoinerFacesCloseFront = concat [
                              ] 
 
 riserJoinerTriangles =  
-   (riserJoinerFaces +++^ riserJoinerCubes)
+   (riserJoinerFaces |+++^| riserJoinerCubes)
    
 
 riserJoinerCubes = cylinderHollow
@@ -247,7 +247,7 @@ riserFacesCloseTop = concat [
                              ]
 
 
-riserTriangles = (riserFaces +++^ riserCubes)
+riserTriangles = (riserFaces |+++^| riserCubes)
                 
 
 riserCubes = cylinderHollow

@@ -8,7 +8,7 @@ module CornerPoints.HorizontalFaces(
   cylinderSolidNoSlope
   )where
 import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, Angle(..),  flatXSlope, flatYSlope,)
-import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (|+++|), Faces(..), (+++>>), (++++>>))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (|+++|), Faces(..), (|@+++#@|))
 import CornerPoints.Points(Point(..))
 import CornerPoints.Radius(Radius(..))
 import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBottomFace)
@@ -143,12 +143,12 @@ cylinderWallsNoSlope :: Radius -> Thickness ->  Origin -> [Angle] -> Height -> [
 cylinderWallsNoSlope    innerRadius    wallThickness origin    angles     height =
         let  --innerCubes = createBottomFaces origin (map (Radius) [innerRadius,innerRadius..]) angles flatXSlope flatYSlope
              innerCubes = createBottomFaces origin [innerRadius | x <-  [1..]] angles flatXSlope flatYSlope
-                         ++++>>
+                         |@+++#@|
                          (upperFaceFromLowerFace . (transposeZ (+height)))
 
              outerCubes = --createBottomFaces origin (map (Radius) [(innerRadius + wallThickness),(innerRadius + wallThickness)..]) angles flatXSlope flatYSlope
                          createBottomFaces origin [Radius ((radius innerRadius) + wallThickness) |x <- [1..]] angles flatXSlope flatYSlope
-                         ++++>>
+                         |@+++#@|
                          (upperFaceFromLowerFace . (transposeZ (+height)))
              cylinderCubes = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- innerCubes]
                              |+++|
@@ -161,7 +161,7 @@ cylinderWallsNoSlope    innerRadius    wallThickness origin    angles     height
 cylinderSolidNoSlope :: Radius -> Origin -> [Angle] -> Height -> [CornerPoints]
 cylinderSolidNoSlope    radius    origin    angles     height  =
   createBottomFaces origin [radius | x <- [1..]] angles flatXSlope flatYSlope
-  ++++>>
+  |@+++#@|
   (upperFaceFromLowerFace . (transposeZ (+height)))
 
 

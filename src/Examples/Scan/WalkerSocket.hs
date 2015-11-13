@@ -9,9 +9,9 @@ import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(.
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalWalls,
                                   createHorizontallyAlignedCubesNoSlope, createHorizontallyAlignedCubes)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..), (+++>>), (++++>>), (+++>>>), CornerPointsBuilder(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..), (|@+++#@|), (&+++#@), CornerPointsBuilder(..))
 import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope, Angle(..))
-import Stl.StlCornerPoints((+++^), (++++^))
+import Stl.StlCornerPoints((|+++^|), (||+++^||))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
 import Scan.Filter(runningAverage, runningAvgSingleDegreeRadii)
@@ -60,7 +60,7 @@ loadMDRAndPassToProcessor = do
 -}
 
 
--- trying to use +++>>> but need to do some testing to see what I am getting
+-- trying to use &+++#@ but need to do some testing to see what I am getting
 pushPlateStl :: MultiDegreeRadii ->  ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) -> ExtensionHeight -> PlateRadius -> IO ()
 pushPlateStl    outerSleeveMDR       extensionFaceBuilder                                     extensionHeight    plateRadius  =
   let --plateRadius = 30
@@ -78,11 +78,21 @@ pushPlateStl    outerSleeveMDR       extensionFaceBuilder                       
          [cylinderWallsNoSlope (Radius plateRadius) (2 :: Thickness) plateOrigin (map (Angle) [0,10..360]) plateHeight, --outer cubes
           cylinderSolidNoSlope (Radius plateRadius) plateOrigin (map (Angle) [0,10..360]) plateHeight ] --inner cubes
         )
-        +++>>> (++++>> ((transposeZ (+5)) . extractTopFace)) --riser cubes
-        +++>>>  ( |+++| [extractTopFace currCube | currCube <- topRowOfSocketCubes]) -- riser to joiner cubes
-        +++>>> (++++>> ((transposeZ (+extensionHeight)) . extractTopFace )) --joiner cubes
+        &+++#@ (|@+++#@| ((transposeZ (+5)) . extractTopFace)) --riser cubes
+        &+++#@  ( |+++| [extractTopFace currCube | currCube <- topRowOfSocketCubes]) -- riser to joiner cubes
+        &+++#@ (|@+++#@| ((transposeZ (+extensionHeight)) . extractTopFace )) --joiner cubes
       
-      cubesTriangles = zipWith (+++^)
+      cubesTriangles = 
+                        [ (extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)), --joiner
+                          (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), --riser to joiner
+                          (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), -- riser
+                          (extensionFaceBuilder (FacesBottomFront) (FacesBottomFrontTop) (FacesBottomFront) (FacesBottomFront)), --outer
+                          (extensionFaceBuilder (FacesBottomTop) (FacesBottomTop) (FacesBottomTop) (FacesBottomTop)) --  innerCubes
+                        ]
+                        ||+++^||
+                        cubes
+      {-
+      cubesTriangles = zipWith (|+++^|)
                         [ (extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)), --joiner
                           (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), --riser to joiner
                           (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), -- riser
@@ -90,16 +100,14 @@ pushPlateStl    outerSleeveMDR       extensionFaceBuilder                       
                           (extensionFaceBuilder (FacesBottomTop) (FacesBottomTop) (FacesBottomTop) (FacesBottomTop)) --  innerCubes
                         ]
                         cubes
+      -}
       
-      
-      cubesStl = newStlShape "with new +++>>>" $ concat cubesTriangles
+      cubesStl = newStlShape "with new &+++#@" cubesTriangles
       
   in  --putStrLn "temp"
       writeStlToFile cubesStl
       
 {-
--- ================================================ do not delete ================================================================
---this version is good for the shape but without using the new ++++>>>
 pushPlateStl :: MultiDegreeRadii ->  ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) -> ExtensionHeight -> PlateRadius -> IO ()
 pushPlateStl    outerSleeveMDR       extensionFaceBuilder                                     extensionHeight    plateRadius  =
   let --plateRadius = 30
@@ -110,36 +118,32 @@ pushPlateStl    outerSleeveMDR       extensionFaceBuilder                       
 
       --gives the shape of the top row of the socket, which is the shape of the joiner 
       topRowOfSocketCubes = head $ createVerticalWalls (extractList (take 2) outerSleeveMDR ) (extractList (take 2)  conOuterMDR) conTopOrigin [0,1..]
+
+      cubes =
+        getCornerPoints $
+        (CornerPointsBuilder
+         [cylinderWallsNoSlope (Radius plateRadius) (2 :: Thickness) plateOrigin (map (Angle) [0,10..360]) plateHeight, --outer cubes
+          cylinderSolidNoSlope (Radius plateRadius) plateOrigin (map (Angle) [0,10..360]) plateHeight ] --inner cubes
+        )
+        &+++#@ (|@+++#@| ((transposeZ (+5)) . extractTopFace)) --riser cubes
+        &+++#@  ( |+++| [extractTopFace currCube | currCube <- topRowOfSocketCubes]) -- riser to joiner cubes
+        &+++#@ (|@+++#@| ((transposeZ (+extensionHeight)) . extractTopFace )) --joiner cubes
       
-      joinerTriangles = (extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop))
-                               +++^
-                               riserToJoinerCubes ++++>> ((transposeZ (+extensionHeight)) . extractTopFace )
-
-
-      riserToJoinerCubes = [extractTopFace currCube | currCube <- topRowOfSocketCubes]
-                        |+++|
-                        (map (lowerFaceFromUpperFace . extractTopFace) riserCubes)
-      riserToJoinerTriangles = (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront))
-                            +++^
-                            riserToJoinerCubes
+      cubesTriangles = zipWith (|+++^|)
+                        [ (extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)), --joiner
+                          (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), --riser to joiner
+                          (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), -- riser
+                          (extensionFaceBuilder (FacesBottomFront) (FacesBottomFrontTop) (FacesBottomFront) (FacesBottomFront)), --outer
+                          (extensionFaceBuilder (FacesBottomTop) (FacesBottomTop) (FacesBottomTop) (FacesBottomTop)) --  innerCubes
+                        ]
+                        cubes
       
-
-      riserCubes =  map (+++>> ((transposeZ (+5)) . extractTopFace)) outerCubes
-      riserTriangles = (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)) +++^  riserCubes
-
       
-      outerCubes = cylinderWallsNoSlope (Radius plateRadius) (2 :: Thickness) plateOrigin (map (Angle) [0,10..360]) plateHeight
-      outerTriangles = (extensionFaceBuilder (FacesBottomFront) (FacesBottomFrontTop) (FacesBottomFront) (FacesBottomFront)) +++^  outerCubes
-      
-      innerCubes = cylinderSolidNoSlope (Radius plateRadius) plateOrigin (map (Angle) [0,10..360]) plateHeight
-      innerTriangles = (extensionFaceBuilder (FacesBottomTop) (FacesBottomTop) (FacesBottomTop) (FacesBottomTop)) +++^  innerCubes
-
-      plateCubesStl = newStlShape "walker base plate" $    innerTriangles ++ outerTriangles ++
-                                                           riserTriangles ++ riserToJoinerTriangles ++
-                                                           joinerTriangles 
+      cubesStl = newStlShape "with new &+++#@" $ concat cubesTriangles
       
   in  --putStrLn "temp"
-      writeStlToFile plateCubesStl
+      writeStlToFile cubesStl
+
 -}
 {-
 reduce the rows of the MulitiDegreeRadii by a factor of 100
@@ -184,7 +188,7 @@ mainSocketStl    innerSleeveMDR      outerSleeveMDR      extensionFaceBuilder ex
                            [FacesNada | x <- [1..]]
                            | x <- [1..]
                  ]
-      tieDownTriangles = (noShowTieDownFaces ++ showTieDownFaces) ++++^ tieDownCubes
+      tieDownTriangles = (noShowTieDownFaces ++ showTieDownFaces) ||+++^|| tieDownCubes
                   
       mainBodyCubes = createVerticalWalls  innerSleeveMDR outerSleeveMDR origin transposeFactors
       extensionCubes = (map (transposeZ (+extensionHeight). extractTopFace)  (head  mainBodyCubes)) |+++| (map ( extractBottomFace)  (head  mainBodyCubes))
@@ -194,7 +198,7 @@ mainSocketStl    innerSleeveMDR      outerSleeveMDR      extensionFaceBuilder ex
         (
           ((topOfExtension : bodyOfExtension) ++  (topOfMainBody : mainBody ))   ++:  btmOfMainBody
         )
-        ++++^
+        ||+++^||
         ( extensionCubes : tail mainBodyCubes)
 
       sleeveStlFile = newStlShape "walker sleeve" $ triangles ++ tieDownTriangles
@@ -247,7 +251,7 @@ mainSocketStl    innerSleeveMDR      outerSleeveMDR      extensionFaceBuilder ex
                            [FacesNada | x <- [1..]]
                            | x <- [1..]
                  ]
-      tieDownTriangles = (noShowTieDownFaces ++ showTieDownFaces) ++++^ tieDownCubes
+      tieDownTriangles = (noShowTieDownFaces ++ showTieDownFaces) ||+++^|| tieDownCubes
       -- ((topOfExtension : bodyOfExtension) ++  (topOfMainBody : mainBody ))   ++:  btmOfMainBody
                   
       mainBodyCubes = createMainSocketCubesFromFrontAndBackFaces outerSleeveMDR innerSleeveMDR
@@ -258,7 +262,7 @@ mainSocketStl    innerSleeveMDR      outerSleeveMDR      extensionFaceBuilder ex
         (
           ((topOfExtension : bodyOfExtension) ++  (topOfMainBody : mainBody ))   ++:  btmOfMainBody
         )
-        ++++^
+        ||+++^||
         ( extensionCubes : tail mainBodyCubes)
 
       sleeveStlFile = newStlShape "walker sleeve" $ triangles ++ tieDownTriangles
@@ -296,11 +300,11 @@ writeStlFileFromRawScan (MultiDegreeRadii name' degrees') =
       rightFaces = createRightFaces origin (head $ degrees smoothedScan) flatXSlope flatYSlope [0,heightPerPixel..]
       frontTriangles = [FaceFront | x <- [1..]]
       triangles =
-       zipWith  (+++^)
+       zipWith  (|+++^|)
         ([FacesFrontTop | x <- [1..]] :   [frontTriangles | x <- [1..1940]] ++:  [FacesBottomFront | x <- [1..]] 
 
         ) 
-        --  +++^
+        --  |+++^|
         (createHorizontallyAlignedCubes rightFaces leftFaces)
       stlFile = newStlShape "backscratcher" $ concat triangles
   in
@@ -319,11 +323,11 @@ writeStlFileFromScan scan =
       rightFaces = createRightFaces origin (head $ degrees scan) flatXSlope flatYSlope [0,heightPerPixel..]
       frontTriangles = [FaceFront | x <- [1..]]
       triangles =
-       zipWith  (+++^)
+       zipWith  (|+++^|)
         ([FacesFrontTop | x <- [1..]] :   [frontTriangles | x <- [5..65]] ++:  [FacesBottomFront | x <- [66..]] 
 
         ) 
-        --  +++^
+        --  |+++^|
         (createHorizontallyAlignedCubes rightFaces leftFaces)
       stlFile = newStlShape "backscratcher" $ concat triangles
   in

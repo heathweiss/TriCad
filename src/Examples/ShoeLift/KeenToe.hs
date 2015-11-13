@@ -5,7 +5,7 @@ import CornerPoints.Create(slopeAdjustedForVerticalAngle, createCornerPoint, Slo
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..))
-import Stl.StlCornerPoints((+++^))
+import Stl.StlCornerPoints((|+++^|))
 import Stl.StlBase (StlShape(..), newStlShape, stlShapeToText)
 import Stl.StlFileWriter(writeStlToFile)
 import CornerPoints.FaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace ) 
@@ -28,7 +28,7 @@ solePlateStlFile = newStlShape "KeenSolePlateAdaptor"  $  solePlateTriangles
 
 solePlateTriangles =
    [FacesBackBottomFrontTop | x <- [1,2..36]]
-   +++^
+   |+++^|
    solePlateCubes
 
 solePlateDebug = [CubeName "solePlateCube" | x <- [1..]]
@@ -54,7 +54,7 @@ adaptorStlFile = newStlShape "KeenToeAdaptor"  $  adaptorTriangles
 
 adaptorTriangles =
    [FacesBackBottomFrontTop | x <- [1,2..36]]
-   +++^
+   |+++^|
    adaptorCubes
 
 adaptorCubesDebug = 
@@ -101,7 +101,7 @@ writeKeyToStlFile  =  writeFile "src/Data/temp.stl" $ stlShapeToText keyStlFile
 keyStlFile = newStlShape "KeenToeKey"  $  keyTriangles
 
 keyTriangles = [FacesBottomFrontTop | x <- [1,2..36]]
- +++^
+ |+++^|
  keyCubes
 
 keyDebug = 
