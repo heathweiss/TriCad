@@ -9,7 +9,7 @@ import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(.
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalWalls,
                                   createHorizontallyAlignedCubesNoSlope, createHorizontallyAlignedCubes)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..), (+++>>), (++++>>))
+import CornerPoints.CornerPoints(CornerPoints(..), (++>), (+++), (++++), Faces(..), (+++>>), (++++>>), (+++>>>), (+++>>>>), CornerPointsBuilder(..))
 import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope, Angle(..))
 import Stl.StlCornerPoints((+++^), (++++^))
 import Stl.StlBase (StlShape(..), newStlShape)
@@ -59,6 +59,47 @@ loadMDRAndPassToProcessor = do
                                                   |||||||||||| || inner and outer
 -}
 
+
+-- trying to use +++>>> but need to do some testing to see what I am getting
+pushPlateStl :: MultiDegreeRadii ->  ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) -> ExtensionHeight -> PlateRadius -> IO ()
+pushPlateStl    outerSleeveMDR       extensionFaceBuilder                                     extensionHeight    plateRadius  =
+  let --plateRadius = 30
+      conOuterMDR = transpose (+2) outerSleeveMDR
+      conTopOrigin = (Point (-10) (-15) 20)
+      plateHeight = 3
+      plateOrigin = (Point 0 0 0)
+
+      --gives the shape of the top row of the socket, which is the shape of the joiner 
+      topRowOfSocketCubes = head $ createVerticalWalls (extractList (take 2) outerSleeveMDR ) (extractList (take 2)  conOuterMDR) conTopOrigin [0,1..]
+
+      cubes =
+        getCornerPoints $
+        (CornerPointsBuilder
+         [cylinderWallsNoSlope (Radius plateRadius) (2 :: Thickness) plateOrigin (map (Angle) [0,10..360]) plateHeight, --outer cubes
+          cylinderSolidNoSlope (Radius plateRadius) plateOrigin (map (Angle) [0,10..360]) plateHeight ] --inner cubes
+        )
+        +++>>> (++++>> ((transposeZ (+5)) . extractTopFace)) --riser cubes
+        +++>>>  ( ++++ [extractTopFace currCube | currCube <- topRowOfSocketCubes]) -- riser to joiner cubes
+        +++>>> (++++>> ((transposeZ (+extensionHeight)) . extractTopFace )) --joiner cubes
+      
+      cubesTriangles = zipWith (+++^)
+                        [ (extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)), --joiner
+                          (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), --riser to joiner
+                          (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), -- riser
+                          (extensionFaceBuilder (FacesBottomFront) (FacesBottomFrontTop) (FacesBottomFront) (FacesBottomFront)), --outer
+                          (extensionFaceBuilder (FacesBottomTop) (FacesBottomTop) (FacesBottomTop) (FacesBottomTop)) --  innerCubes
+                        ]
+                        cubes
+      
+      
+      cubesStl = newStlShape "with new +++>>>" $ concat cubesTriangles
+      
+  in  --putStrLn "temp"
+      writeStlToFile cubesStl
+      
+{-
+-- ================================================ do not delete ================================================================
+--this version is good for the shape but without using the new ++++>>>
 pushPlateStl :: MultiDegreeRadii ->  ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) -> ExtensionHeight -> PlateRadius -> IO ()
 pushPlateStl    outerSleeveMDR       extensionFaceBuilder                                     extensionHeight    plateRadius  =
   let --plateRadius = 30
@@ -99,57 +140,6 @@ pushPlateStl    outerSleeveMDR       extensionFaceBuilder                       
       
   in  --putStrLn "temp"
       writeStlToFile plateCubesStl
-      
-{-
-pushPlateStl :: MultiDegreeRadii ->  ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) -> ExtensionHeight -> PlateRadius -> IO ()
-pushPlateStl    outerSleeveMDR       extensionFaceBuilder                                     extensionHeight    plateRadius  =
-  let --plateRadius = 30
-      conOuterMDR = transpose (+2) outerSleeveMDR
-      conTopOrigin = (Point (-10) (-15) 20)
-
-      --gives the shape of the top row of the socket, which is the shape of the joiner 
-      topRowOfSocketCubes = head $ createVerticalWalls (extractList (take 2) outerSleeveMDR ) (extractList (take 2)  conOuterMDR) conTopOrigin [0,1..]
-      
-      joinerTriangles = (extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop))
-                               +++^
-                               riserToJoinerCubes ++++>> ((transposeZ (+extensionHeight)) . extractTopFace )
-
-
-      riserToJoinerCubes = [extractTopFace currCube | currCube <- topRowOfSocketCubes]
-                        ++++
-                        (map (lowerFaceFromUpperFace . extractTopFace) riserCubes)
-      riserToJoinerTriangles = (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront))
-                            +++^
-                            riserToJoinerCubes
-      
-
-      riserCubes =  map (+++>> ((transposeZ (+5)) . extractTopFace)) outerCubes
-      riserTriangles = (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)) +++^  riserCubes
-
-      --replace this with a horizontal faces module cylinderWalls
-      --Start by turning this into a function
-      outerBtmFaces =  createBottomFaces (Point 0 0 0) (map (Radius) [(plateRadius + 2),(plateRadius+2)..]) (map (Angle) [0,10..360]) flatXSlope flatYSlope
-      outerCubesTemp = outerBtmFaces ++++>> (upperFaceFromLowerFace . (transposeZ (+3)))
-      outerFrontFaces = [ (extractFrontFace) currCube    |currCube <- outerCubesTemp]
-      outerBackFaces = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- innerCubes]
-      outerCubes = outerBackFaces ++++ outerFrontFaces
-      outerTriangles = (extensionFaceBuilder (FacesBottomFront) (FacesBottomFrontTop) (FacesBottomFront) (FacesBottomFront)) +++^  outerCubes
-      
-
-      --replace this with horizontal faces cylinderSolid
-      innerBtmFaces = createBottomFaces (Point 0 0 0) (map (Radius) [plateRadius,plateRadius..]) (map (Angle) [0,10..360]) flatXSlope flatYSlope
-      innerCubes = innerBtmFaces ++++>> (upperFaceFromLowerFace . (transposeZ (+3)))
-      innerTriangles = (extensionFaceBuilder (FacesBottomTop) (FacesBottomTop) (FacesBottomTop) (FacesBottomTop)) +++^  innerCubes
-
-      
-      
-      plateCubesStl = newStlShape "walker base plate" $    innerTriangles ++ outerTriangles ++
-                                                           riserTriangles ++ riserToJoinerTriangles ++
-                                                           joinerTriangles 
-      
-  in  --putStrLn "temp"
-      writeStlToFile plateCubesStl
-
 -}
 {-
 reduce the rows of the MulitiDegreeRadii by a factor of 100

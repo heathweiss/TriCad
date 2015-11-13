@@ -5,12 +5,12 @@ CornerPoints(..),
 (++++),
 (++>),
 (+++>>),
+(+++>>>),
 (++++>>),
+(+++>>>>),
 scaleCornerPoints,
 scaleCornerPointsZ,
---transposePointZ,
---transposecornerpointsz,
---upperfacefrom_,
+CornerPointsBuilder(..),
 Faces(..)
 ) where
 import CornerPoints.Points (Point(..))
@@ -307,6 +307,18 @@ Without the lower infix +++$ this would have tried to add the BackTopLine to the
 (++++>>) :: [CornerPoints] -> (CornerPoints -> CornerPoints) -> [CornerPoints]
 faces ++++>> f = [ x +++>> f |  x <- faces]
 
+-- ToDo: Get this to be an instance of Monad. Getting it to compile is the big problem.
+-- |Building up a shape usually involves [[CornerPoints]]. This allow use of infix operators
+--  to build up the shape in an monadic way.
+data CornerPointsBuilder  = CornerPointsBuilder {getCornerPoints :: [[CornerPoints]]}
+  deriving (Eq, Show)
+-- |The infix operator to go along with CornerPointsBuilder for building up shapes as [[CornerPoints]]
+(+++>>>) :: CornerPointsBuilder -> ([CornerPoints] -> [CornerPoints]) -> CornerPointsBuilder
+(CornerPointsBuilder cornerPoints) +++>>> f = CornerPointsBuilder ( (f $ head cornerPoints) : cornerPoints)
+(+++>>>>) :: CornerPointsBuilder -> ([CornerPoints] -> [CornerPoints]  -> [CornerPoints] ) -> CornerPointsBuilder
+(CornerPointsBuilder cornerPoints) +++>>>> f = CornerPointsBuilder (        (f (head $ tail cornerPoints) (head cornerPoints))  : cornerPoints)
+
+
 {-Add CornerPoints together.
 Must follow all the rules of adding.
 Ex: FrontFace can be added to BackFace
@@ -590,5 +602,8 @@ data Faces =
  | FaceRight
  | FaceTop
  
+
+
+
 
 

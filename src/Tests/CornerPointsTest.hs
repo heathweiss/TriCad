@@ -1,7 +1,10 @@
 module Tests.CornerPointsTest(cornerPointsTestDo ) where
 import Test.HUnit
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++>), (++++))
-import CornerPoints.Points (Point(..)) 
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (++>), (++++), CornerPointsBuilder(..), (+++>>>), (++++>>), (+++>>))
+import CornerPoints.Points (Point(..))
+import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
+import CornerPoints.Transpose (transposeZ)
+
 
 
 cornerPointsTestDo = do
@@ -41,6 +44,45 @@ cornerPointsTestDo = do
   runTestTT shouldBeEqualF3
   runTestTT shouldBeEqualPoints
 
+  -- CornerPointsBuilder tests----
+  runTestTT cornerPointsBldrTest1
+  runTestTT cornerPointsBldrTest2
+-------------------------------------------- CornerPointsBuilder-------------------------------
+cubePoints = (BottomFace
+              {f1 = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}, f4 = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0},
+               b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, b4 = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 0.0}})
+              +++>>
+              ((transposeZ(+1)) . upperFaceFromLowerFace)
+             
+
+--a very straight forward application
+cornerPointsBldrTest1 = TestCase $ assertEqual
+  "cornerPointsBldrTest1"
+  (CornerPointsBuilder [[CubePoints {f1 = Point {x_axis = 2.0, y_axis = 2.0, z_axis = 2.0}, f2 = Point {x_axis = 2.0, y_axis = 2.0, z_axis = 4.0},
+                                     f3 = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 3.0}, f4 = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0},
+                                     b1 = Point {x_axis = 2.0, y_axis = 2.0, z_axis = 2.0}, b2 = Point {x_axis = 2.0, y_axis = 2.0, z_axis = 4.0},
+                                     b3 = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 3.0}, b4 = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0}}],
+                        [BottomFace {b1 = Point {x_axis = 2.0, y_axis = 2.0, z_axis = 2.0}, f1 = Point {x_axis = 2.0, y_axis = 2.0, z_axis = 2.0},
+                                     b4 = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0}, f4 = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0}}]])
+  (
+    (CornerPointsBuilder [[(BottomFace (Point 2 2 2) (Point 2 2 2) (Point 1 1 1) (Point 1 1 1))]])
+      +++>>> (++++>> ((transposeZ(+2)) . upperFaceFromLowerFace) )
+  )
+
+--extract the faces from the previous [CornerPoints] and add them to another set of faces
+cornerPointsBldrTest2 = TestCase $ assertEqual
+  "cornerPointsBldrTest2"
+  (CornerPointsBuilder [[(CubePoints { f1 = Point {x_axis = 0, y_axis = 1, z_axis = 1.0}, f2 = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 2.0},
+                                     f3 = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 2.0}, f4 = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0},
+                                     b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 1.0}, b2 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 2.0},
+                                     b3 = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 2.0}, b4 = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}})],
+                        
+                        [cubePoints]
+                       ]
+  )
+  (CornerPointsBuilder [[cubePoints]] +++>>>
+   (++++ [(TopFace (Point 0 0 2) (Point 0 1 2) (Point 1 0 2) (Point 1 1 2))]) 
+  )
 ------------------------ equality tests ------------------------------
 shouldBeEqualPoints = TestCase $ assertEqual
   "points should be equal:-6.123233995736766e-1 "
