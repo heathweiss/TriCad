@@ -43,9 +43,69 @@ loadMDRAndPassToProcessor = do
         let innerSleeveMDR = reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
             outerSleeveMDR = transpose (+2) innerSleeveMDR
         in  --mainSocketStl innerSleeveMDR outerSleeveMDR extensionFaceBuilder extensionHeight rowReductionFactor pixelsPerMM
-            pushPlateStl outerSleeveMDR extensionFaceBuilder extensionHeight plateRadius
+            --pushPlateStl outerSleeveMDR extensionFaceBuilder extensionHeight plateRadius
+              hoseAttachment plateRadius
       Nothing                                ->
         putStrLn "File not decoded"
+
+
+{-
+                     ||  ||   hose
+                     ||  ||   
+                    |||  |||  riser
+              |||||||||||||||||||  innerHose riserBase outsideScrews
+
+-}
+hoseAttachment :: PlateRadius -> IO ()
+hoseAttachment    plateRadius =
+  let wallThickness = 3
+      hoseInnerRadius = Radius 7.5
+      hoseThickness = wallThickness
+      hoseOuterRadius = transpose (+ hoseThickness) hoseInnerRadius
+      riserInnerRadius = hoseOuterRadius
+      riserThickness = 10
+      riserOuterRadius = riserThickness + (radius riserInnerRadius)
+      screwInsideRadius = Radius riserOuterRadius
+      screwsThickness = plateRadius - (radius screwInsideRadius)
+
+      baseHeight = 3
+      riserHeight = 17
+      hoseHeight = 20
+      
+      baseOrigin = Point 0 0 0
+      riserOrigin = transposeZ ( + baseHeight) baseOrigin
+      
+      angles = (map (Angle) [0,10..360])
+      
+      
+      
+      cubes =  getCornerPoints $
+        (CornerPointsBuilder
+         [
+           cylinderWallsNoSlope riserInnerRadius riserThickness  baseOrigin angles baseHeight,     -- riserBase
+           cylinderWallsNoSlope screwInsideRadius screwsThickness   baseOrigin angles baseHeight, --outsideScrews
+           cylinderSolidNoSlope hoseOuterRadius  baseOrigin angles baseHeight                  --innerHose
+           
+         ]
+          &+++#@ (|+++|  [extractTopFace x | x <- (cylinderWallsNoSlope hoseInnerRadius hoseThickness   riserOrigin angles riserHeight)]) -- riser
+          &+++#@ (|@+++#@| ((transposeZ (+20)) . extractTopFace) ) --hose
+        )
+      
+      triangles = [
+                    [FacesBackFrontTop | x <- [1..]],    --hose
+                    [FacesBackFront | x <- [1..]],       --riser
+                    [FaceBottom | x <- [1..]],       --riserBase
+                    [FacesBottomFrontTop | x <- [1..]], --ousideScrews
+                    [FacesBottomTop | x <- [1..]]      --innerHose
+                    
+                  ]
+                  ||+++^|| 
+                  cubes
+      cubesStl = newStlShape "hose attachment" triangles
+  in  
+      --putStrLn "temp"
+      writeStlToFile cubesStl
+        
 {-
 
 
@@ -60,7 +120,7 @@ loadMDRAndPassToProcessor = do
 -}
 
 
--- trying to use &+++#@ but need to do some testing to see what I am getting
+
 pushPlateStl :: MultiDegreeRadii ->  ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) -> ExtensionHeight -> PlateRadius -> IO ()
 pushPlateStl    outerSleeveMDR       extensionFaceBuilder                                     extensionHeight    plateRadius  =
   let --plateRadius = 30
@@ -91,60 +151,13 @@ pushPlateStl    outerSleeveMDR       extensionFaceBuilder                       
                         ]
                         ||+++^||
                         cubes
-      {-
-      cubesTriangles = zipWith (|+++^|)
-                        [ (extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)), --joiner
-                          (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), --riser to joiner
-                          (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), -- riser
-                          (extensionFaceBuilder (FacesBottomFront) (FacesBottomFrontTop) (FacesBottomFront) (FacesBottomFront)), --outer
-                          (extensionFaceBuilder (FacesBottomTop) (FacesBottomTop) (FacesBottomTop) (FacesBottomTop)) --  innerCubes
-                        ]
-                        cubes
-      -}
+     
       
       cubesStl = newStlShape "with new &+++#@" cubesTriangles
       
   in  --putStrLn "temp"
       writeStlToFile cubesStl
       
-{-
-pushPlateStl :: MultiDegreeRadii ->  ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) -> ExtensionHeight -> PlateRadius -> IO ()
-pushPlateStl    outerSleeveMDR       extensionFaceBuilder                                     extensionHeight    plateRadius  =
-  let --plateRadius = 30
-      conOuterMDR = transpose (+2) outerSleeveMDR
-      conTopOrigin = (Point (-10) (-15) 20)
-      plateHeight = 3
-      plateOrigin = (Point 0 0 0)
-
-      --gives the shape of the top row of the socket, which is the shape of the joiner 
-      topRowOfSocketCubes = head $ createVerticalWalls (extractList (take 2) outerSleeveMDR ) (extractList (take 2)  conOuterMDR) conTopOrigin [0,1..]
-
-      cubes =
-        getCornerPoints $
-        (CornerPointsBuilder
-         [cylinderWallsNoSlope (Radius plateRadius) (2 :: Thickness) plateOrigin (map (Angle) [0,10..360]) plateHeight, --outer cubes
-          cylinderSolidNoSlope (Radius plateRadius) plateOrigin (map (Angle) [0,10..360]) plateHeight ] --inner cubes
-        )
-        &+++#@ (|@+++#@| ((transposeZ (+5)) . extractTopFace)) --riser cubes
-        &+++#@  ( |+++| [extractTopFace currCube | currCube <- topRowOfSocketCubes]) -- riser to joiner cubes
-        &+++#@ (|@+++#@| ((transposeZ (+extensionHeight)) . extractTopFace )) --joiner cubes
-      
-      cubesTriangles = zipWith (|+++^|)
-                        [ (extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)), --joiner
-                          (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), --riser to joiner
-                          (extensionFaceBuilder (FacesBackFrontLeft) (FacesNada) (FacesBackFrontRight) (FacesBackFront)), -- riser
-                          (extensionFaceBuilder (FacesBottomFront) (FacesBottomFrontTop) (FacesBottomFront) (FacesBottomFront)), --outer
-                          (extensionFaceBuilder (FacesBottomTop) (FacesBottomTop) (FacesBottomTop) (FacesBottomTop)) --  innerCubes
-                        ]
-                        cubes
-      
-      
-      cubesStl = newStlShape "with new &+++#@" $ concat cubesTriangles
-      
-  in  --putStrLn "temp"
-      writeStlToFile cubesStl
-
--}
 {-
 reduce the rows of the MulitiDegreeRadii by a factor of 100
 chop of the top layer as it has an error,
