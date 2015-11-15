@@ -8,6 +8,8 @@ module CornerPoints.Create(
   flatYSlope,
   Origin(..),
   Angle(..),
+  createCornerPointSquaredOff,
+  getQuadrantAngle
   ) where
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (+++), Faces(..))
@@ -62,14 +64,10 @@ orign: Point
 -The starting point which gets adjusted to give the return point. That way, this point can be created relative to some position, instead of at an origin of 0 0 0
 
 -}
-
+--this is the orig, renamed to Implict so testing will still compile
 createCornerPoint :: (Point-> CornerPoints) -> Origin -> Radius ->  Angle -> Slope -> Slope -> CornerPoints
 createCornerPoint cPoint origin horizRadius verticalAngle xSlope ySlope  =
                              let 
-                                 
-                                 
-
-
                                  currentSlope = slopeAdjustedForVerticalAngle xSlope ySlope verticalAngle
                                                                                       
                                  radiusAdjustedForSlope = radius (adjustRadiusForSlope horizRadius currentSlope)
@@ -114,12 +112,84 @@ createCornerPoint cPoint origin horizRadius verticalAngle xSlope ySlope  =
                              in       
                                  cPoint (Point setXaxis setYaxis' setZaxis)
 
-                                  
- 
 
+{-Try to make a new version, that works like Christopher Olah's blog
+https://christopherolah.wordpress.com/2011/11/06/manipulation-of-implicit-functions-with-an-eye-on-cad/-}
+createCornerPointSquaredOff :: (Point-> CornerPoints) -> Origin -> Radius ->  Angle -> Slope -> Slope -> Power -> CornerPoints
+createCornerPointSquaredOff cPoint origin horizRadius verticalAngle xSlope ySlope power  =
+                             let 
+                                 currentSlope = slopeAdjustedForVerticalAngle xSlope ySlope verticalAngle
+                                                                                      
+                                 radiusAdjustedForSlope = radius (adjustRadiusForSlope horizRadius currentSlope)
 
+                                 baseOfAngle = (angle $ getQuadrantAngle verticalAngle)
+                                 sinOfVerticalQuadrantAngle = sinDegrees baseOfAngle
+                                 cosOfVerticalQuadrantAngle = cosDegrees baseOfAngle
+                                 
+                                 setXaxis =
+                                   let length  =  sinOfVerticalQuadrantAngle * radiusAdjustedForSlope
+                                       x_axis' = x_axis origin
+                                   in
+                                      
+                                    case getQuadrantAngle verticalAngle of
+                                      (Quadrant1Angle _) -> x_axis' + length
+                                      (Quadrant2Angle _) -> x_axis' + length
+                                      (Quadrant3Angle _) -> x_axis' - length
+                                      (Quadrant4Angle _) -> x_axis' - length
 
-
+                                 getX = sinOfVerticalQuadrantAngle * radiusAdjustedForSlope
+                                 x3 =
+                                   let length  = sinOfVerticalQuadrantAngle * getZ3
+                                       x_axis' = x_axis origin
+                                   in
+                                      
+                                    case getQuadrantAngle verticalAngle of
+                                      (Quadrant1Angle _) -> x_axis' + length --nfg 
+                                      (Quadrant2Angle _) -> x_axis' + length --nfg 
+                                      (Quadrant3Angle _) -> x_axis' - length --nfg
+                                      (Quadrant4Angle _) -> x_axis' - length --nfg
+                                 
+                                 setYaxis' =
+                                   let length = cosOfVerticalQuadrantAngle * radiusAdjustedForSlope
+                                       y_axis' = y_axis origin
+                                   in
+                                     
+                                    case getQuadrantAngle verticalAngle of
+                                      (Quadrant1Angle _) -> y_axis' - length
+                                      (Quadrant2Angle _) -> y_axis' + length
+                                      (Quadrant3Angle _) -> y_axis' + length
+                                      (Quadrant4Angle _) -> y_axis' - length
+                                   
+                                 getY = cosOfVerticalQuadrantAngle * radiusAdjustedForSlope
+                                 y3 =
+                                   let length = cosOfVerticalQuadrantAngle *  getZ3
+                                       y_axis' = y_axis origin
+                                   in
+                                     
+                                    case getQuadrantAngle verticalAngle of
+                                      (Quadrant1Angle _) -> y_axis' - length --nfg 
+                                      (Quadrant2Angle _) -> y_axis' + length --nfg 
+                                      (Quadrant3Angle _) -> y_axis' + length --nfg 
+                                      (Quadrant4Angle _) -> y_axis' - length --
+                                 
+                                 
+                                 setZaxis =
+                                   let length = (radius horizRadius) * (sinDegrees (slope currentSlope))
+                                       z_axis' = z_axis origin
+                                   in
+                                    case currentSlope of
+                                     (PosSlope _) -> z_axis' +  length
+                                     (NegSlope _)  -> z_axis' - length
+                                 
+                                 --Making it the inverse of (radiusAdjustedForSlope**2) squared it off immensely,
+                                 --as opposed to just making it x*n + y*n = r*n
+                                 --Why does it work. What does inversing do.
+                                 --Making it 1/ instead of (radiusAdjustedForSlope**2) squares it off, but the dimensions
+                                 --are totally out. What does (radiusAdjustedForSlope**2)\ do compared to 1/
+                                 getZ3 = (radiusAdjustedForSlope**2)/ (((getX**power) + (getY**power)) **(1/power))
+                                 
+                             in       
+                                 cPoint (Point x3 y3 setZaxis)
 
 
 
@@ -316,3 +386,4 @@ adjustRadiusForSlope (Radius radius) (NegSlope xySlope) = DownRadius $ radius * 
 -}
 
   
+type Power = Double

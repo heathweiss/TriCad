@@ -5,9 +5,11 @@ module CornerPoints.HorizontalFaces(
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
   cylinderWallsNoSlope,
-  cylinderSolidNoSlope
+  cylinderWallsNoSlopeSquaredOff,
+  cylinderSolidNoSlope,
+  cylinderSolidNoSlopeSquaredOff
   )where
-import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, Angle(..),  flatXSlope, flatYSlope,)
+import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, createCornerPointSquaredOff, Angle(..),  flatXSlope, flatYSlope,)
 import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (|+++|), Faces(..), (|@+++#@|))
 import CornerPoints.Points(Point(..))
 import CornerPoints.Radius(Radius(..))
@@ -49,6 +51,36 @@ createBottomFaces inOrigin radii angles xSlope ySlope  =
        | angle <- tail angles
        | radius <- tail radii
     ]
+
+createBottomFacesSquaredOff :: Origin -> [Radius] -> [Angle] -> Slope -> Slope ->  Power -> [CornerPoints]
+createBottomFacesSquaredOff    inOrigin  radii       angles     xSlope   ySlope    power  =
+    (createCornerPointSquaredOff 
+      (F4)
+      inOrigin
+      (head radii)
+      (head angles)
+      xSlope
+      ySlope
+      power
+    ) 
+    +++
+    B4 inOrigin
+    +++>
+    [(createCornerPointSquaredOff 
+      (F1)
+      inOrigin
+      radius
+      angle
+      xSlope
+      ySlope
+      power
+     ) 
+     +++
+     B1 inOrigin
+       | angle <- tail angles
+       | radius <- tail radii
+    ]
+
 
 
 createBottomFacesWithVariableSlope :: Origin -> [Radius] -> [Angle] -> [Slope] -> [Slope] -> [CornerPoints]
@@ -158,6 +190,24 @@ cylinderWallsNoSlope    innerRadius    wallThickness origin    angles     height
                --outerCubes = outerBackFaces |+++| outerFrontFaces
         in  cylinderCubes
 
+
+cylinderWallsNoSlopeSquaredOff :: Radius -> Thickness ->    Origin -> [Angle] -> Height -> Power -> [CornerPoints]
+cylinderWallsNoSlopeSquaredOff    innerRadius wallThickness origin    angles     height    power  =
+        let  innerCubes = createBottomFacesSquaredOff origin [innerRadius | x <-  [1..]] angles flatXSlope flatYSlope power
+                         |@+++#@|
+                         (upperFaceFromLowerFace . (transposeZ (+height)))
+         
+             outerCubes = createBottomFacesSquaredOff origin [Radius ((radius innerRadius) + wallThickness) |x <- [1..]] angles flatXSlope flatYSlope power
+                          |@+++#@|
+                          (upperFaceFromLowerFace . (transposeZ (+height)))
+             cylinderCubes = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- innerCubes]
+                             |+++|
+                             [ (extractFrontFace) currCube    |currCube <- outerCubes]
+             
+        in   cylinderCubes
+
+
+
 cylinderSolidNoSlope :: Radius -> Origin -> [Angle] -> Height -> [CornerPoints]
 cylinderSolidNoSlope    radius    origin    angles     height  =
   createBottomFaces origin [radius | x <- [1..]] angles flatXSlope flatYSlope
@@ -165,5 +215,13 @@ cylinderSolidNoSlope    radius    origin    angles     height  =
   (upperFaceFromLowerFace . (transposeZ (+height)))
 
 
+--
+cylinderSolidNoSlopeSquaredOff :: Radius -> Origin -> [Angle] -> Height -> Power -> [CornerPoints]
+cylinderSolidNoSlopeSquaredOff    radius    origin    angles     height    power  =
+  createBottomFacesSquaredOff origin [radius | x <- [1..]] angles flatXSlope flatYSlope power
+  |@+++#@|
+  (upperFaceFromLowerFace . (transposeZ (+height)))
+
 type Thickness = Double
 type Height = Double
+type Power = Double

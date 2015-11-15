@@ -46,6 +46,7 @@ library
                    Examples.MiscShapes.RvVentCaps
                    -- Primitives
                    Examples.Primitives.Cube
+                   Examples.Primitives.Cylinders
                    --adaptors
                    Examples.Adaptors.HockeyStick
                    --Shapes

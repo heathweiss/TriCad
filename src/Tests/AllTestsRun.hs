@@ -10,6 +10,7 @@ import Tests.VerticalFacesTest(verticalFacesTestDo)
 import Tests.ParseJuicyTest (parseJuicyTestDo)
 import Tests.ScanFilterTest (scanFilterTestDo)
 import Tests.ListHelpersTest(listHelperTestDo)
+import Tests.CornerPointsCreateTest(cornerPointsCreateTestDo )
 
 runAllTestsDo = do
   putStrLn "corner points debug test"
@@ -32,3 +33,5 @@ runAllTestsDo = do
   scanFilterTestDo
   putStrLn "list helpers test"
   listHelperTestDo
+  putStrLn "cornerpoints create test"
+  cornerPointsCreateTestDo

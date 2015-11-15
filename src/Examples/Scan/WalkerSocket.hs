@@ -89,8 +89,20 @@ hoseAttachment    plateRadius =
          ]
           &+++#@ (|+++|  [extractTopFace x | x <- (cylinderWallsNoSlope hoseInnerRadius hoseThickness   riserOrigin angles riserHeight)]) -- riser
           &+++#@ (|@+++#@| ((transposeZ (+20)) . extractTopFace) ) --hose
+         
         )
       
+      triangles = [
+                    [FacesBackFrontTop | x <- [1..]],    --hose
+                    [FacesNada | x <- [1..]],       --riser
+                    [FacesNada | x <- [1..]],       --riserBase
+                    [FacesNada | x <- [1..]], --ousideScrews
+                    [FacesNada | x <- [1..]]      --innerHose
+                    
+                  ]
+                  ||+++^|| 
+                  cubes
+      {-
       triangles = [
                     [FacesBackFrontTop | x <- [1..]],    --hose
                     [FacesBackFront | x <- [1..]],       --riser
@@ -101,6 +113,7 @@ hoseAttachment    plateRadius =
                   ]
                   ||+++^|| 
                   cubes
+       -}
       cubesStl = newStlShape "hose attachment" triangles
   in  
       --putStrLn "temp"
