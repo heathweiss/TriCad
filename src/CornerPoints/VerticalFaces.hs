@@ -158,6 +158,7 @@ createLeftFacesMultiColumnsNoSlope topOrigin (d:ds) zTransposeFactor =
 
 Normally: RightFace +++> [LeftFaces], instead of  [RightFace] +++> [[LeftFace]],  so need recursion to work through the extra level of lists.
 -}
+
 createHorizontallyAlignedCubes :: [CornerPoints] -> [[CornerPoints]] -> [[CornerPoints]]
 createHorizontallyAlignedCubes ([]) _ = []
 createHorizontallyAlignedCubes (x:xs) (ys) =

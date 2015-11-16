@@ -21,7 +21,7 @@ solidCylinderSquared =
 walledCylinderSquared =
   let cylinder = cylinderWallsNoSlopeSquaredOff (Radius 100) (10::Thickness) (Point 0 0 0) angles (10 :: Height) (10 :: Power)
       --cylinderWallsNoSlope ::                  Radius -> Thickness ->       Origin ->    [Angle] -> Height -> [CornerPoints]
-      cylinderTriangles =  [FacesBackBottomFrontTop | x <- [1..]]
+      cylinderTriangles = FacesBackBottomFront :  [FacesBackBottomFrontTop | x <- [1..]]
              |+++^|
              cylinder
       cylinderStl = newStlShape "cylinder" cylinderTriangles

@@ -1,7 +1,10 @@
 
 module CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..),
-                          extractSingle, extractList) where
+                          extractSingle, extractList, rotateMDR, sortMDR) where
 import CornerPoints.Transposable( TransposeLength, transpose)
+import Data.List(sortBy)
+import Data.Ord (Ordering(..), comparing)
+import CornerPoints.CornerPoints(CornerPoints(..))
 
 {-|
 Represents a radius of a circular shape, which is what all shapes in math polar are created from.
@@ -60,6 +63,40 @@ data MultiDegreeRadii = MultiDegreeRadii {name::String, degrees::[SingleDegreeRa
 instance TransposeLength MultiDegreeRadii  where
   transpose f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (transpose f) degrees')
 
+-- |rotate the degrees on the xy plane.
+rotateMDR ::  RotateFactor -> MultiDegreeRadii -> MultiDegreeRadii
+rotateMDR factor          multiDegreeRadii = rotateMDROrig factor multiDegreeRadii
+
+
+
+rotateMDROrig      factor          multiDegreeRadii   =
+  --[SingleDegreeRadii (degree' (rotateSDR sdr) | (SingleDegreeRadii degree' radii' )  singleDegreeRadii]
+  multiDegreeRadii {degrees = (rotateSDR  (degrees multiDegreeRadii ) factor )}
+  
+rotateSDR  :: [SingleDegreeRadii] -> RotateFactor -> [SingleDegreeRadii]
+rotateSDR singleDegreeRadii factor  = rotateSDRNew  singleDegreeRadii factor
+
+rotateSDRNew  :: [SingleDegreeRadii] -> RotateFactor -> [SingleDegreeRadii]
+rotateSDRNew (x:xs) ignoreFactor =
+  (x {radii = (radii $ last $ init xs)}) :  rotateSDRRecur (radii x) xs
+
+rotateSDRRecur :: [Radius] -> [SingleDegreeRadii] -> [SingleDegreeRadii]
+
+rotateSDRRecur radii'   (x:xs) =
+    (x {radii = radii'}) : (rotateSDRRecur (radii  x) xs)
+rotateSDRRecur radii' [] = []
+
+  
+rotateSDROrig singleDegreeRadii factor  =
+  --map (rotateDegree factor) singleDegreeRadii
+  [SingleDegreeRadii (rotateDegree factor degree') radii'  | SingleDegreeRadii degree' radii' <- singleDegreeRadii]
+
+rotateDegree :: RotateFactor -> Degree ->  Degree
+rotateDegree    factor          degree'
+  | degree' + factor > 360 =  (degree' + factor) - 360
+  | otherwise =  degree' + factor
+  
+  
 
 class ExtractableRadius a  where
   extractList :: ([Radius] -> [Radius]) -> a -> a
@@ -73,6 +110,15 @@ instance ExtractableRadius MultiDegreeRadii where
   extractSingle f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (extractSingle f) degrees')
   extractList f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (extractList f) degrees')
 
+-- Sort SingleDegreeRadii on ascending order of degree
+sortSDR (SingleDegreeRadii degree' _) (SingleDegreeRadii degree'' _)
+  | degree' <= degree'' = LT
+  | degree' > degree'' = GT
 
 
+
+-- |Sort MingleDegreeRadii on ascending order of degree of the SingleDegreeRadii
+sortMDR (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (sortBy sortSDR degrees')
+
+type RotateFactor = Double
 

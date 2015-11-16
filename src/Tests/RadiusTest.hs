@@ -1,9 +1,10 @@
 
-module Tests.RadiusTests where
+module Tests.RadiusTest(radisuTestDo) where
 import Test.HUnit
 import CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..),
-                          extractSingle, extractList)
+                          extractSingle, extractList, rotateMDR, sortMDR)
 import CornerPoints.Transposable(transpose)
+
 
 radisuTestDo = do
  runTestTT extractRadiusFromMultiDegreeRadiiTest
@@ -14,6 +15,28 @@ radisuTestDo = do
  runTestTT transposeRadiusTest
  runTestTT transposeSDRTest
  runTestTT transposeSDRTest2
+
+ runTestTT rotateMultiDegreeRadiiTest
+
+ runTestTT sortMultiDegreeRadiiTest
+ runTestTT sortMultiDegreeRadiiOverlappingTest
+
+
+
+sortMultiDegreeRadiiTest = TestCase $ assertEqual 
+  "rotateMultiDegreeRadiiTest"
+  (MultiDegreeRadii "name"                   [SingleDegreeRadii 1 [Radius 1], SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 20 [Radius 1]])
+  (sortMDR $ MultiDegreeRadii "name"  [SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 1 [Radius 1], SingleDegreeRadii 20 [Radius 1]])
+
+sortMultiDegreeRadiiOverlappingTest = TestCase $ assertEqual 
+  "sortMultiDegreeRadiiOverlappingTest"
+  (MultiDegreeRadii "name"                   [SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 20 [Radius 1]])
+  (sortMDR $ MultiDegreeRadii "name"  [SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 20 [Radius 1]])
+
+rotateMultiDegreeRadiiTest = TestCase $ assertEqual 
+  "rotateMultiDegreeRadiiTest"
+  (MultiDegreeRadii "name" [SingleDegreeRadii 0 [Radius 20], SingleDegreeRadii 10 [Radius 0], SingleDegreeRadii 20 [Radius 10]])
+  (rotateMDR 5 (MultiDegreeRadii "name" [SingleDegreeRadii 0 [Radius 0], SingleDegreeRadii 10 [Radius 10], SingleDegreeRadii 20 [Radius 20]]))
 
 transposeRadiusTest = TestCase $ assertEqual
   "transposeRadiusTest"
@@ -50,4 +73,5 @@ extractRadiusFromSinleDegreeRadiiTest2 = TestCase $ assertEqual
   "extractRadiusFromSinleDegreeRadiiTest2"
   (SingleDegreeRadii 1 [Radius 2, Radius 3])
   (extractList tail (SingleDegreeRadii 1 [Radius 1, Radius 2, Radius 3]))
+
 

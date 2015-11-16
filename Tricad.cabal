@@ -30,7 +30,7 @@ library
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.HorizontalFacesTest,
-                   Tests.JsonTest, Tests.ListHelpersTest
+                   Tests.JsonTest, Tests.ListHelpersTest, Tests.RadiusTest,
                    Tests.VerticalFacesTest, Tests.ParseJuicyTest, Tests.ScanFilterTest
                    --Examples
                    -- Example ShoeLifts
@@ -42,6 +42,7 @@ library
                    -- Sockets
                    -- scanned shapes
                    Examples.Scan.WalkerSocket
+                   Examples.Scan.WalkerSocketSquared
                    -- Misc Shapes
                    Examples.MiscShapes.RvVentCaps
                    -- Primitives
@@ -65,5 +66,6 @@ library
                      , text >= 1.1.0.0
                      , attoparsec >= 0.13.0.1
                      , JuicyPixels >= 3.2.6.1
+                     
   hs-source-dirs:  src    
   default-language:    Haskell2010

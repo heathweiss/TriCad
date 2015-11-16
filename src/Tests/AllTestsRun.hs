@@ -11,6 +11,7 @@ import Tests.ParseJuicyTest (parseJuicyTestDo)
 import Tests.ScanFilterTest (scanFilterTestDo)
 import Tests.ListHelpersTest(listHelperTestDo)
 import Tests.CornerPointsCreateTest(cornerPointsCreateTestDo )
+import Tests.RadiusTest(radisuTestDo)
 
 runAllTestsDo = do
   putStrLn "corner points debug test"
@@ -35,3 +36,5 @@ runAllTestsDo = do
   listHelperTestDo
   putStrLn "cornerpoints create test"
   cornerPointsCreateTestDo
+  putStrLn "radius tests"
+  radisuTestDo
