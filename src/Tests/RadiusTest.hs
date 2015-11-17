@@ -2,7 +2,7 @@
 module Tests.RadiusTest(radisuTestDo) where
 import Test.HUnit
 import CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..),
-                          extractSingle, extractList, rotateMDR, sortMDR)
+                          extractSingle, extractList, rotateMDR)
 import CornerPoints.Transposable(transpose)
 
 
@@ -18,25 +18,12 @@ radisuTestDo = do
 
  runTestTT rotateMultiDegreeRadiiTest
 
- runTestTT sortMultiDegreeRadiiTest
- runTestTT sortMultiDegreeRadiiOverlappingTest
-
-
-
-sortMultiDegreeRadiiTest = TestCase $ assertEqual 
-  "rotateMultiDegreeRadiiTest"
-  (MultiDegreeRadii "name"                   [SingleDegreeRadii 1 [Radius 1], SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 20 [Radius 1]])
-  (sortMDR $ MultiDegreeRadii "name"  [SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 1 [Radius 1], SingleDegreeRadii 20 [Radius 1]])
-
-sortMultiDegreeRadiiOverlappingTest = TestCase $ assertEqual 
-  "sortMultiDegreeRadiiOverlappingTest"
-  (MultiDegreeRadii "name"                   [SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 20 [Radius 1]])
-  (sortMDR $ MultiDegreeRadii "name"  [SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 10 [Radius 1], SingleDegreeRadii 20 [Radius 1]])
-
+{-The first and last [Radius] must always match, which is why a [Radius0] was eliminated, and an extra [Radius 20] was created.-}
 rotateMultiDegreeRadiiTest = TestCase $ assertEqual 
   "rotateMultiDegreeRadiiTest"
-  (MultiDegreeRadii "name" [SingleDegreeRadii 0 [Radius 20], SingleDegreeRadii 10 [Radius 0], SingleDegreeRadii 20 [Radius 10]])
-  (rotateMDR 5 (MultiDegreeRadii "name" [SingleDegreeRadii 0 [Radius 0], SingleDegreeRadii 10 [Radius 10], SingleDegreeRadii 20 [Radius 20]]))
+  (MultiDegreeRadii "name" [SingleDegreeRadii 0 [Radius 20], SingleDegreeRadii 10 [Radius 0], SingleDegreeRadii 20 [Radius 10],SingleDegreeRadii 30 [Radius 20]])
+  (rotateMDR  (MultiDegreeRadii "name" [SingleDegreeRadii 0 [Radius 0], SingleDegreeRadii 10 [Radius 10], SingleDegreeRadii 20 [Radius 20],SingleDegreeRadii 30 [Radius 0]]))
+  
 
 transposeRadiusTest = TestCase $ assertEqual
   "transposeRadiusTest"

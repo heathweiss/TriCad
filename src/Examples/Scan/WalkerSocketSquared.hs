@@ -1,6 +1,6 @@
 module Examples.Scan.WalkerSocketSquared where
 
-import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(..),extractSingle, extractList, rotateMDR, sortMDR)
+import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(..),extractSingle, extractList, rotateMDR)
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalWalls,
                                   createHorizontallyAlignedCubesNoSlope, createHorizontallyAlignedCubes)
 import CornerPoints.Points(Point(..))
@@ -42,9 +42,8 @@ loadMDRAndPassToProcessor = do
    
       Just (MultiDegreeRadii name' degrees') ->
         let --enlarge it to fit over the socket already printed with WalkerSocket.
-            --can't sort it because I lose 10 degrees, probably because of the way createVerticalWalls raps back around
-            --innerSleeveMDR = sortMDR $ rotateMDR 30 $ transpose (+2) $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
-            innerSleeveMDR = rotateMDR 20 $  rotateMDR 20 $ transpose (+2) $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
+            --rotate it to line up better with the riser
+            innerSleeveMDR = rotateMDR $ rotateMDR $ transpose (+2) $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
             --give it a thickness of 3 mm
             outerSleeveMDR = transpose (+3) innerSleeveMDR
         in  mainSocketStl innerSleeveMDR outerSleeveMDR extensionFaceBuilder extensionHeight rowReductionFactor pixelsPerMM
@@ -94,7 +93,7 @@ mainSocketStl    innerSleeveMDR      outerSleeveMDR      extensionFaceBuilder ex
                     
       socketAndAdaptor = -- ++
                            [adaptorFaces] ++ [topOfSocketFaces]  ++
-                           --[[FacesBackFront | x <- [1..]] | x <- [1..2]] ++  get rid of a most layers, so that just the top is printed out, for fixing 1st print of socket.
+                           [[FacesBackFront | x <- [1..]] | x <- [1..9]] ++  --get rid of a most layers, so that just the top is printed out, for fixing 1st print of socket.
                            [ [FacesBackBottomFront | x <- [1..]]   ]
 
                          

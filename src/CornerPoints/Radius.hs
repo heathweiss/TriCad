@@ -1,6 +1,6 @@
 
 module CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..),
-                          extractSingle, extractList, rotateMDR, sortMDR) where
+                          extractSingle, extractList, rotateMDR) where
 import CornerPoints.Transposable( TransposeLength, transpose)
 import Data.List(sortBy)
 import Data.Ord (Ordering(..), comparing)
@@ -63,44 +63,38 @@ data MultiDegreeRadii = MultiDegreeRadii {name::String, degrees::[SingleDegreeRa
 instance TransposeLength MultiDegreeRadii  where
   transpose f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (transpose f) degrees')
 
--- |rotate the degrees on the xy plane.
-rotateMDR ::  RotateFactor -> MultiDegreeRadii -> MultiDegreeRadii
-rotateMDR factor          multiDegreeRadii = rotateMDROrig factor multiDegreeRadii
+-- |Rotate the radii clockwise on the xy plane.
+--  Shifts the [Radius] up to the next SingleDegreeRadii in the degrees field,
+--  while preserving the fact that the first and last degree must always having matching [Radius].
+rotateMDR ::  MultiDegreeRadii -> MultiDegreeRadii
+rotateMDR     multiDegreeRadii   =
+  let
+     -- Rotate the radii clockwise on the xy plane.
+     --  Shifts the [Radius] up to the next SingleDegreeRadii in the degrees field.
+     -- The first and and last degree [Radius] must always match, so this inital call
+     -- needs to set the new first degree [Radius] from the 2nd last entry, as that will become the new last entry.
+     rotateSDR  :: [SingleDegreeRadii]  -> [SingleDegreeRadii]
+     rotateSDR (x:xs)  =
+       (x {radii = (radii $ last $ init xs)}) :  rotateSDRRecur (radii x) xs
+     rotateSDRRecur :: [Radius] -> [SingleDegreeRadii] -> [SingleDegreeRadii]
+     rotateSDRRecur radii'   (x:xs) =
+      (x {radii = radii'}) : (rotateSDRRecur (radii  x) xs)
+     rotateSDRRecur radii' [] = []
+     
+  in 
+     multiDegreeRadii {degrees = (rotateSDR  (degrees multiDegreeRadii ))}
 
-
-
-rotateMDROrig      factor          multiDegreeRadii   =
-  --[SingleDegreeRadii (degree' (rotateSDR sdr) | (SingleDegreeRadii degree' radii' )  singleDegreeRadii]
-  multiDegreeRadii {degrees = (rotateSDR  (degrees multiDegreeRadii ) factor )}
-  
-rotateSDR  :: [SingleDegreeRadii] -> RotateFactor -> [SingleDegreeRadii]
-rotateSDR singleDegreeRadii factor  = rotateSDRNew  singleDegreeRadii factor
-
-rotateSDRNew  :: [SingleDegreeRadii] -> RotateFactor -> [SingleDegreeRadii]
-rotateSDRNew (x:xs) ignoreFactor =
-  (x {radii = (radii $ last $ init xs)}) :  rotateSDRRecur (radii x) xs
-
-rotateSDRRecur :: [Radius] -> [SingleDegreeRadii] -> [SingleDegreeRadii]
-
-rotateSDRRecur radii'   (x:xs) =
-    (x {radii = radii'}) : (rotateSDRRecur (radii  x) xs)
-rotateSDRRecur radii' [] = []
-
-  
-rotateSDROrig singleDegreeRadii factor  =
-  --map (rotateDegree factor) singleDegreeRadii
-  [SingleDegreeRadii (rotateDegree factor degree') radii'  | SingleDegreeRadii degree' radii' <- singleDegreeRadii]
-
-rotateDegree :: RotateFactor -> Degree ->  Degree
-rotateDegree    factor          degree'
-  | degree' + factor > 360 =  (degree' + factor) - 360
-  | otherwise =  degree' + factor
-  
-  
 
 class ExtractableRadius a  where
+  -- |Know instances:
+  -- MultiDegreeRadii uses it to extract [horizontal row of SingleDegreeRadii]
+  -- Ex: Pick the top n rows from a scan.
   extractList :: ([Radius] -> [Radius]) -> a -> a
+  -- |Know instances:
+  -- MultiDegreeRadii uses it to extract a single horizontal row of SingleDegreeRadii.
+  -- Ex: Pick the top row from a scan.
   extractSingle :: ([Radius] -> Radius) -> a -> a
+  
 
 instance ExtractableRadius SingleDegreeRadii where
   extractSingle f (SingleDegreeRadii degree' radii') = SingleDegreeRadii degree' [(f radii')]
@@ -110,15 +104,6 @@ instance ExtractableRadius MultiDegreeRadii where
   extractSingle f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (extractSingle f) degrees')
   extractList f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (extractList f) degrees')
 
--- Sort SingleDegreeRadii on ascending order of degree
-sortSDR (SingleDegreeRadii degree' _) (SingleDegreeRadii degree'' _)
-  | degree' <= degree'' = LT
-  | degree' > degree'' = GT
-
-
-
--- |Sort MingleDegreeRadii on ascending order of degree of the SingleDegreeRadii
-sortMDR (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (sortBy sortSDR degrees')
 
 type RotateFactor = Double
 
