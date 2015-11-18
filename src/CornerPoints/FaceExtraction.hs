@@ -5,7 +5,8 @@ extractBottomFrontLine,
  extractTopFace,
  extractBackTopLine,
  extractBottomFace,
- extractBackBottomLine
+ extractBackBottomLine,
+ extractBackFace
  ) where
 import CornerPoints.CornerPoints(CornerPoints(..))
 
@@ -32,4 +33,7 @@ extractBackBottomLine (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) = BackBottomLine b1 b
 extractBackBottomLine (BottomFace b1 f1 b4 f4) = BackBottomLine b1 b4
 
 extractBottomFace (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) = BottomFace b1 f1 b4 f4
+
+extractBackFace :: CornerPoints -> CornerPoints
+extractBackFace (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) = BackFace b1 b2 b3 b4
 
