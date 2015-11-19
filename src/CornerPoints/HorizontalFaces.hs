@@ -4,7 +4,7 @@ module CornerPoints.HorizontalFaces(
   createBottomFaces,
   createTopFacesWithVariableSlope,
   createBottomFacesWithVariableSlope,
-  cylinderWallsNoSlope,
+  --cylinderWallsNoSlope,
   cylinderWallsNoSlopeSquaredOff,
   cylinderSolidNoSlope,
   cylinderSolidNoSlopeSquaredOff,
@@ -179,24 +179,6 @@ createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
     ]
 
 
-cylinderWallsNoSlope :: Radius -> Thickness ->  Origin -> [Angle] -> Height -> [CornerPoints]
-cylinderWallsNoSlope    innerRadius    wallThickness origin    angles     height =
-        let  --innerCubes = createBottomFaces origin (map (Radius) [innerRadius,innerRadius..]) angles flatXSlope flatYSlope
-             innerCubes = createBottomFaces origin [innerRadius | x <-  [1..]] angles flatXSlope flatYSlope
-                         |@+++#@|
-                         (upperFaceFromLowerFace . (transposeZ (+height)))
-
-             outerCubes = --createBottomFaces origin (map (Radius) [(innerRadius + wallThickness),(innerRadius + wallThickness)..]) angles flatXSlope flatYSlope
-                         createBottomFaces origin [Radius ((radius innerRadius) + wallThickness) |x <- [1..]] angles flatXSlope flatYSlope
-                         |@+++#@|
-                         (upperFaceFromLowerFace . (transposeZ (+height)))
-             cylinderCubes = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- innerCubes]
-                             |+++|
-                             [ (extractFrontFace) currCube    |currCube <- outerCubes]
-               --outerFrontFaces = [ (extractFrontFace) currCube    |currCube <- outerCubesTemp]
-               --outerBackFaces = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- innerCubes]
-               --outerCubes = outerBackFaces |+++| outerFrontFaces
-        in  cylinderCubes
 
 
 cylinderWallsNoSlopeSquaredOff :: Radius ->    Origin -> [Angle] -> Height -> Thickness ->  Power -> [CornerPoints]

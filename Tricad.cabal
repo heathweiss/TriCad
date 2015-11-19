@@ -44,7 +44,9 @@ library
                    Examples.Scan.WalkerSocket
                    Examples.Scan.WalkerSocketSquared
                    -- Misc Shapes
-                   Examples.MiscShapes.RvVentCaps
+                   --Examples.MiscShapes.RvVentCaps
+                     --Exlcluded as they have not been updated for the new cylinders.
+                     --Leave in until I have the trailer fixed, to be sure I don't need them.
                    -- Primitives
                    Examples.Primitives.Cube
                    Examples.Primitives.Cylinders

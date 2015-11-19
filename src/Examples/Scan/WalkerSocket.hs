@@ -20,7 +20,8 @@ import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBott
 import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
 import CornerPoints.Transpose (transposeZ)
 import Helpers.List((++:))
-import CornerPoints.HorizontalFaces(createBottomFaces, createTopFaces, cylinderWallsNoSlope, cylinderSolidNoSlope)
+import CornerPoints.HorizontalFaces(createBottomFaces, createTopFaces, cylinderSolidNoSlope)
+import Primitives.Cylindrical(cylinderWallsNoSlope)
 import CornerPoints.Transposable(transpose)
 {-
 read in the Multidegree json file, which has valid Radii,

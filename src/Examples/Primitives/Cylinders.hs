@@ -1,7 +1,8 @@
 {-# LANGUAGE ParallelListComp #-}
 module Examples.Primitives.Cylinders where
-import CornerPoints.HorizontalFaces(cylinderSolidNoSlopeSquaredOff, cylinderSolidNoSlope, cylinderWallsNoSlopeSquaredOff, cylinderWallsNoSlope,
+import CornerPoints.HorizontalFaces(cylinderSolidNoSlopeSquaredOff, cylinderSolidNoSlope, cylinderWallsNoSlopeSquaredOff, 
                                    cylinderSolidNoSlopeLengthenY, cylinderSolidNoSlopeSquaredOffLengthenY, cylinderWallsNoSlopeSquaredOffLengthenY)
+import Primitives.Cylindrical(cylinderWallsNoSlope)
 import CornerPoints.Radius(Radius(..))
 import CornerPoints.Points(Point(..))
 import Stl.StlCornerPoints((|+++^|), (||+++^||))

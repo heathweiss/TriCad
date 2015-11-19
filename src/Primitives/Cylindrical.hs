@@ -5,17 +5,47 @@ Includes:
   cylinder
 -}
 
-module Primitives.Cylindrical(cylinderHollow, cylinderSolid) where
+module Primitives.Cylindrical(cylinderWallsNoSlope) where
 
-import CornerPoints.Create(slopeAdjustedForVerticalAngle, Slope(..), Angle(..), flatXSlope, flatYSlope)
+import CornerPoints.Create(slopeAdjustedForVerticalAngle, Slope(..), Angle(..), flatXSlope, flatYSlope, Origin(..))
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), (|@+++#@|), Faces(..))
 import CornerPoints.FaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace )
-import CornerPoints.FaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine, upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine)
+import CornerPoints.FaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine,
+                                    upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine, backFaceFromFrontFace)
 import CornerPoints.Radius(Radius(..))
- 
+import CornerPoints.Transpose (transposeZ)
+--import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
 
+type Thickness = Double
+type Height = Double
+type Power = Double
+type LengthenFactor = Double
+
+
+cylinderWallsNoSlope :: Radius -> Thickness ->  Origin -> [Angle] -> Height -> [CornerPoints]
+cylinderWallsNoSlope    innerRadius    wallThickness origin    angles     height =
+        let  --innerCubes = createBottomFaces origin (map (Radius) [innerRadius,innerRadius..]) angles flatXSlope flatYSlope
+             innerCubes = createBottomFaces origin [innerRadius | x <-  [1..]] angles flatXSlope flatYSlope
+                         |@+++#@|
+                         (upperFaceFromLowerFace . (transposeZ (+height)))
+
+             outerCubes = --createBottomFaces origin (map (Radius) [(innerRadius + wallThickness),(innerRadius + wallThickness)..]) angles flatXSlope flatYSlope
+                         createBottomFaces origin [Radius ((radius innerRadius) + wallThickness) |x <- [1..]] angles flatXSlope flatYSlope
+                         |@+++#@|
+                         (upperFaceFromLowerFace . (transposeZ (+height)))
+             cylinderCubes = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- innerCubes]
+                             |+++|
+                             [ (extractFrontFace) currCube    |currCube <- outerCubes]
+               
+        in  cylinderCubes
+
+
+
+
+  
+-- =========================================== all following is the original cylinders =================================================
 {--------- ringBase ------------------------
 The base shape upon which all the others are based.
 Do not export this, as it may be subject to change.
@@ -28,7 +58,7 @@ of straight up.
 The top and bottom are level horizontally, as no slope is given.
 Need to go back and visit TriCad.MathPolar and work on the tapered vs non-taperered slopes first.
 Till then, no point in doing anything with slopes.
--}
+
 ringBase btmOrigin btmInnerRadius btmOuterRadius topOrigin topInnerRadius topOuterRadius angles  =
   topFaces |+++| btmFaces
    where
@@ -71,3 +101,4 @@ Almost the same as ring base.
 --coneHollow  includes all that ringBase uses.
 
 --coneSolid  Same as coneHollow, but no need for inner radii. Do the same as cylinder solid.
+-}
