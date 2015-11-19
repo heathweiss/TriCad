@@ -102,18 +102,7 @@ hoseAttachment    plateRadius =
                   ]
                   ||+++^|| 
                   cubes
-      {-
-      triangles = [
-                    [FacesBackFrontTop | x <- [1..]],    --hose
-                    [FacesBackFront | x <- [1..]],       --riser
-                    [FaceBottom | x <- [1..]],       --riserBase
-                    [FacesBottomFrontTop | x <- [1..]], --ousideScrews
-                    [FacesBottomTop | x <- [1..]]      --innerHose
-                    
-                  ]
-                  ||+++^|| 
-                  cubes
-       -}
+      
       cubesStl = newStlShape "hose attachment" triangles
   in  
       --putStrLn "temp"

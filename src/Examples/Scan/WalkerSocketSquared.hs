@@ -35,7 +35,8 @@ loadMDRAndPassToProcessor = do
       rowReductionFactor = 100
       extensionHeight = 30
       plateRadius = 30
-            
+      power = 2.5
+      lengthenYFactor = 20
       extensionFaceBuilder :: (Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]
       extensionFaceBuilder leftFace emptyFaces rightFace fillerFaces =
         [leftFace] ++ [emptyFaces | x <- [2..30]] ++ [rightFace]   ++  [fillerFaces | x <- [31..]]
@@ -47,40 +48,106 @@ loadMDRAndPassToProcessor = do
             innerSleeveMDR = rotateMDR $ rotateMDR $ transpose (+3) $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
             --give it a thickness of 3 mm
             outerSleeveMDR = transpose (+3) innerSleeveMDR
+            plateRadius = 24
         in  --mainSocketStl innerSleeveMDR outerSleeveMDR extensionFaceBuilder extensionHeight rowReductionFactor pixelsPerMM
-            pushPlate
+            pushPlate plateRadius power lengthenYFactor
+            --hosePlate plateRadius power lengthenYFactor
             
       Nothing                                ->
         putStrLn "File not decoded"
 
 {-
-May need to make it bigger.
+The attaches to the pushPlate and the hose
+                     ||  ||   hose
+                     ||  ||   
+                    |||  |||  riser
+              |||||||||||||||||||  innerHose riserBase outsideScrews
 -}
-pushPlate :: IO ()
-pushPlate =
+hosePlate ::  PlateRadius -> Power -> LengthenYFactor -> IO ()
+hosePlate plateRadius power lengthenYFactor =
+  let
+    
+    wallThickness = 3
+    hoseInnerRadius = 7.5
+    hoseThickness = wallThickness
+    hoseOuterRadius = hoseThickness + hoseInnerRadius
+    riserInnerRadius = hoseOuterRadius
+    riserThickness = 5 --10
+    riserOuterRadius = riserThickness + riserInnerRadius
+    screwInsideRadius = riserOuterRadius
+    screwsThickness = plateRadius - screwInsideRadius
+    
+    
+
+    baseHeight = 3
+    riserHeight = 17
+    hoseHeight = 20
+      
+    baseOrigin = Point 0 0 0
+    riserOrigin = transposeZ ( + baseHeight) baseOrigin
+      
+    angles = (map (Angle) [0,10..360])
+    cubes =  getCornerPoints $
+        (CornerPointsBuilder
+         [
+           --cylinderWallsNoSlope riserInnerRadius riserThickness  baseOrigin angles baseHeight,     -- riserBase
+           --cylinderWallsNoSlope screwInsideRadius screwsThickness   baseOrigin angles baseHeight, --outsideScrews
+           --cylinderSolidNoSlope hoseOuterRadius  baseOrigin angles baseHeight                  --innerHose
+       
+           (cylinderWallsNoSlopeSquaredOffLengthenY  (Radius riserInnerRadius) baseOrigin angles baseHeight riserThickness power lengthenYFactor),--riser base
+           (cylinderWallsNoSlopeSquaredOffLengthenY  (Radius screwInsideRadius) baseOrigin angles baseHeight screwsThickness power lengthenYFactor),--outer screw ring
+           (cylinderSolidNoSlopeSquaredOffLengthenY  (Radius hoseOuterRadius)   baseOrigin    angles     baseHeight  power    lengthenYFactor) --innerHose
+           
+         ]
+          &+++#@ (|+++|  [extractTopFace x | x <- (cylinderWallsNoSlope (Radius hoseInnerRadius) hoseThickness   riserOrigin angles riserHeight)]) -- riser
+          &+++#@ (|@+++#@| ((transposeZ (+20)) . extractTopFace) ) --hose
+         
+        )
+
+    triangles = [
+                    [FacesBackFrontTop | x <- [1..]],    --hose
+                    [FacesBackFront | x <- [1..]],       --riser
+                    [FaceBottom | x <- [1..]],       --riserBase
+                    [FacesBottomFrontTop | x <- [1..]], --ousideScrews
+                    [FacesBottomTop | x <- [1..]]      --innerHose
+                    
+                ]
+                ||+++^||
+                cubes
+    
+    stlFile = newStlShape "walker push plate" triangles 
+  
+  in
+    writeStlToFile stlFile      
+  
+     
+
+{-
+Attaches directly to the socket
+-}
+pushPlate :: PlateRadius -> Power -> LengthenYFactor -> IO ()
+pushPlate    plateRadius    power    lengthenYFactor  = 
   let
     origin = Point 0 0 0 :: Origin
     angles = (map (Angle) [0,10..360])
     plateHeight = 3
-    power = 2.5
+    --power = 2.5
     riserThickness = 3
-    lengthenFactor = 20
+    --lengthenFactor = 20
     
     triangles  =
       [
         [FacesBackBottomTop | x <- [1..]], --center of plate
-        (riserFaceBuilder FacesBottomFront FacesBottomFront FacesBottomFrontTop FacesBottomFront FacesBottomFront), --outer ring
-        --                [faces1| x <- [1..8]] ++ [faces2] ++           [faces3| x <- [10..27]] ++ [faces4]   ++  [faces5 | x <- [11..]]
-        (riserFaceBuilder FacesBackFrontTop        FacesBackFrontLeftTop FacesNada                  FacesBackFrontRightTop FacesBackFrontTop)--riser
+        (riserFaceBuilder FacesBottomFront  FacesBottomFront      FacesBottomFrontTop FacesBottomFront       FacesBottomFront), --outer ring
+        (riserFaceBuilder FacesBackFrontTop FacesBackFrontLeftTop FacesNada           FacesBackFrontRightTop FacesBackFrontTop)--riser
       ]
       ||+++^||
       [ --the center of the plate
-        (cylinderSolidNoSlopeSquaredOffLengthenY  (Radius 21)   origin    angles     plateHeight  power    lengthenFactor),
-        --(cylinderWallsNoSlopeSquaredOffLengthenY  (Radius 1)   origin    angles     plateHeight (20::Thickness) power    lengthenFactor),
+        (cylinderSolidNoSlopeSquaredOffLengthenY  (Radius 21)   origin    angles     plateHeight  power    lengthenYFactor),
         --the outer ring, which has an inner radius = outer radius of riser on socket
-        (cylinderWallsNoSlopeSquaredOffLengthenY  (Radius 21)  origin angles plateHeight riserThickness power lengthenFactor),
+        (cylinderWallsNoSlopeSquaredOffLengthenY  (Radius (plateRadius - riserThickness))  origin angles plateHeight riserThickness power lengthenYFactor),
         --the riser that takes off from the outer ring
-        (cylinderWallsNoSlopeSquaredOffLengthenY  (Radius 21)   (transposeZ (+plateHeight)origin)  angles (30 :: Height) riserThickness  power  lengthenFactor)
+        (cylinderWallsNoSlopeSquaredOffLengthenY  (Radius (plateRadius - riserThickness))   (transposeZ (+plateHeight)origin)  angles (30 :: Height) riserThickness  power  lengthenYFactor)
       ]
 
     stlFile = newStlShape "walker push plate" triangles 
@@ -156,4 +223,5 @@ type TransposeFactor = Double
 type Thickness = Double
 type Height = Double
 type Power = Double
+type LengthenYFactor = Double
 
