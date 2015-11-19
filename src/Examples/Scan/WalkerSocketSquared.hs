@@ -15,7 +15,7 @@ import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBott
 import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
 import CornerPoints.Transpose (transposeZ, transposeY, transposeX)
 import Helpers.List((++:))
-import CornerPoints.HorizontalFaces(createBottomFaces, createTopFaces,  cylinderWallsNoSlopeSquaredOff, cylinderSolidNoSlopeSquaredOff,
+import Primitives.Cylindrical(cylinderWallsNoSlopeSquaredOff, cylinderSolidNoSlopeSquaredOff,
                                    cylinderWallsNoSlopeSquaredOffLengthenY, cylinderSolidNoSlopeSquaredOffLengthenY)
 import Primitives.Cylindrical(cylinderWallsNoSlope)
 import CornerPoints.Transposable(transpose)

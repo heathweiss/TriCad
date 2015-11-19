@@ -1,13 +1,12 @@
 module Examples.Primitives.Cube() where
-import Primitives.Cubical(rectangularCube)
 import Stl.StlCornerPoints((|+++^|))
 import CornerPoints.CornerPoints( Faces(..))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
-import CornerPoints.HorizontalFaces( rectangularSolidNoSlope)
+import Primitives.Cubical( rectangularSolidNoSlope)
 import CornerPoints.Radius(Radius(..))
 import CornerPoints.Points(Point(..))
-import CornerPoints.Create(Angle(..))
+import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, createCornerPointSquaredOff, Angle(..),  flatXSlope, flatYSlope,)
 
 writeJoinerStlFile = writeStlToFile stlFile
 stlFile = newStlShape "joiner cube" rectangleTriangles

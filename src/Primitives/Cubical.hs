@@ -2,8 +2,8 @@
 For creating hexahedrons such as cubes, rectangular cubes, etc.
 -}
 
-module Primitives.Cubical(rectangularCube) where
-import CornerPoints.CornerPoints(CornerPoints(..),(+++),(+++-),(@+++#@))
+module Primitives.Cubical(rectangularCubeNonRadial, rectangularSolidNoSlope) where
+import CornerPoints.CornerPoints(CornerPoints(..),(+++),(+++-),(@+++#@),(|@+++#@|))
 import CornerPoints.Points (Point(..))
 import CornerPoints.Transpose (transposeZ,transposeX,transposeY)
 import CornerPoints.FaceConversions(
@@ -17,17 +17,34 @@ import CornerPoints.FaceConversions(
   frontTopLineFromBackTopLine,
   bottomFrontLineFromBackBottomLine)
 import  Math.Trigonometry(atanDegrees)
-
+import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, createCornerPointSquaredOff, Angle(..),  flatXSlope, flatYSlope,)
+import CornerPoints.Radius(Radius(..))
+import CornerPoints.HorizontalFaces(createTopFaces, createBottomFaces, createTopFacesWithVariableSlope,  createBottomFacesWithVariableSlope)
 
 type ZHeight = Double
 type XWidth = Double
 type YLength = Double
+type Thickness = Double
+type Height = Double
+type Power = Double
+type LengthenFactor = Double
 
+-- | Create a 4 sided shape radially from an origin.
+--   See Examples.Primitives.Cubes for an example.
+-- Should be named something else, as it could make any 4 sided shape, just by varying the
+-- angles and radii.
+rectangularSolidNoSlope :: [Radius] -> Origin -> [Angle] -> Height -> [CornerPoints]
+rectangularSolidNoSlope    radii    origin    angles     height   =
+  createBottomFaces origin radii   angles flatXSlope flatYSlope
+  |@+++#@|
+  (upperFaceFromLowerFace . (transposeZ (+height)))
 
---Cube :: { height :: ZHieght, width :: XWidth, length = YLength}
-
-rectangularCube :: ZHeight -> XWidth -> YLength -> CornerPoints
-rectangularCube height width length =
+{-
+Create a rectangle with a non-radial system.
+Should I get rid of this, and go to the strictly radial system.
+-}
+rectangularCubeNonRadial :: ZHeight -> XWidth -> YLength -> CornerPoints
+rectangularCubeNonRadial height width length =
   
  let
     b1Point =  (Point 0 0 0) --the origin of the cube is the B1 corner
