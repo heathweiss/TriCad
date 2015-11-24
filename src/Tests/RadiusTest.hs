@@ -1,9 +1,11 @@
 
 module Tests.RadiusTest(radisuTestDo) where
 import Test.HUnit
-import CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..),
-                          extractSingle, extractList, rotateMDR)
+import CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..), resetMultiDegreeRadiiIfNull,
+                          extractSingle, extractList, rotateMDR, setRadiusIfNull,  resetSingleDegreeRadiiIfNull,
+                          setRadiusWithPrecedingValueIfNull, resetMultiDegreeRadiiIfNullWithPreviousValue)
 import CornerPoints.Transposable(transpose)
+import Scan.ParseJuicy(averageValueOf)
 
 
 radisuTestDo = do
@@ -17,6 +19,87 @@ radisuTestDo = do
  runTestTT transposeSDRTest2
 
  runTestTT rotateMultiDegreeRadiiTest
+
+ runTestTT setRadiusIfNullTest
+ runTestTT setRadiusIfNotNullTest
+ runTestTT setRadiusWithPrecedingRadiusIfNullTest
+ runTestTT setRadiusWithPrecedingRadiusIfNullTest2
+ runTestTT setRadiusWithPrecedingRadiusIfNullTest3
+ 
+
+ runTestTT resetSingleDegreeRadiiNaNTest
+ runTestTT resetMultiDegreeRadiiNaNTest
+ runTestTT resetMultiDegreeRadiiNullWithPreviousValueTest
+
+ 
+
+resetMultiDegreeRadiiNaNTest  = TestCase $ assertEqual 
+  "resetMultiDegreeRadiiNaNTest"
+  (MultiDegreeRadii
+   "myName"
+   [(SingleDegreeRadii 0 (map (Radius) [1,2])),
+    (SingleDegreeRadii 0 (map (Radius) [3,44]))
+   ]
+  )
+  (resetMultiDegreeRadiiIfNull 44
+   
+    ( MultiDegreeRadii
+      "myName"
+      [(SingleDegreeRadii 0 [Radius 1, Radius 2]),
+       (SingleDegreeRadii 0 [Radius 3, Radius (averageValueOf [])])
+      ]
+    )
+  )
+
+resetMultiDegreeRadiiNullWithPreviousValueTest  = TestCase $ assertEqual 
+  "resetMultiDegreeRadiiNullWithPreviousValueTest"
+  (MultiDegreeRadii
+   "myName"
+   [(SingleDegreeRadii 0 (map (Radius) [1,2])),
+    (SingleDegreeRadii 0 (map (Radius) [3,3]))
+   ]
+  )
+  (resetMultiDegreeRadiiIfNullWithPreviousValue 44
+   
+    ( MultiDegreeRadii
+      "myName"
+      [(SingleDegreeRadii 0 [Radius 1, Radius 2]),
+       (SingleDegreeRadii 0 [Radius 3, Radius (averageValueOf [])])
+      ]
+    )
+  )
+
+resetSingleDegreeRadiiNaNTest  = TestCase $ assertEqual 
+  "resetSingleDegreeRadiiNaNTest"
+  (SingleDegreeRadii 0 (map (Radius) [1,2]))
+  (resetSingleDegreeRadiiIfNull 3 (SingleDegreeRadii 0 [Radius 1, Radius 2]))
+
+
+ 
+setRadiusIfNullTest = TestCase $ assertEqual 
+  "setRadiusIfNullTest"
+  (Radius 0)
+  (setRadiusIfNull 0 $ Radius $ averageValueOf [])
+
+setRadiusWithPrecedingRadiusIfNullTest = TestCase $ assertEqual 
+  "setRadiusWithPrecedingRadiusIfNullTest"
+  ([Radius 0, Radius 1])
+  (setRadiusWithPrecedingValueIfNull 0  [Radius $ averageValueOf [], Radius 1])
+
+setRadiusWithPrecedingRadiusIfNullTest2 = TestCase $ assertEqual 
+  "setRadiusWithPrecedingRadiusIfNullTest2"
+  ([Radius 1, Radius 1])
+  (setRadiusWithPrecedingValueIfNull 2  [ Radius 1, Radius $ averageValueOf []])
+
+setRadiusWithPrecedingRadiusIfNullTest3 = TestCase $ assertEqual 
+  "setRadiusWithPrecedingRadiusIfNullTest3"
+  ([Radius 1, Radius 2])
+  (setRadiusWithPrecedingValueIfNull 3  [ Radius 1, Radius 2])
+
+setRadiusIfNotNullTest = TestCase $ assertEqual 
+  "setRadiusIfNotNullTest"
+  (Radius 2)
+  (setRadiusIfNull 1 $ Radius 2)
 
 {-The first and last [Radius] must always match, which is why a [Radius0] was eliminated, and an extra [Radius 20] was created.-}
 rotateMultiDegreeRadiiTest = TestCase $ assertEqual 

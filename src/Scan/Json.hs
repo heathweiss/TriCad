@@ -54,11 +54,17 @@ Those 2 only get used later on, when dealing with slopes.
 instance FromJSON Radius where
   parseJSON (Object v) = Radius <$>
                          v .: "radius"
+  
   parseJSON _          = mzero
 
 
+
 instance ToJSON Radius where
+  --"radius" sets the output name of the field. Could use anything.
   toJSON (Radius radius) = object ["radius" .= radius]
+  --need to output Null to make it compile
+  --can't use it because I can't use FromJSON as it will not compile.
+  --toJSON (RadiusNaN )     = object ["RadiusNaN" .= Null]
 
 
 

@@ -46,7 +46,7 @@ loadMDRAndPassToProcessor = do
       Just (MultiDegreeRadii name' degrees') ->
         let --enlarge it to fit over the socket already printed with WalkerSocket. 1st attempt at +2 was not quite big enough, trying 3.
             --rotate it to line up better with the riser
-            innerSleeveMDR = rotateMDR $ rotateMDR $ transpose (+3) $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
+            innerSleeveMDR = rotateMDR $ rotateMDR $ rotateMDR $ transpose (+3) $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
             --give it a thickness of 3 mm
             outerSleeveMDR = transpose (+3) innerSleeveMDR
             plateRadius = 24
@@ -119,6 +119,12 @@ hosePlate plateRadius power lengthenYFactor =
 
 {-
 Attaches directly to the socket
+
+Printing notes:
+I printed with no infill, and 2 top layers. This resulted in the top 2 layers of the plate,
+printing over a gap of about 1 mm. This was not a problem. Should have had solid infill or more bottom layers.
+
+Used abs glue directly on upper glass plate with a primer wash just before printing. Worked great.
 -}
 pushPlate :: PlateRadius -> Power -> LengthenYFactor -> IO ()
 pushPlate    plateRadius    power    lengthenYFactor  = 
@@ -182,7 +188,7 @@ mainSocketStl    innerSleeveMDR      outerSleeveMDR      extensionFaceBuilder ex
         (
           [riserFaceBuilder FacesBackFront FacesBackFrontLeft FacesNada FacesBackFrontRight FacesBackFront] ++  --the socket to riser transition
           [riserFaceBuilder FacesBackFront FacesBackFront (FacesBackFrontTop) FacesBackFront FacesBackFront]  ++ --top layer of the socket
-          [[FacesBackFront | x <- [1..]] | x <- []] ++  --get rid of a most layers, so that just the top is printed out, for fixing 1st print of socket.
+          [[FacesBackFront | x <- [1..]] | x <- [1..9]] ++  --get rid of a most layers, so that just the top is printed out, for fixing 1st print of socket.
                                                            --leave empty to get rid of all mid-layers. Use 1..9 for all layers printed
           [ [FacesBackBottomFront | x <- [1..]]   ]         --bottom of the socket      
         )

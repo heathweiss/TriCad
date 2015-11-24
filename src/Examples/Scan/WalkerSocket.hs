@@ -5,7 +5,7 @@ import Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii, getRedLaserLineS
 import Data.Word(Word8)
 import qualified Data.ByteString.Lazy as BL
 import Data.Aeson
-import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(..),extractSingle, extractList)
+import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(..),extractSingle, extractList, resetMultiDegreeRadiiIfNull)
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalWalls,
                                   createHorizontallyAlignedCubesNoSlope, createHorizontallyAlignedCubes)
 import CornerPoints.Points(Point(..))
@@ -301,6 +301,25 @@ writeStlFileFromRawScanWrapper = do
         writeStlFileFromRawScan (MultiDegreeRadii name' degrees')
       Nothing                                ->
         putStrLn "File not decoded"
+
+{-
+Read in the processed json file and
+replace all the invalid RadiusNaN with a default value.
+First I need to read the file, so that the new RadiusNaN is used.
+-}
+resetJsonFileMDRNaN :: IO ()
+resetJsonFileMDRNaN = do
+  contents <- BL.readFile "src/Data/scanFullData.json"
+  
+  case (decode contents) of
+   
+      Just (MultiDegreeRadii name' degrees') ->
+        let multiDegreeRadii = resetMultiDegreeRadiiIfNull 2000 $ MultiDegreeRadii name' degrees'
+        in  BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
+        
+      Nothing                                ->
+        putStrLn "File not decoded"
+
 {-
 This was orignally is set up to have rows reduced by 10, and from a smaller jpeg image so
 will need to change the number of of center front triangles

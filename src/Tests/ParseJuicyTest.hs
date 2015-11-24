@@ -1,6 +1,6 @@
 module Tests.ParseJuicyTest (parseJuicyTestDo) where
 import Test.HUnit
-import Scan.ParseJuicy( getThePixelsRightOfCenter, convertPixelsToMillmeters, calculateRadiusFrom,
+import Scan.ParseJuicy( getThePixelsRightOfCenter, convertPixelsToMillmeters, calculateRadiusFrom, averageValueOf,
                        removeLeftOfCenterPixels, TargetValueIndex(..), ofThe, forThe, andThen, adjustedFor, andThe)
 import CornerPoints.Radius(Radius(..))
 
@@ -10,6 +10,11 @@ parseJuicyTestDo = do
   runTestTT calculateMillimetersTest
   --get pixels right of center
   runTestTT adjustPixelIndexForLeftSlopeTestRedo
+
+  --get rid of blank values
+  runTestTT whatIsDivdeZeroBy
+  runTestTT averageValueOfValidListTest
+  runTestTT averageValueOfEmptyListTest
 
 {-
 calculateMillimetersFromPixelsRightOfCenter :: PixelToMillmeterConversionFactor -> NumberOfPixels -> Angle ->  Millimeters
@@ -59,3 +64,18 @@ adjustPixelIndexForLeftSlopeTestRedo = TestCase $ assertEqual
        ]
   )
 
+whatIsDivdeZeroBy  = TestCase $ assertEqual
+  "whatIsDivdeZeroBy"
+  0
+  (0/3)
+
+averageValueOfValidListTest = TestCase $ assertEqual
+  "averageValueOfValidListTest"
+  1.5
+  (averageValueOf [1,2])
+
+
+averageValueOfEmptyListTest = TestCase $ assertEqual
+  "averageValueOfEmptyListTest"
+  True
+  (isNaN $ averageValueOf [])

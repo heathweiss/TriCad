@@ -1,6 +1,7 @@
 
-module CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..),
-                          extractSingle, extractList, rotateMDR) where
+module CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..),resetMultiDegreeRadiiIfNull,
+                          extractSingle, extractList, rotateMDR, setRadiusIfNull, resetSingleDegreeRadiiIfNull,
+                          setRadiusWithPrecedingValueIfNull, resetMultiDegreeRadiiIfNullWithPreviousValue) where
 import CornerPoints.Transposable( TransposeLength, transpose)
 import Data.List(sortBy)
 import Data.Ord (Ordering(..), comparing)
@@ -10,8 +11,26 @@ import CornerPoints.CornerPoints(CornerPoints(..))
 Represents a radius of a circular shape, which is what all shapes in math polar are created from.
 -}
 data Radius = Radius {radius :: Double}
+              
    deriving (Show)
+ -- | Instantiate a Radius
+setRadiusIfNull :: Double -> Radius -> Radius
+setRadiusIfNull resetValue (Radius radius')
+  | isNaN radius' = Radius resetValue --RadiusNaN
+  -- | If the value is NaN, make it a RadiusNaN
+  | otherwise = Radius radius'
+  -- |If it is a valid value, create a Radius value.
 
+-- | Reset all null value Radius with the preceding Radius.
+--   Pass in a value to start off the list, in case 1st Radius is null.
+setRadiusWithPrecedingValueIfNull :: Double -> [Radius] -> [Radius]
+setRadiusWithPrecedingValueIfNull resetValue (x:xs) =
+  let currRadius = setRadiusIfNull resetValue x
+  in currRadius : setRadiusWithPrecedingValueIfNull (radius currRadius) xs
+setRadiusWithPrecedingValueIfNull resetValue [] = []
+  
+
+-- |Check for equaility of Radius and RadiusNaN
 radiusEqual :: (Eq a, Num a, Ord a, Fractional a) => a -> a -> Bool
 radiusEqual  a b
   
@@ -23,11 +42,23 @@ instance Eq Radius where
       | (radiusEqual rad rad') = True 
       | otherwise = False
 
-
 instance TransposeLength Radius where
   transpose f (Radius a) = Radius $ f a
 
+-- | Reset all Radius Null to a Radius defaultValue
+resetSingleDegreeRadiiIfNull :: Double ->  SingleDegreeRadii -> SingleDegreeRadii
+resetSingleDegreeRadiiIfNull resetValue    (SingleDegreeRadii degree' radii') =
+  SingleDegreeRadii degree' $ map (setRadiusIfNull resetValue) radii'
 
+
+
+-- | Reset  Radius Null to previous  Radius value.
+--   If it is the very first Radius, give it a default value.
+
+resetSingleDegreeRadiiIfNullWithPreviousValue :: Double ->  SingleDegreeRadii -> SingleDegreeRadii
+resetSingleDegreeRadiiIfNullWithPreviousValue resetValue    (SingleDegreeRadii degree' radii') =
+  SingleDegreeRadii degree' $ setRadiusWithPrecedingValueIfNull resetValue radii'
+ 
 {-
 Contains the [Radius] associated with a single degree from a vertical scan.
 
@@ -44,6 +75,8 @@ data SingleDegreeRadii = SingleDegreeRadii {degree::Degree, radii::[Radius]}
 
 instance TransposeLength SingleDegreeRadii  where
   transpose f (SingleDegreeRadii degree' radii') = SingleDegreeRadii degree' (map (transpose f) radii')
+
+
 
 -- |Degree of a circle.
 type Degree = Double
@@ -84,6 +117,15 @@ rotateMDR     multiDegreeRadii   =
   in 
      multiDegreeRadii {degrees = (rotateSDR  (degrees multiDegreeRadii ))}
 
+-- | Reset all Radii Null values with a default value
+resetMultiDegreeRadiiIfNull :: Double -> MultiDegreeRadii -> MultiDegreeRadii
+resetMultiDegreeRadiiIfNull resetValue (MultiDegreeRadii name' degrees') =
+  MultiDegreeRadii name' $ map (resetSingleDegreeRadiiIfNull resetValue) degrees'
+
+-- | Reset all Radii Null values with the previous Radius. Provide a starter Radius for start of list.
+resetMultiDegreeRadiiIfNullWithPreviousValue :: Double -> MultiDegreeRadii -> MultiDegreeRadii
+resetMultiDegreeRadiiIfNullWithPreviousValue resetValue (MultiDegreeRadii name' degrees') =
+  MultiDegreeRadii name' $ map (resetSingleDegreeRadiiIfNullWithPreviousValue resetValue) degrees'
 
 class ExtractableRadius a  where
   -- |Know instances:

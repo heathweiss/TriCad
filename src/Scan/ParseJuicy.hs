@@ -2,7 +2,7 @@
 {-# LANGUAGE ParallelListComp #-}
 module Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii,  TargetValueIndex(..), ofThe, forThe, andThen, adjustedFor, andThe,
                         getThePixelsRightOfCenter, removeLeftOfCenterPixels, getRedLaserLineSingleImage, convertPixelsToMillmeters,
-                        calculateRadiusFrom, reduceScanRows, reduceRows, reduceScan) where
+                        calculateRadiusFrom, reduceScanRows, reduceRows, reduceScan, averageValueOf) where
 import Codec.Picture.Jpg
 import Codec.Picture
 import Codec.Picture.Types
@@ -12,7 +12,7 @@ import Codec.Picture.Types
 import qualified Data.List as L
 import Data.Word(Word8)
 import qualified Data.ByteString as BS
-import CornerPoints.Radius(SingleDegreeRadii(..), Radius(..), MultiDegreeRadii(..))
+import CornerPoints.Radius(SingleDegreeRadii(..), Radius(..), MultiDegreeRadii(..), resetMultiDegreeRadiiIfNullWithPreviousValue)
 import Control.Monad
 import qualified Data.ByteString.Lazy.Char8 as BL
 import Scan.Json
@@ -139,6 +139,39 @@ getRedLaserLineSingleImage :: TargetValue -> (Image  PixelYCbCr8) -> [TargetValu
 getRedLaserLineSingleImage    redLaserLine   jpegImage = 
   processSingleImageToReducedEachRowToTargetValueIndex jpegImage (extractCR) (averageValueOf) (indicesOfThePixelValuesGTE) redLaserLine
 
+--just for testing. Wrapper around processSingleDegreeToMultiDegreeRadii
+processSingleImageToMultiDegreeRadiiJsonFileWrapper = processSingleImageToMultiDegreeRadiiJsonFile (getRedLaserLineSingleImage redLaserLine)
+{-
+Just for testing.
+Process and write to json, a single image into a red laser line.
+Clean out any Radius null values before saving.
+-}
+processSingleImageToMultiDegreeRadiiJsonFile :: ((Image  PixelYCbCr8) -> [TargetValueIndex]) -> IO ()
+processSingleImageToMultiDegreeRadiiJsonFile     edgeDetector   = do
+
+  jpegImage0 <-   readImage' "0"
+  
+  let
+      singleDegreeRadiiList :: [SingleDegreeRadii]
+      singleDegreeRadiiList =
+        [
+          case jpegImage0 of
+            Left err -> (SingleDegreeRadii 360 [Radius 0])
+            --Do without cleaning out the Radius null values.
+            Right (ImageYCbCr8 jpegImage0') -> (SingleDegreeRadii 360 (map (Radius) (edgeDetector jpegImage0')))
+            
+        ]
+       
+      --Clean out any Radius null values and save to json.  
+      multiDegreeRadii = resetMultiDegreeRadiiIfNullWithPreviousValue 10 $ MultiDegreeRadii "theName" singleDegreeRadiiList
+  BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
+  putStrLn "done"
+  
+  where 
+
+        readImage' fileName = readImage $ filePathBuilder fileName
+
+
 {- |
 Process the images from src/Data/scanImages, into a json file of multiDegreeRadii.
 Needs an edgeDetector passed in, such as detecting the red laser line.
@@ -200,6 +233,7 @@ process10DegreeImagesToMultiDegreeRadii     edgeDetector   = do
        case jpegImage0 of
             Left err -> [(SingleDegreeRadii 360 [Radius 0])] 
             Right (ImageYCbCr8 jpegImage0') -> [(SingleDegreeRadii 360 (map (Radius) (edgeDetector jpegImage0')))]
+            --Right (ImageYCbCr8 jpegImage0') -> [(SingleDegreeRadii 360 (map (setRadius) (edgeDetector jpegImage0')))]
         
       multiDegreeRadii = MultiDegreeRadii "theName" singleDegreeRadiiList
   BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
@@ -209,6 +243,7 @@ process10DegreeImagesToMultiDegreeRadii     edgeDetector   = do
            case imageAsRead of
              Left err -> (SingleDegreeRadii currDegree [Radius 0]) 
              Right (ImageYCbCr8 jpegImage) -> (SingleDegreeRadii currDegree (map (Radius) (edgeDetector jpegImage)))
+             --Right (ImageYCbCr8 jpegImage) -> (SingleDegreeRadii currDegree (map (setRadius) (edgeDetector jpegImage)))
 
         readImage' fileName = readImage $ filePathBuilder fileName
 
@@ -441,7 +476,9 @@ indicesOfThePixelValuesGTE thresholdValue rawData  = ( L.findIndices) (>=thresho
 pixel8ToWord8 :: Pixel8 -> Word8
 pixel8ToWord8 pixel = pixel
 
-
+-- |Get the average value of a [Int].
+--  Return NaN if the list was empty.
+-- Used to  get the average pixels indices for target values such as the red laser line.
 averageValueOf :: [Int] -> Double
 averageValueOf list =
   (fromIntegral $ L.sum list)  / (fromIntegral $ length list)
