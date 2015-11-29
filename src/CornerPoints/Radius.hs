@@ -13,14 +13,13 @@ Represents a radius of a circular shape, which is what all shapes in math polar 
 data Radius = Radius {radius :: Double}
               
    deriving (Show)
- -- | Instantiate a Radius
+
+-- | Reset value of a Radius if null.
 setRadiusIfNull :: Double -> Radius -> Radius
 setRadiusIfNull resetValue (Radius radius')
-  | isNaN radius' = Radius resetValue --RadiusNaN
-  -- | If the value is NaN, make it a RadiusNaN
+  | isNaN radius' = Radius resetValue 
   | otherwise = Radius radius'
-  -- |If it is a valid value, create a Radius value.
-
+  
 -- | Reset all null value Radius with the preceding Radius.
 --   Pass in a value to start off the list, in case 1st Radius is null.
 setRadiusWithPrecedingValueIfNull :: Double -> [Radius] -> [Radius]

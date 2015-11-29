@@ -23,7 +23,8 @@ import Data.Word(Word8)
 import qualified Data.ByteString.Lazy as BL
 import Data.Aeson
 import Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii, getRedLaserLineSingleImage, removeLeftOfCenterPixels, getThePixelsRightOfCenter,  reduceScanRows, reduceRows, reduceScan,
-                      andThen, forThe, ofThe, adjustedFor, andThe, calculateRadiusFrom)
+                      calculateRadiusFrom)
+import  Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
 
 {-
 read in the Multidegree json file, which has valid Radii,

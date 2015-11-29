@@ -1,8 +1,8 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE ParallelListComp #-}
-module Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii,  TargetValueIndex(..), ofThe, forThe, andThen, adjustedFor, andThe,
+module Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii,  TargetValueIndex(..), 
                         getThePixelsRightOfCenter, removeLeftOfCenterPixels, getRedLaserLineSingleImage, convertPixelsToMillmeters,
-                        calculateRadiusFrom, reduceScanRows, reduceRows, reduceScan, averageValueOf) where
+                        calculateRadiusFrom, reduceScanRows, reduceRows, reduceScan, averageValueOf, calculatePixelsPerMillmeter) where
 import Codec.Picture.Jpg
 import Codec.Picture
 import Codec.Picture.Types
@@ -18,6 +18,7 @@ import qualified Data.ByteString.Lazy.Char8 as BL
 import Scan.Json
 import Data.Aeson
 import Math.Trigonometry(sinDegrees )
+import Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
 
 
 type RedValue = Word8
@@ -34,12 +35,7 @@ type Millimeters = Double
 type CameraAngle = Double
 type PixelOffset = Double
 
---ToDo: Create a DSL module, perhaps in a helper folder, for DSL helpers like this.
-ofThe = id
-forThe = id
-andThen = id
-adjustedFor = id
-andThe = id
+
 
 {- |Calculate the Radius, which is the hypotenuse, of angle created by a CameraAngle, and the number of pixels right of center.
 This is the actual radius of the scanned object for the current degree.
@@ -66,6 +62,14 @@ convertPixelsToMillmeters      pixelsPerMillimeter     pixels         =
   pixels / pixelsPerMillimeter
 
 
+{- |Calculate the pixels/mm of an image based on a calibration image, of an object of know dimensions.
+Can calculate this based on either the width or the height, as they will give the same value.
+
+-}
+calculatePixelsPerMillmeter :: NumberOfPixels ->  Millimeters -> Millimeters          -> Millimeters          -> PixelsPerMillimeter 
+calculatePixelsPerMillmeter    imageWidthPx       imageWidthMM   objectWidthReadWorldMM  objectWidthOnScreenMM =
+  ((objectWidthOnScreenMM * imageWidthPx) / imageWidthMM) / objectWidthReadWorldMM 
+
 removeLeftOfCenterPixels :: CenterIndex -> CenterIndex -> RowIndex -> RowIndex -> AdjustmentFactor
 removeLeftOfCenterPixels    btmCenterIndex topCenterIndex totalRows   currentRow =
   let pixelOffset = btmCenterIndex - topCenterIndex
@@ -79,11 +83,9 @@ getThePixelsRightOfCenter :: (RowIndex ->  AdjustmentFactor ) -> ColumnIndex -> 
 getThePixelsRightOfCenter    centerAdjustment                    colIndexOfTargeValue  rowIndex         =
   (fromIntegral colIndexOfTargeValue) - (centerAdjustment rowIndex)
 
-{- | Shows the index of the red laser line for an image.
-
-Handy to have a look at the alignment of the camera and laser.
+{- | Shows the index of the red laser line for an image, at the 1st and last row
 Take a picture with something flat, facing the camera, on the origin.
-Not used during processing of a scan.-}
+Used during processing of a scan, to correct for mis-alignment of the laser and the camera.-}
 --TargetValue
 showFirstAndLastCenterOfRedLaser = do
   jpegImage <-   readImage "src/Data/scanImages/center.JPG"

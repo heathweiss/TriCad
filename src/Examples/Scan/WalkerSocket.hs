@@ -1,7 +1,7 @@
 {-# LANGUAGE ParallelListComp #-}
 module Examples.Scan.WalkerSocket() where
 import Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii, getRedLaserLineSingleImage, removeLeftOfCenterPixels, getThePixelsRightOfCenter,  reduceScanRows, reduceRows, reduceScan,
-                      andThen, forThe, ofThe, adjustedFor, andThe, calculateRadiusFrom)
+                       calculateRadiusFrom)
 import Data.Word(Word8)
 import qualified Data.ByteString.Lazy as BL
 import Data.Aeson
@@ -23,6 +23,7 @@ import Helpers.List((++:))
 import Primitives.Cylindrical(cylinderSolidNoSlope)
 import Primitives.Cylindrical(cylinderWallsNoSlope)
 import CornerPoints.Transposable(transpose)
+import Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
 {-
 read in the Multidegree json file, which has valid Radii,
 and process it into stl using whatever function required for the current shape. -}

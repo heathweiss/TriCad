@@ -26,7 +26,7 @@ library
                    --stl
                    Stl.StlBase, Stl.StlCornerPoints, Stl.StlFileWriter,
                    --helpers
-                   Helpers.List
+                   Helpers.List, Helpers.DSL
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.HorizontalFacesTest,
@@ -34,7 +34,8 @@ library
                    Tests.VerticalFacesTest, Tests.ParseJuicyTest, Tests.ScanFilterTest
                    --Examples
                    -- Example ShoeLifts
-                   Examples.ShoeLift.KeenToe, Examples.ShoeLift.KeenHeel
+                   Examples.ShoeLift.KeenToe, Examples.ShoeLift.KeenHeel,
+                   Examples.ShoeLift.SnowBoardBoot
                    --HeelGenerators.SandalsToe, HeelGenerators.SandalsHeel
                    --HeelGenerators.BlackRunnerHeel,  HeelGenerators.BlackRunnerToe,
                      --Have not been redone for changes to MathPolar.
@@ -71,3 +72,5 @@ library
                      
   hs-source-dirs:  src    
   default-language:    Haskell2010
+  --jhw: Options for doing multi-thread processing of images with Scan.ParseJuicy
+  ghc-options: -O2 -threaded 

@@ -1,8 +1,9 @@
 module Tests.ParseJuicyTest (parseJuicyTestDo) where
 import Test.HUnit
 import Scan.ParseJuicy( getThePixelsRightOfCenter, convertPixelsToMillmeters, calculateRadiusFrom, averageValueOf,
-                       removeLeftOfCenterPixels, TargetValueIndex(..), ofThe, forThe, andThen, adjustedFor, andThe)
+                       removeLeftOfCenterPixels, TargetValueIndex(..), calculatePixelsPerMillmeter)
 import CornerPoints.Radius(Radius(..))
+import  Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
 
 parseJuicyTestDo = do
   runTestTT calculateRadiusFromPixelsRightOfCenterTest
@@ -10,6 +11,7 @@ parseJuicyTestDo = do
   runTestTT calculateMillimetersTest
   --get pixels right of center
   runTestTT adjustPixelIndexForLeftSlopeTestRedo
+  runTestTT calculatePixelsPerMillmeterTest
 
   --get rid of blank values
   runTestTT whatIsDivdeZeroBy
@@ -31,6 +33,13 @@ calculateRadiusFromPixelsRightOfCenterTest = TestCase $ assertEqual
    in  calculateRadiusFrom  pixelsRightOfCenter (adjustedFor pixelsPerMillemter) $ andThe cameraAngle
        
   )
+
+calculatePixelsPerMillmeterTest =  TestCase $ assertEqual
+ "calculatePixelsPerMillmeterTest"
+ (18.14220374220374)
+ (calculatePixelsPerMillmeter     2592               390            37                      101 )
+ --calculatePixelsPerMillmeter :: NumberOfPixels ->  Millimeters -> Millimeters          -> Millimeters          -> PixelsPerMillimeter
+ --calculatePixelsPerMillmeter    imageWidthPx       imageWidthMM   objectWidthReadWorldMM  objectWidthOnScreenMM =
   
 calculateMillimetersTest = TestCase $ assertEqual
   ("calculate millimeters from pixels")
