@@ -250,112 +250,24 @@ process10DegreeImagesToMultiDegreeRadii     edgeDetector   = do
         readImage' fileName = readImage $ filePathBuilder fileName
 
 {-
-==============================================================================================
-This runs ok, but has not implemented the new calculateRadiusFromPixelsRightOfCenter
-process10DegreeImagesToMultiDegreeRadii :: ((Image  PixelYCbCr8) -> [TargetValueIndex]) -> IO ()
-process10DegreeImagesToMultiDegreeRadii     edgeDetector   = do
-  jpegImage0 <-   readImage' "0"
-  jpegImage10 <-  readImage' "10"
-  jpegImage20 <-  readImage' "20"
-  jpegImage30 <-  readImage' "30"
-  jpegImage40 <-  readImage' "40"
-  jpegImage50 <-  readImage' "50"
-  jpegImage60 <-  readImage' "60"
-  jpegImage70 <-  readImage' "70"
-  jpegImage80 <-  readImage' "80"
-  jpegImage90 <-  readImage' "90"
-  jpegImage100 <-  readImage' "100"
-  jpegImage110 <-  readImage' "110"
-  jpegImage120 <-  readImage' "120"
-  jpegImage130 <-  readImage' "130"
-  jpegImage140 <-  readImage' "140"
-  jpegImage150 <-  readImage' "150"
-  jpegImage160 <-  readImage' "160"
-  jpegImage170 <-  readImage' "170"
-  jpegImage180 <-  readImage' "180"
-  jpegImage190 <-  readImage' "190"
-  jpegImage200 <-  readImage' "200"
-  jpegImage210 <-  readImage' "210"
-  jpegImage220 <-  readImage' "220"
-  jpegImage230 <-  readImage' "230"
-  jpegImage240 <-  readImage' "240"
-  jpegImage250 <-  readImage' "250"
-  jpegImage260 <-  readImage' "260"
-  jpegImage270 <-  readImage' "270"
-  jpegImage280 <-  readImage' "280"
-  jpegImage290 <-  readImage' "290"
-  jpegImage300 <-  readImage' "300"
-  jpegImage310 <-  readImage' "310"
-  jpegImage320 <-  readImage' "320"
-  jpegImage330 <-  readImage' "330"
-  jpegImage340 <-  readImage' "340"
-  jpegImage350 <-  readImage' "350"
-  
+--------------------------- multiple processors on single image -----------------------------------------
+Try to process a single image, in some way making it run 4 processors.
+Have a look at getRedLaserLineSingleImage which is being passed into process10DegreeImagesToMultiDegreeRadii edgeDetector.
 
-  let
-      singleDegreeRadiiList :: [SingleDegreeRadii]
-      singleDegreeRadiiList =
-        [
-          setSingleDegreeRadii currImage currDegree
-          | currDegree <- [0,10..350]
-          | currImage <- [jpegImage0, jpegImage10, jpegImage20, jpegImage30, jpegImage40, jpegImage50, jpegImage60, jpegImage70, jpegImage80, jpegImage90, jpegImage100, jpegImage110,
-                          jpegImage120, jpegImage130, jpegImage140, jpegImage150, jpegImage160, jpegImage170, jpegImage180, jpegImage190, jpegImage200, jpegImage210, jpegImage220, jpegImage230,
-                          jpegImage240, jpegImage250, jpegImage260, jpegImage270, jpegImage280, jpegImage290, jpegImage300, jpegImage310, jpegImage320, jpegImage340,
-                          jpegImage340, jpegImage350] --, jpegImage10] Removed the last one, as it must be an error. Did not test it out yet.
-       ]
-       ++
-       --read in the 0 degree image again as the 360 degree image, to ensure they are exactly the same.
-       case jpegImage0 of
-            Left err -> [(SingleDegreeRadii 360 [Radius 0])] 
-            Right (ImageYCbCr8 jpegImage0') -> [(SingleDegreeRadii 360 (map (Radius) (edgeDetector jpegImage0')))]
-        
-      multiDegreeRadii = MultiDegreeRadii "theName" singleDegreeRadiiList
-  BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
-  putStrLn "done"
-  
-  where setSingleDegreeRadii imageAsRead currDegree =
-           case imageAsRead of
-             Left err -> (SingleDegreeRadii currDegree [Radius 0]) 
-             Right (ImageYCbCr8 jpegImage) -> (SingleDegreeRadii currDegree (map (Radius) (edgeDetector jpegImage)))
+It in turn is a call to
+  processSingleImageToReducedEachRowToTargetValueIndex jpegImage (extractCR) (averageValueOf) (indicesOfThePixelValuesGTE) redLaserLine
 
-        readImage' fileName = readImage $ filePathBuilder fileName
+This is the point where can try to get multiple processors trying to work.
+Try to:
+Break the list of rows into 4 pieces, perhaps in a paralle list comp.
 
-===========================================================================================================
-This version uses Control.Monad to try to automate things, but always get the Left err msg out of the monad.
-Should try to write the json from within the monad, to see it it works ok.
-Keep this around to try it out.
-Probably obsolete as I should try using parallel monad as per parallel haskell book.
+------------------------------- multiple processors on multiple images ------------------------------
+Have a single processor work on a singel image, but with multiple processors all working at the same time.
+Put this in a function like process10DegreeImagesToMultiDegreeRadii
 
-See http://learnyouahaskell.com/input-and-output for info about using Control.Monad
-
-processMultiDegreeImagesToRedLaserLine = do
-  --degree list must end with the last degree read, prior to the 360 degree. Must start with 0
-  singleDegreeRadiis  <- forM [0,10..350] (\currDegree -> do
-    jpegImage <-  readImage' $ show currDegree
-    case jpegImage of
-            Left err -> return  (SingleDegreeRadii currDegree [Radius 0]) 
-            Right (ImageYCbCr8 jpegImage') -> return (SingleDegreeRadii currDegree (map (Radius) (getRedLaserLineSingleImage jpegImage'))))
-    
-
-  jpegImage360 <- readImage' "0"
-  let
-    lastSingleDegreeRadii =
-      case jpegImage360 of
-            Left err -> [(SingleDegreeRadii 360 [Radius 0])] 
-            Right (ImageYCbCr8 jpegImage360') -> [(SingleDegreeRadii 360 (map (Radius) (getRedLaserLineSingleImage jpegImage360')))]
-     
-    multiDegreeRadii = MultiDegreeRadii "theName" (singleDegreeRadiis ++ lastSingleDegreeRadii)
-
-  BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
-  putStrLn "done"
-  
-  where setSingleDegreeRadii imageAsRead currDegree =
-           case imageAsRead of
-             Left err -> (SingleDegreeRadii currDegree [Radius 0]) 
-             Right (ImageYCbCr8 jpegImage) -> (SingleDegreeRadii currDegree (map (Radius) (getRedLaserLineSingleImage jpegImage)))
-
-        readImage' fileName = readImage $ filePathBuilder fileName
-
+In singleDegreeRadiiList, could try making each entry a:  as' <- rpar (force (map solve as))
+                                                       type of thing such as done in chap 2 of the book Parallel and Concurrent Programming In Haskell
+                                                       where he starts breaking up the sudoku.
 -}
 
 
@@ -366,12 +278,13 @@ processMultiDegreeImagesToRedLaserLine = do
 
 filePathBuilder :: FilePath -> FilePath
 filePathBuilder fileName = "src/Data/scanImages/" ++ fileName ++ ".JPG"
+
+
 {-
-
+Work through each row of the image running
+  (toASingleIndexValueFrom (pixelsThatQualifyAsA) targetValue)
+over each row of the image.
 -}
-
-
-
 processSingleImageToReducedEachRowToTargetValueIndex:: (Image  PixelYCbCr8) -> ((PixelYCbCr8) -> Word8) ->  ([Int] -> Double)   ->         ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  [TargetValueIndex]
 processSingleImageToReducedEachRowToTargetValueIndex   jpegImage                extractColor                 reduceIndexesOfTargetPixels     pixelsThatQualifyAsA           targetValue  = 
       reduceEachRowOfThe jpegImage  (toASingleIndexValueFrom (pixelsThatQualifyAsA) targetValue)  
