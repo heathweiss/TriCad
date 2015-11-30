@@ -2,7 +2,8 @@
 {-# LANGUAGE ParallelListComp #-}
 module Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii,  TargetValueIndex(..), 
                         getThePixelsRightOfCenter, removeLeftOfCenterPixels, getRedLaserLineSingleImage, convertPixelsToMillmeters,
-                        calculateRadiusFrom, reduceScanRows, reduceRows, reduceScan, averageValueOf, calculatePixelsPerMillmeter) where
+                        calculateRadiusFrom, reduceScanRows, reduceRows, reduceScan, averageValueOf, calculatePixelsPerMillmeter,
+                        process10DegreeImagesToMultiDegreeRadiiMultiCoreWrapper) where
 import Codec.Picture.Jpg
 import Codec.Picture
 import Codec.Picture.Types
@@ -19,7 +20,9 @@ import Scan.Json
 import Data.Aeson
 import Math.Trigonometry(sinDegrees )
 import Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
-
+import Control.Parallel
+import Control.Parallel.Strategies(evalList, parList,rseq, using )
+import Control.Monad
 
 type RedValue = Word8
 type AvgIndexPosition = Double
@@ -45,15 +48,6 @@ calculateRadiusFrom    offsetFromCenter pixelsPerMillimeter    cameraAngle  =
   let convertPixelsToMillmetersForThe = convertPixelsToMillmeters pixelsPerMillimeter
       numberOfRadiusPixels = (offsetFromCenter / (sinDegrees cameraAngle))
   in  Radius $ convertPixelsToMillmetersForThe  numberOfRadiusPixels
-
-{-
-calculateRadiusFromPixelsRightOfCenter :: PixelsPerMillimeter ->  PixelOffset -> CameraAngle ->  Radius
-calculateRadiusFromPixelsRightOfCenter    pixelsPerMillimeter     numberOfPixels    cameraAngle  =
-  let convertPixelsToMillmetersForThe = convertPixelsToMillmeters pixelsPerMillimeter
-      numberOfRadiusPixels = (numberOfPixels / (sinDegrees cameraAngle))
-  in  Radius $ convertPixelsToMillmetersForThe  numberOfRadiusPixels
--}
-
 
 
 {- | Convert pixels to millimeters given the  pixels/millimeter and the number of pixels.-}
@@ -328,35 +322,6 @@ showAverageOfIndicesOfLaserLineValuesForEachRow  = do
 
          --redLaserLine :: TargetValue
          --redLaserLine = 160
-{-
-showAverageOfIndicesOfLaserLineValuesForEachRow:: IO ()
-showAverageOfIndicesOfLaserLineValuesForEachRow  = do
-      jpegImage <-   readImage filePath
-      case  jpegImage of
-        Left err -> putStrLn err
-        Right (ImageYCbCr8 jpegImage') ->
-          putStrLn $ show $ reduceEachRowOfThe jpegImage'  (toTheAvgOfThe (indicesOfThePixelValuesGTE) redLaserLine)  
-        otherwise -> putStrLn "another format"
-      where
-         toTheAvgOfThe :: ( Word8 -> [Word8] -> [Int]) -> TargetValue ->  RowIndex -> (Image  PixelYCbCr8) -> AvgIndexPosition
-         toTheAvgOfThe    pixelValuesGTE                  targetValue     row         img'  =
-           averageValueOf $  pixelValuesGTE  targetValue  [ extractCR $ pixelAt img' x row |  x <- [0..((imageWidth img')-1)]]
-
-         reduceEachRowOfThe :: (Image  PixelYCbCr8) ->  ( RowIndex -> (Image  PixelYCbCr8) ->  AvgIndexPosition) ->  [AvgIndexPosition]
-         reduceEachRowOfThe    img''                    reducer                                                       =
-           [reducer  y img'' | y <-  [0..((imageHeight img'')-1)]]
-
-         extractCR :: (PixelYCbCr8) -> RedValue
-         extractCR (PixelYCbCr8 _ _ cr) =
-           pixel8ToWord8 cr
-
-         filePath :: FilePath
-         filePath = "src/Data/IMG_2457.JPG"
-
-         --redLaserLine :: TargetValue
-         --redLaserLine = 160
--}
-
 
 showFullColorsFor1Row = do
       contents <-   readImage "src/Data/IMG_2457.JPG"
@@ -444,3 +409,125 @@ reduceRows' factor counter (x:xs)
 
 -- |Factor by which to reduce rows.
 type RowReductionFactor = Int
+
+
+-- ========================================================================== multicore =====================================================
+-- ===========================================================================================================================================
+--ToDo: Dynamically build the image name so that an input of the firt file name can be put in and it will read the files
+--without having to rename them all.
+process10DegreeImagesToMultiDegreeRadiiMultiCoreWrapper = process10DegreeImagesToMultiDegreeRadiiMultiCore (getRedLaserLineSingleImage redLaserLine)
+
+process10DegreeImagesToMultiDegreeRadiiMultiCore :: ((Image  PixelYCbCr8) -> [TargetValueIndex]) -> IO ()
+process10DegreeImagesToMultiDegreeRadiiMultiCore     edgeDetector   = do
+  jpegImage0 <-   readImage' "0"
+  jpegImage10 <-  readImage' "10"
+  jpegImage20 <-  readImage' "20"
+  jpegImage30 <-  readImage' "30"
+  jpegImage40 <-  readImage' "40"
+  jpegImage50 <-  readImage' "50"
+  jpegImage60 <-  readImage' "60"
+  jpegImage70 <-  readImage' "70"
+  jpegImage80 <-  readImage' "80"
+  jpegImage90 <-  readImage' "90"
+  jpegImage100 <-  readImage' "100"
+  jpegImage110 <-  readImage' "110"
+  jpegImage120 <-  readImage' "120"
+  jpegImage130 <-  readImage' "130"
+  jpegImage140 <-  readImage' "140"
+  jpegImage150 <-  readImage' "150"
+  jpegImage160 <-  readImage' "160"
+  jpegImage170 <-  readImage' "170"
+  jpegImage180 <-  readImage' "180"
+  jpegImage190 <-  readImage' "190"
+  jpegImage200 <-  readImage' "200"
+  jpegImage210 <-  readImage' "210"
+  jpegImage220 <-  readImage' "220"
+  jpegImage230 <-  readImage' "230"
+  jpegImage240 <-  readImage' "240"
+  jpegImage250 <-  readImage' "250"
+  jpegImage260 <-  readImage' "260"
+  jpegImage270 <-  readImage' "270"
+  jpegImage280 <-  readImage' "280"
+  jpegImage290 <-  readImage' "290"
+  jpegImage300 <-  readImage' "300"
+  jpegImage310 <-  readImage' "310"
+  jpegImage320 <-  readImage' "320"
+  jpegImage330 <-  readImage' "330"
+  jpegImage340 <-  readImage' "340"
+  jpegImage350 <-  readImage' "350"
+   
+  
+
+  let 
+      jpegImage0WithDegree = ImageWithDegrees jpegImage0 0
+      jpegImage10WithDegree = ImageWithDegrees jpegImage10 10
+      jpegImage20WithDegree = ImageWithDegrees jpegImage20 20
+      jpegImage30WithDegree = ImageWithDegrees jpegImage30 30
+      jpegImage40WithDegree = ImageWithDegrees jpegImage40 40
+      jpegImage50WithDegree = ImageWithDegrees jpegImage50 50
+      jpegImage60WithDegree = ImageWithDegrees jpegImage60 60
+      jpegImage70WithDegree = ImageWithDegrees jpegImage70 70
+      jpegImage80WithDegree = ImageWithDegrees jpegImage80 80
+      jpegImage90WithDegree = ImageWithDegrees jpegImage90 90
+      jpegImage100WithDegree = ImageWithDegrees jpegImage100 100
+      jpegImage110WithDegree = ImageWithDegrees jpegImage110 110
+      jpegImage120WithDegree = ImageWithDegrees jpegImage120 120
+      jpegImage130WithDegree = ImageWithDegrees jpegImage130 130
+      jpegImage140WithDegree = ImageWithDegrees jpegImage140 140
+      jpegImage150WithDegree = ImageWithDegrees jpegImage150 150
+      jpegImage160WithDegree = ImageWithDegrees jpegImage160 160
+      jpegImage170WithDegree = ImageWithDegrees jpegImage170 170
+      jpegImage180WithDegree = ImageWithDegrees jpegImage180 180
+      jpegImage190WithDegree = ImageWithDegrees jpegImage190 190
+      jpegImage200WithDegree = ImageWithDegrees jpegImage200 200
+      jpegImage210WithDegree = ImageWithDegrees jpegImage210 210
+      jpegImage220WithDegree = ImageWithDegrees jpegImage220 220
+      jpegImage230WithDegree = ImageWithDegrees jpegImage230 230
+      jpegImage240WithDegree = ImageWithDegrees jpegImage240 240
+      jpegImage250WithDegree = ImageWithDegrees jpegImage250 250
+      jpegImage260WithDegree = ImageWithDegrees jpegImage260 260
+      jpegImage270WithDegree = ImageWithDegrees jpegImage270 270
+      jpegImage280WithDegree = ImageWithDegrees jpegImage280 280
+      jpegImage290WithDegree = ImageWithDegrees jpegImage290 290
+      jpegImage300WithDegree = ImageWithDegrees jpegImage300 300
+      jpegImage310WithDegree = ImageWithDegrees jpegImage310 310
+      jpegImage320WithDegree = ImageWithDegrees jpegImage320 320
+      jpegImage330WithDegree = ImageWithDegrees jpegImage330 330
+      jpegImage340WithDegree = ImageWithDegrees jpegImage340 340
+      jpegImage350WithDegree = ImageWithDegrees jpegImage350 350
+      jpegImage360WithDegree = ImageWithDegrees jpegImage0 360 --this last degree is a copy of the first degree.
+      
+      
+     
+      
+      
+      solutions =
+        map setSingleDegreeRadii
+         [currImage | currImage <- [(jpegImage0WithDegree), (jpegImage10WithDegree), (jpegImage20WithDegree), (jpegImage30WithDegree),(jpegImage40WithDegree),
+                                    (jpegImage50WithDegree), (jpegImage60WithDegree), (jpegImage70WithDegree), (jpegImage80WithDegree), (jpegImage90WithDegree),
+                                    (jpegImage100WithDegree), (jpegImage110WithDegree), (jpegImage120WithDegree), (jpegImage130WithDegree), (jpegImage140WithDegree),
+                                    (jpegImage150WithDegree), (jpegImage160WithDegree), (jpegImage170WithDegree), (jpegImage180WithDegree), (jpegImage190WithDegree),
+                                    (jpegImage200WithDegree), (jpegImage210WithDegree), (jpegImage220WithDegree), (jpegImage230WithDegree), (jpegImage240WithDegree),
+                                    (jpegImage250WithDegree), (jpegImage260WithDegree), (jpegImage270WithDegree), (jpegImage280WithDegree), (jpegImage290WithDegree),
+                                    (jpegImage300WithDegree), (jpegImage310WithDegree), (jpegImage320WithDegree), (jpegImage330WithDegree), (jpegImage340WithDegree),
+                                    (jpegImage350WithDegree), (jpegImage360WithDegree)]]
+          `using` parList rseq
+
+        
+      --multiDegreeRadii = MultiDegreeRadii "theName" singleDegreeRadiiList
+      multiDegreeRadii = solutions
+  BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
+  putStrLn "done"
+  
+  where --setSingleDegreeRadii :: ((Image PixelYCbCr8), Int)
+        setSingleDegreeRadii imageAsReadWithDegrees  =
+           case imageAsReadWithDegrees of
+             (ImageWithDegrees (Left(err))  deg') ->  (SingleDegreeRadii deg' [Radius 0])
+             (ImageWithDegrees (Right(ImageYCbCr8 jpegImage))  deg') -> (SingleDegreeRadii deg' (map (Radius) (edgeDetector jpegImage)))
+             
+        
+        readImage' fileName = readImage $ filePathBuilder fileName
+
+--used by process10DegreeImagesToMultiDegreeRadiiMultiCore to associate an image with a degree.
+--Was required as a tuple would not compile when using parallel strategies.
+data ImageWithDegrees = ImageWithDegrees {image :: (Either String DynamicImage), deg :: Double}

@@ -222,75 +222,6 @@ mainSocketStl    innerSleeveMDR      outerSleeveMDR      extensionFaceBuilder ex
   in
       writeStlToFile sleeveStlFile
 
-{-
-mainSocketStl :: MultiDegreeRadii -> MultiDegreeRadii -> ((Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]) ->
-                 ExtensionHeight -> RowReductionFactor -> PixelsPerMillimeter ->  IO ()
-mainSocketStl    innerSleeveMDR      outerSleeveMDR      extensionFaceBuilder extensionHeight    rowReductionFactor pixelsPerMM  =
-  let transposeFactors = [0,heightPerPixel.. ]
-      heightPerPixel = 1/pixelsPerMM * (fromIntegral rowReductionFactor)
-      origin = (Point{x_axis=0, y_axis=0, z_axis=50})
-
-      createMainSocketCubesFromFrontAndBackFaces ::  MultiDegreeRadii ->   MultiDegreeRadii -> [[CornerPoints]]
-      createMainSocketCubesFromFrontAndBackFaces multiDegreeRadiiOuter multiDegreeRadiiInner =
-       [
-        currBackFace |+++| currFrontFace
-        | currFrontFace <- [map (extractFrontFace) currRow  | currRow  <- createHorizontallyAlignedCubesNoSlope origin multiDegreeRadiiOuter transposeFactors] 
-        | currBackFace <- [ map (backFaceFromFrontFace . extractFrontFace) currRow | currRow  <- (createHorizontallyAlignedCubesNoSlope origin multiDegreeRadiiInner transposeFactors ) ]
-       ]
-
-      topOfExtension = extensionFaceBuilder (FacesBackFrontLeftTop) (FacesNada) (FacesBackFrontRightTop) (FacesBackFrontTop)
-      bodyOfExtension = [
-                        extensionFaceBuilder (FacesBackFrontLeft)(FacesNada)(FacesBackFrontRight)(FacesBackFront)
-                        | x <- [1..6]
-                      ]
-      topOfMainBody = extensionFaceBuilder (FacesBackFront) (FacesBackFrontTop) (FacesBackFront) (FacesBackFront)
-      mainBody = [
-                           [FacesBackFront | x <- [1..]]
-                           | x <- [1..9]
-                 ] 
-      btmOfMainBody = [FacesBackBottomFront | x <- [1..3]]   ++
-                      [FacesBackBottom | x <- [1]] ++
-                      [FacesBackBottomFront | x <- [1..19]] ++
-                      [FacesBackBottom | x <- [1..2 ]] ++
-                      [FacesBackBottomFront | x <- [1.. ]]
-      
-      tieDownMDR = transpose (+20) outerSleeveMDR
-      tieDownCubes = tail $ createMainSocketCubesFromFrontAndBackFaces tieDownMDR outerSleeveMDR
-      noShowTieDownFaces = [
-                           [FacesNada | x <- [1..]]
-                           | x <- [1..16]
-                 ]
-      showTieDownFaces = [ [FacesNada | x <- [1..3]] ++
-                           [FacesBottomFrontLeftRightTop] ++
-                           [FacesNada | x <- [1..19]] ++
-                           [FacesBottomFrontRightTop] ++
-                           [FacesBottomFrontLeftTop] ++
-                           [FacesNada | x <- [1..]]
-                           | x <- [1..]
-                 ]
-      tieDownTriangles = (noShowTieDownFaces ++ showTieDownFaces) ||+++^|| tieDownCubes
-      -- ((topOfExtension : bodyOfExtension) ++  (topOfMainBody : mainBody ))   ++:  btmOfMainBody
-                  
-      mainBodyCubes = createMainSocketCubesFromFrontAndBackFaces outerSleeveMDR innerSleeveMDR
-      extensionCubes = (map (transposeZ (+extensionHeight). extractTopFace)  (head  mainBodyCubes)) |+++| (map ( extractBottomFace)  (head  mainBodyCubes))
-      
-
-      triangles =
-        (
-          ((topOfExtension : bodyOfExtension) ++  (topOfMainBody : mainBody ))   ++:  btmOfMainBody
-        )
-        ||+++^||
-        ( extensionCubes : tail mainBodyCubes)
-
-      sleeveStlFile = newStlShape "walker sleeve" $ triangles ++ tieDownTriangles
-  in
-      writeStlToFile sleeveStlFile
-
--}
-
-
-
-
 
 writeStlFileFromRawScanWrapper :: IO ()
 writeStlFileFromRawScanWrapper = do
@@ -347,30 +278,6 @@ writeStlFileFromRawScan (MultiDegreeRadii name' degrees') =
       writeStlToFile stlFile
       --print origin
 {-
-as copied from singleLine.hs
---this is set up to have rows reduced by 10
---This is a support function, not to be called directly.
---Used by parseCannedRawDataToScanWriteStlFileWithParseAtto
-writeStlFileFromScan :: MultiDegreeRadii -> IO ()
-writeStlFileFromScan scan = 
-  let origin = (Point{x_axis=0, y_axis=0, z_axis=50})
-      heightPerPixel = 10
-      leftFaces = createLeftFacesMultiColumns origin (tail $ degrees scan) flatXSlope flatYSlope [0,heightPerPixel..]
-      rightFaces = createRightFaces origin (head $ degrees scan) flatXSlope flatYSlope [0,heightPerPixel..]
-      frontTriangles = [FaceFront | x <- [1..]]
-      triangles =
-       zipWith  (|+++^|)
-        ([FacesFrontTop | x <- [1..]] :   [frontTriangles | x <- [5..65]] ++:  [FacesBottomFront | x <- [66..]] 
-
-        ) 
-        --  |+++^|
-        (createHorizontallyAlignedCubes rightFaces leftFaces)
-      stlFile = newStlShape "backscratcher" $ concat triangles
-  in
-      writeStlToFile stlFile
-      --print origin
--}
-{-
 process the raw MultiDegreeRadii into radius.
 -}
 processMultiDegreeRadii :: IO ()
@@ -392,27 +299,6 @@ processMultiDegreeRadii = do
            
       Nothing                              -> putStrLn "Nothing"
 
-{-
-compiles and writes json file.
-processMultiDegreeRadii = do
-  contents <- BL.readFile "src/Data/scanFullData.json"
-  
-  case (decode contents) of
-   
-      Just (MultiDegreeRadii name' degrees') ->
-        let multiDegreeRadii =
-              MultiDegreeRadii
-                name'
-                [ processSingleDegreeRadii currSingleDegreeRadii
-                  | currSingleDegreeRadii <- degrees'
-                ]
-               
-        in
-           BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
-           
-      Nothing                              -> putStrLn "Nothing"
-
--}
 
 
 {-process a SingleDegreeRadii, to go from raw data to a Radius of the scan.-}
