@@ -3,7 +3,8 @@
 module Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii,  TargetValueIndex(..), 
                         getThePixelsRightOfCenter, removeLeftOfCenterPixels, getRedLaserLineSingleImage, convertPixelsToMillmeters,
                         calculateRadiusFrom, reduceScanRows, reduceRows, reduceScan, averageValueOf, calculatePixelsPerMillmeter,
-                        process10DegreeImagesToMultiDegreeRadiiMultiCoreWrapper) where
+                        process10DegreeImagesToMultiDegreeRadiiBaseUsingMap
+                        ) where
 import Codec.Picture.Jpg
 import Codec.Picture
 import Codec.Picture.Types
@@ -23,7 +24,9 @@ import Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
 import Control.Parallel
 import Control.Parallel.Strategies(evalList, parList,rseq, using )
 import Control.Monad
+import qualified Data.Map as Map
 
+--to make signatures more readable
 type RedValue = Word8
 type AvgIndexPosition = Double
 type TargetValueIndex = Double
@@ -37,7 +40,10 @@ type PixelsPerMillimeter = Double
 type Millimeters = Double
 type CameraAngle = Double
 type PixelOffset = Double
-
+type Degree = Int
+type FileName = String
+type FileExtension = String
+--type FileNamePrefix = String
 
 
 {- |Calculate the Radius, which is the hypotenuse, of angle created by a CameraAngle, and the number of pixels right of center.
@@ -168,110 +174,6 @@ processSingleImageToMultiDegreeRadiiJsonFile     edgeDetector   = do
         readImage' fileName = readImage $ filePathBuilder fileName
 
 
-{- |
-Process the images from src/Data/scanImages, into a json file of multiDegreeRadii.
-Needs an edgeDetector passed in, such as detecting the red laser line.
--}
---processScanImagesToMultiDegreeRadiiOfRedLaserLine = process10DegreeImagesToMultiDegreeRadii (getRedLaserLineSingleImage redLaserLine)
-process10DegreeImagesToMultiDegreeRadii :: ((Image  PixelYCbCr8) -> [TargetValueIndex]) -> IO ()
-process10DegreeImagesToMultiDegreeRadii     edgeDetector   = do
-  jpegImage0 <-   readImage' "0"
-  jpegImage10 <-  readImage' "10"
-  jpegImage20 <-  readImage' "20"
-  jpegImage30 <-  readImage' "30"
-  jpegImage40 <-  readImage' "40"
-  jpegImage50 <-  readImage' "50"
-  jpegImage60 <-  readImage' "60"
-  jpegImage70 <-  readImage' "70"
-  jpegImage80 <-  readImage' "80"
-  jpegImage90 <-  readImage' "90"
-  jpegImage100 <-  readImage' "100"
-  jpegImage110 <-  readImage' "110"
-  jpegImage120 <-  readImage' "120"
-  jpegImage130 <-  readImage' "130"
-  jpegImage140 <-  readImage' "140"
-  jpegImage150 <-  readImage' "150"
-  jpegImage160 <-  readImage' "160"
-  jpegImage170 <-  readImage' "170"
-  jpegImage180 <-  readImage' "180"
-  jpegImage190 <-  readImage' "190"
-  jpegImage200 <-  readImage' "200"
-  jpegImage210 <-  readImage' "210"
-  jpegImage220 <-  readImage' "220"
-  jpegImage230 <-  readImage' "230"
-  jpegImage240 <-  readImage' "240"
-  jpegImage250 <-  readImage' "250"
-  jpegImage260 <-  readImage' "260"
-  jpegImage270 <-  readImage' "270"
-  jpegImage280 <-  readImage' "280"
-  jpegImage290 <-  readImage' "290"
-  jpegImage300 <-  readImage' "300"
-  jpegImage310 <-  readImage' "310"
-  jpegImage320 <-  readImage' "320"
-  jpegImage330 <-  readImage' "330"
-  jpegImage340 <-  readImage' "340"
-  jpegImage350 <-  readImage' "350"
-  
-
-  let
-      singleDegreeRadiiList :: [SingleDegreeRadii]
-      singleDegreeRadiiList =
-        [
-          setSingleDegreeRadii currImage currDegree
-          | currDegree <- [0,10..350]
-          | currImage <- [jpegImage0, jpegImage10, jpegImage20, jpegImage30, jpegImage40, jpegImage50, jpegImage60, jpegImage70, jpegImage80, jpegImage90, jpegImage100, jpegImage110,
-                          jpegImage120, jpegImage130, jpegImage140, jpegImage150, jpegImage160, jpegImage170, jpegImage180, jpegImage190, jpegImage200, jpegImage210, jpegImage220, jpegImage230,
-                          jpegImage240, jpegImage250, jpegImage260, jpegImage270, jpegImage280, jpegImage290, jpegImage300, jpegImage310, jpegImage320, jpegImage340,
-                          jpegImage340, jpegImage350] --, jpegImage10] Removed the last one, as it must be an error. Did not test it out yet.
-       ]
-       ++
-       --read in the 0 degree image again as the 360 degree image, to ensure they are exactly the same.
-       case jpegImage0 of
-            Left err -> [(SingleDegreeRadii 360 [Radius 0])] 
-            Right (ImageYCbCr8 jpegImage0') -> [(SingleDegreeRadii 360 (map (Radius) (edgeDetector jpegImage0')))]
-            --Right (ImageYCbCr8 jpegImage0') -> [(SingleDegreeRadii 360 (map (setRadius) (edgeDetector jpegImage0')))]
-        
-      multiDegreeRadii = MultiDegreeRadii "theName" singleDegreeRadiiList
-  BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
-  putStrLn "done"
-  
-  where setSingleDegreeRadii imageAsRead currDegree =
-           case imageAsRead of
-             Left err -> (SingleDegreeRadii currDegree [Radius 0]) 
-             Right (ImageYCbCr8 jpegImage) -> (SingleDegreeRadii currDegree (map (Radius) (edgeDetector jpegImage)))
-             --Right (ImageYCbCr8 jpegImage) -> (SingleDegreeRadii currDegree (map (setRadius) (edgeDetector jpegImage)))
-
-        readImage' fileName = readImage $ filePathBuilder fileName
-
-{-
---------------------------- multiple processors on single image -----------------------------------------
-Try to process a single image, in some way making it run 4 processors.
-Have a look at getRedLaserLineSingleImage which is being passed into process10DegreeImagesToMultiDegreeRadii edgeDetector.
-
-It in turn is a call to
-  processSingleImageToReducedEachRowToTargetValueIndex jpegImage (extractCR) (averageValueOf) (indicesOfThePixelValuesGTE) redLaserLine
-
-This is the point where can try to get multiple processors trying to work.
-Try to:
-Break the list of rows into 4 pieces, perhaps in a paralle list comp.
-
-------------------------------- multiple processors on multiple images ------------------------------
-Have a single processor work on a singel image, but with multiple processors all working at the same time.
-Put this in a function like process10DegreeImagesToMultiDegreeRadii
-
-In singleDegreeRadiiList, could try making each entry a:  as' <- rpar (force (map solve as))
-                                                       type of thing such as done in chap 2 of the book Parallel and Concurrent Programming In Haskell
-                                                       where he starts breaking up the sudoku.
--}
-
-
-
-    
-    
-
-
-filePathBuilder :: FilePath -> FilePath
-filePathBuilder fileName = "src/Data/scanImages/" ++ fileName ++ ".JPG"
 
 
 {-
@@ -411,14 +313,24 @@ reduceRows' factor counter (x:xs)
 type RowReductionFactor = Int
 
 
--- ========================================================================== multicore =====================================================
--- ===========================================================================================================================================
+
+
+
+
+
 --ToDo: Dynamically build the image name so that an input of the firt file name can be put in and it will read the files
 --without having to rename them all.
-process10DegreeImagesToMultiDegreeRadiiMultiCoreWrapper = process10DegreeImagesToMultiDegreeRadiiMultiCore (getRedLaserLineSingleImage redLaserLine)
+{- |
+Process the images from src/Data/scanImages, into a json file of multiDegreeRadii.
+Takes edgeDetector, such as detecting the red laser line.
 
-process10DegreeImagesToMultiDegreeRadiiMultiCore :: ((Image  PixelYCbCr8) -> [TargetValueIndex]) -> IO ()
-process10DegreeImagesToMultiDegreeRadiiMultiCore     edgeDetector   = do
+Needs to be run from an executable so that multi processors can be used.
+See the executable parallelProcess that is part of this cabal project, on how to run in parallel.
+With parallel: ~15 seconds
+Without      : ~3 minutes
+-}
+process10DegreeImagesToMultiDegreeRadii :: ((Image  PixelYCbCr8) -> [TargetValueIndex]) -> IO ()
+process10DegreeImagesToMultiDegreeRadii     edgeDetector   = do
   jpegImage0 <-   readImage' "0"
   jpegImage10 <-  readImage' "10"
   jpegImage20 <-  readImage' "20"
@@ -456,53 +368,58 @@ process10DegreeImagesToMultiDegreeRadiiMultiCore     edgeDetector   = do
   jpegImage340 <-  readImage' "340"
   jpegImage350 <-  readImage' "350"
    
+    
+      
+      --process the images in parallel.
   
+      
+      
+  
+  
+  let
 
-  let 
-      jpegImage0WithDegree = ImageWithDegrees jpegImage0 0
-      jpegImage10WithDegree = ImageWithDegrees jpegImage10 10
-      jpegImage20WithDegree = ImageWithDegrees jpegImage20 20
-      jpegImage30WithDegree = ImageWithDegrees jpegImage30 30
-      jpegImage40WithDegree = ImageWithDegrees jpegImage40 40
-      jpegImage50WithDegree = ImageWithDegrees jpegImage50 50
-      jpegImage60WithDegree = ImageWithDegrees jpegImage60 60
-      jpegImage70WithDegree = ImageWithDegrees jpegImage70 70
-      jpegImage80WithDegree = ImageWithDegrees jpegImage80 80
-      jpegImage90WithDegree = ImageWithDegrees jpegImage90 90
-      jpegImage100WithDegree = ImageWithDegrees jpegImage100 100
-      jpegImage110WithDegree = ImageWithDegrees jpegImage110 110
-      jpegImage120WithDegree = ImageWithDegrees jpegImage120 120
-      jpegImage130WithDegree = ImageWithDegrees jpegImage130 130
-      jpegImage140WithDegree = ImageWithDegrees jpegImage140 140
-      jpegImage150WithDegree = ImageWithDegrees jpegImage150 150
-      jpegImage160WithDegree = ImageWithDegrees jpegImage160 160
-      jpegImage170WithDegree = ImageWithDegrees jpegImage170 170
-      jpegImage180WithDegree = ImageWithDegrees jpegImage180 180
-      jpegImage190WithDegree = ImageWithDegrees jpegImage190 190
-      jpegImage200WithDegree = ImageWithDegrees jpegImage200 200
-      jpegImage210WithDegree = ImageWithDegrees jpegImage210 210
-      jpegImage220WithDegree = ImageWithDegrees jpegImage220 220
-      jpegImage230WithDegree = ImageWithDegrees jpegImage230 230
-      jpegImage240WithDegree = ImageWithDegrees jpegImage240 240
-      jpegImage250WithDegree = ImageWithDegrees jpegImage250 250
-      jpegImage260WithDegree = ImageWithDegrees jpegImage260 260
-      jpegImage270WithDegree = ImageWithDegrees jpegImage270 270
-      jpegImage280WithDegree = ImageWithDegrees jpegImage280 280
-      jpegImage290WithDegree = ImageWithDegrees jpegImage290 290
-      jpegImage300WithDegree = ImageWithDegrees jpegImage300 300
-      jpegImage310WithDegree = ImageWithDegrees jpegImage310 310
-      jpegImage320WithDegree = ImageWithDegrees jpegImage320 320
-      jpegImage330WithDegree = ImageWithDegrees jpegImage330 330
-      jpegImage340WithDegree = ImageWithDegrees jpegImage340 340
-      jpegImage350WithDegree = ImageWithDegrees jpegImage350 350
-      jpegImage360WithDegree = ImageWithDegrees jpegImage0 360 --this last degree is a copy of the first degree.
-      
-      
-     
-      
-      
-      solutions =
-        map setSingleDegreeRadii
+      --put images in a data structure along with the degree
+      --so that they can processed in parallel.
+      jpegImage0WithDegree = ImageWithDegree jpegImage0 0
+      jpegImage10WithDegree = ImageWithDegree jpegImage10 10
+      jpegImage20WithDegree = ImageWithDegree jpegImage20 20
+      jpegImage30WithDegree = ImageWithDegree jpegImage30 30
+      jpegImage40WithDegree = ImageWithDegree jpegImage40 40
+      jpegImage50WithDegree = ImageWithDegree jpegImage50 50
+      jpegImage60WithDegree = ImageWithDegree jpegImage60 60
+      jpegImage70WithDegree = ImageWithDegree jpegImage70 70
+      jpegImage80WithDegree = ImageWithDegree jpegImage80 80
+      jpegImage90WithDegree = ImageWithDegree jpegImage90 90
+      jpegImage100WithDegree = ImageWithDegree jpegImage100 100
+      jpegImage110WithDegree = ImageWithDegree jpegImage110 110
+      jpegImage120WithDegree = ImageWithDegree jpegImage120 120
+      jpegImage130WithDegree = ImageWithDegree jpegImage130 130
+      jpegImage140WithDegree = ImageWithDegree jpegImage140 140
+      jpegImage150WithDegree = ImageWithDegree jpegImage150 150
+      jpegImage160WithDegree = ImageWithDegree jpegImage160 160
+      jpegImage170WithDegree = ImageWithDegree jpegImage170 170
+      jpegImage180WithDegree = ImageWithDegree jpegImage180 180
+      jpegImage190WithDegree = ImageWithDegree jpegImage190 190
+      jpegImage200WithDegree = ImageWithDegree jpegImage200 200
+      jpegImage210WithDegree = ImageWithDegree jpegImage210 210
+      jpegImage220WithDegree = ImageWithDegree jpegImage220 220
+      jpegImage230WithDegree = ImageWithDegree jpegImage230 230
+      jpegImage240WithDegree = ImageWithDegree jpegImage240 240
+      jpegImage250WithDegree = ImageWithDegree jpegImage250 250
+      jpegImage260WithDegree = ImageWithDegree jpegImage260 260
+      jpegImage270WithDegree = ImageWithDegree jpegImage270 270
+      jpegImage280WithDegree = ImageWithDegree jpegImage280 280
+      jpegImage290WithDegree = ImageWithDegree jpegImage290 290
+      jpegImage300WithDegree = ImageWithDegree jpegImage300 300
+      jpegImage310WithDegree = ImageWithDegree jpegImage310 310
+      jpegImage320WithDegree = ImageWithDegree jpegImage320 320
+      jpegImage330WithDegree = ImageWithDegree jpegImage330 330
+      jpegImage340WithDegree = ImageWithDegree jpegImage340 340
+      jpegImage350WithDegree = ImageWithDegree jpegImage350 350
+      jpegImage360WithDegree = ImageWithDegree jpegImage0 360 --this last degree is a copy of the first degree.
+
+      multiDegreeRadii =
+        map createSingleDegreeRadiiUingTheEdgeDetector 
          [currImage | currImage <- [(jpegImage0WithDegree), (jpegImage10WithDegree), (jpegImage20WithDegree), (jpegImage30WithDegree),(jpegImage40WithDegree),
                                     (jpegImage50WithDegree), (jpegImage60WithDegree), (jpegImage70WithDegree), (jpegImage80WithDegree), (jpegImage90WithDegree),
                                     (jpegImage100WithDegree), (jpegImage110WithDegree), (jpegImage120WithDegree), (jpegImage130WithDegree), (jpegImage140WithDegree),
@@ -512,22 +429,158 @@ process10DegreeImagesToMultiDegreeRadiiMultiCore     edgeDetector   = do
                                     (jpegImage300WithDegree), (jpegImage310WithDegree), (jpegImage320WithDegree), (jpegImage330WithDegree), (jpegImage340WithDegree),
                                     (jpegImage350WithDegree), (jpegImage360WithDegree)]]
           `using` parList rseq
-
-        
-      --multiDegreeRadii = MultiDegreeRadii "theName" singleDegreeRadiiList
-      multiDegreeRadii = solutions
-  BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
-  putStrLn "done"
-  
-  where --setSingleDegreeRadii :: ((Image PixelYCbCr8), Int)
-        setSingleDegreeRadii imageAsReadWithDegrees  =
-           case imageAsReadWithDegrees of
-             (ImageWithDegrees (Left(err))  deg') ->  (SingleDegreeRadii deg' [Radius 0])
-             (ImageWithDegrees (Right(ImageYCbCr8 jpegImage))  deg') -> (SingleDegreeRadii deg' (map (Radius) (edgeDetector jpegImage)))
+      
+      
+      createSingleDegreeRadiiUingTheEdgeDetector imageWithDegree  =
+           case imageWithDegree of
+             (ImageWithDegree (Left(err))  deg') ->  (SingleDegreeRadii deg' [Radius 0])
+             (ImageWithDegree (Right(ImageYCbCr8 jpegImage))  deg') -> (SingleDegreeRadii deg' (map (Radius) (edgeDetector jpegImage)))
              
         
-        readImage' fileName = readImage $ filePathBuilder fileName
+      
 
---used by process10DegreeImagesToMultiDegreeRadiiMultiCore to associate an image with a degree.
---Was required as a tuple would not compile when using parallel strategies.
-data ImageWithDegrees = ImageWithDegrees {image :: (Either String DynamicImage), deg :: Double}
+      
+  BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
+  putStrLn "done"
+
+  where 
+    readImage' fileName = readImage $ filePathBuilder fileName
+  
+--Used by process10DegreeImagesToMultiDegreeRadiiMultiCore to associate an image with a degree.
+data ImageWithDegree = ImageWithDegree {image :: (Either String DynamicImage), deg :: Double}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------- warning warning warning-----------------------------------------
+--as soon as I export this function, compiler runs out of memory and locks up.
+
+
+--try new filepath system.
+--will replace process10DegreeImagesToMultiDegreeRadiiBase when done
+
+process10DegreeImagesToMultiDegreeRadiiBaseUsingMap :: ((Image  PixelYCbCr8) -> [TargetValueIndex]) -> String ->       String -> String ->    Int            ->  IO ()
+process10DegreeImagesToMultiDegreeRadiiBaseUsingMap     (edgeDetector)                                 fileNamePrefix  fileExtension filePath starterNumber  = do
+
+  let
+    filePathWithTrailingSlash 
+      |  last filePath == '/' =  filePath
+      |  otherwise            =  '/' : filePath
+
+    readImage' currNumber = readImage $ filePathWithTrailingSlash ++ fileNamePrefix ++ (fileNameStarterNumber currNumber) ++ "." ++ fileExtension
+    fileNameStarterNumber currNumber = show $ starterNumber + currNumber
+    
+                                       
+    --fileMap = filePathBuilderBase "src/Data/scanImages/"  [2508..2543] [0,10..360]
+    createSingleDegreeRadiiUingTheEdgeDetector imageWithDegree  =
+           case imageWithDegree of
+             (ImageWithDegree (Left(err))  deg') ->  (SingleDegreeRadii deg' [Radius 0])
+             (ImageWithDegree (Right(ImageYCbCr8 jpegImage))  deg') -> (SingleDegreeRadii deg' (map (Radius) (edgeDetector jpegImage)))
+  
+  jpegImage0 <-   readImage' 0
+  jpegImage10 <-  readImage' 1 
+  jpegImage20 <-  readImage' 2
+  jpegImage30 <-  readImage' 3
+  jpegImage40 <-  readImage' 4
+  jpegImage50 <-  readImage' 5
+  jpegImage60 <-  readImage' 6
+  jpegImage70 <-  readImage' 7
+  jpegImage80 <-  readImage' 8
+  jpegImage90 <-  readImage' 9
+  jpegImage100 <-  readImage' 10
+  jpegImage110 <-  readImage' 11
+  jpegImage120 <-  readImage' 12
+  jpegImage130 <-  readImage' 13
+  jpegImage140 <-  readImage' 14
+  jpegImage150 <-  readImage' 15
+  jpegImage160 <-  readImage' 16
+  jpegImage170 <-  readImage' 17
+  jpegImage180 <-  readImage' 18
+  jpegImage190 <-  readImage' 19
+  jpegImage200 <-  readImage' 20
+  jpegImage210 <-  readImage' 21
+  jpegImage220 <-  readImage' 22
+  jpegImage230 <-  readImage' 23
+  jpegImage240 <-  readImage' 24
+  jpegImage250 <-  readImage' 25
+  jpegImage260 <-  readImage' 26
+  jpegImage270 <-  readImage' 27
+  jpegImage280 <-  readImage' 28
+  jpegImage290 <-  readImage' 29
+  jpegImage300 <-  readImage' 30
+  jpegImage310 <-  readImage' 31
+  jpegImage320 <-  readImage' 32
+  jpegImage330 <-  readImage' 33
+  jpegImage340 <-  readImage' 34
+  jpegImage350 <-  readImage' 35
+   
+  
+      
+  BL.writeFile "src/Data/scanFullData.json" $ encode
+     (map createSingleDegreeRadiiUingTheEdgeDetector 
+         [currImage | currImage <- [(ImageWithDegree jpegImage0 0), (ImageWithDegree jpegImage10 10), (ImageWithDegree jpegImage20 20), (ImageWithDegree jpegImage30 30)
+                                    , (ImageWithDegree jpegImage40 40), (ImageWithDegree jpegImage50 50), (ImageWithDegree jpegImage60 60), (ImageWithDegree jpegImage70 70)
+                                    , (ImageWithDegree jpegImage80 80), (ImageWithDegree jpegImage90 90), (ImageWithDegree jpegImage100 100), (ImageWithDegree jpegImage110 110)
+                                    , (ImageWithDegree jpegImage120 120), (ImageWithDegree jpegImage130 130), (ImageWithDegree jpegImage140 140), (ImageWithDegree jpegImage150 150)
+                                    , (ImageWithDegree jpegImage160 160), (ImageWithDegree jpegImage170 170), (ImageWithDegree jpegImage180 180), (ImageWithDegree jpegImage190 190)
+                                    , (ImageWithDegree jpegImage200 200), (ImageWithDegree jpegImage200 200), (ImageWithDegree jpegImage210 210), (ImageWithDegree jpegImage220 220)
+                                    , (ImageWithDegree jpegImage230 230), (ImageWithDegree jpegImage240 240), (ImageWithDegree jpegImage250 250), (ImageWithDegree jpegImage260 260)
+                                    , (ImageWithDegree jpegImage270 270), (ImageWithDegree jpegImage280 280), (ImageWithDegree jpegImage290 290), (ImageWithDegree jpegImage300 300)
+                                    , (ImageWithDegree jpegImage310 310), (ImageWithDegree jpegImage320 320), (ImageWithDegree jpegImage330 330), (ImageWithDegree jpegImage340 340)
+                                    , (ImageWithDegree jpegImage350 350), (ImageWithDegree jpegImage350 360)]]
+                                    --360 uses image 0 so they are the same
+     `using` parList rseq
+     )
+  putStrLn "done"
+  
+  where
+   a = 'a'
+       
+
+
+
+
+
+
+
+
+--the original. Leave it alone for now, so everything compiles
+filePathBuilder :: FilePath -> FilePath
+filePathBuilder fileName = "src/Data/scanImages/" ++ fileName ++ ".JPG"

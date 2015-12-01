@@ -70,6 +70,7 @@ library
                      , attoparsec >= 0.13.0.1
                      , JuicyPixels >= 3.2.6.1
                      , parallel >= 3.2.0.6
+                     , containers >= 0.5.5.1
                      
   hs-source-dirs:  src    
   default-language:    Haskell2010
@@ -77,11 +78,13 @@ library
   --See Main.hs for more info on running.
   ghc-options: -O2 -threaded 
 
+--for processing scan images with multi-processors/cores
 executable  parallelProcess
   
   main-is: Main.hs
   build-depends:       base >=4.7 && <4.8, parallel >=3.2.0.6, text >= 1.1.0.0,
-                       aeson >= 0.9.0.0, bytestring >= 0.10.4.0, JuicyPixels >= 3.2.6.1
+                       aeson >= 0.9.0.0, bytestring >= 0.10.4.0, JuicyPixels >= 3.2.6.1,
+                       containers >= 0.5.5.1
   hs-source-dirs:      parallelProcess src 
   other-modules:       Fib, Scan.ParseJuicy
   ghc-options:         -O2 -threaded -eventlog -rtsopts

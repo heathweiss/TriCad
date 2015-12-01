@@ -1,9 +1,10 @@
 module Tests.ParseJuicyTest (parseJuicyTestDo) where
 import Test.HUnit
 import Scan.ParseJuicy( getThePixelsRightOfCenter, convertPixelsToMillmeters, calculateRadiusFrom, averageValueOf,
-                       removeLeftOfCenterPixels, TargetValueIndex(..), calculatePixelsPerMillmeter)
+                       removeLeftOfCenterPixels, TargetValueIndex(..), calculatePixelsPerMillmeter )
 import CornerPoints.Radius(Radius(..))
 import  Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
+import qualified Data.Map as Map
 
 parseJuicyTestDo = do
   runTestTT calculateRadiusFromPixelsRightOfCenterTest
@@ -18,12 +19,34 @@ parseJuicyTestDo = do
   runTestTT averageValueOfValidListTest
   runTestTT averageValueOfEmptyListTest
 
-{-
-calculateMillimetersFromPixelsRightOfCenter :: PixelToMillmeterConversionFactor -> NumberOfPixels -> Angle ->  Millimeters
-calculateMillimetersFromPixelsRightOfCenter    conversionFactor                    pixelCount        angle  =
-  (pixelCount / (sinDegrees angle)) * conversionFactor
+  
+  --runTestTT filePathBuilderBaseAllGoodTest
+  --runTestTT filePathBuilderBaseNoSlashTest
 
+  
+
+
+{-
+fileNameBuilder and filePathBuilderBase do not need to be exported, and
+have been moved into a let clause.
+Keep for testing them if required.
+
+filePathBuilderBaseAllGoodTest = TestCase $ assertEqual
+  "filePathBuilderBaseAllGoodTest"
+  (Map.fromList [(0,"myPath/myFileName1010.JPG"),
+                 (10,"myPath/myFileName1011.JPG")
+                ])
+  (filePathBuilderBase "myPath/" fileNameBuilder "myFileName" "JPG" [1010..] [0,10]  )
+
+filePathBuilderBaseNoSlashTest = TestCase $ assertEqual
+  "filePathBuilderBaseNoSlashTest"
+  (Map.fromList [(0,"myPath/myFileName1010.JPG"),
+                 (10,"myPath/myFileName1011.JPG")
+                ])
+  (filePathBuilderBase "myPath" fileNameBuilder "myFileName" "JPG" [1010..] [0,10]  )
 -}
+
+
 calculateRadiusFromPixelsRightOfCenterTest = TestCase $ assertEqual
   ("calculate Radius From Pixels Right Of Center Test")
   (Radius 4)
