@@ -1,6 +1,6 @@
 {-# LANGUAGE ParallelListComp #-}
 module Examples.Scan.WalkerSocket() where
-import Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii, getRedLaserLineSingleImage, removeLeftOfCenterPixels, getThePixelsRightOfCenter,  reduceScanRows, reduceRows, reduceScan,
+import Scan.ParseJuicy(getRedLaserLineSingleImage, removeLeftOfCenterPixels, getThePixelsRightOfCenter,  reduceScanRows, reduceScan,
                        calculateRadiusFrom)
 import Data.Word(Word8)
 import qualified Data.ByteString.Lazy as BL
@@ -15,7 +15,6 @@ import Stl.StlCornerPoints((|+++^|), (||+++^||))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
 import Scan.Filter(runningAverage, runningAvgSingleDegreeRadii)
---import Scan.Transform(reduceScanRows, reduceRows, reduceScan )
 import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBottomFace)
 import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
 import CornerPoints.Transpose (transposeZ)
@@ -331,7 +330,8 @@ This is the red laser line in pixels Right of Left hand edge.
 It is written out to json as a MultiDegreeRadii, even though the data is
 in the form of pixel indices RightOfLHS, in other words, not processed at all beyond finding the laser line.
 -}
-processImagesToRedLaserLineAsPixelsRightOfLHS = process10DegreeImagesToMultiDegreeRadii (getRedLaserLineSingleImage redLaserLine)
+--has now been replaced with processImagesIntoFull360DegreeMultiDegreeRadiiAt10DegreeIntervals
+--processImagesToRedLaserLineAsPixelsRightOfLHS = process10DegreeImagesToMultiDegreeRadii (getRedLaserLineSingleImage redLaserLine)
 
 
 

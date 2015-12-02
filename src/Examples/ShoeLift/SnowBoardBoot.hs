@@ -1,7 +1,14 @@
 {-# LANGUAGE ParallelListComp #-}
-module Examples.ShoeLift.SnowBoardBoot (processImagesToRedLaserLineAsPixelsRightOfLHS) where
+{- |
+Should be deleted as I am no longer going to scan the boot.
+Leave it here for now, as it is the latest use of ParseJuicy, including things such as removeNulls.
+Once I have used them in a new project, then delete this file.
 
-import Scan.ParseJuicy(process10DegreeImagesToMultiDegreeRadii, getRedLaserLineSingleImage, removeLeftOfCenterPixels, getThePixelsRightOfCenter,  reduceScanRows, reduceRows, reduceScan,
+Also has an example of filtering the MDR down to a single section.
+-}
+module Examples.ShoeLift.SnowBoardBoot () where
+
+import Scan.ParseJuicy( getRedLaserLineSingleImage, removeLeftOfCenterPixels, getThePixelsRightOfCenter,  reduceScanRows, reduceScan,
                        calculateRadiusFrom, calculatePixelsPerMillmeter)
 import Data.Word(Word8)
 import CornerPoints.Radius(resetMultiDegreeRadiiIfNullWithPreviousValue, MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(..), )
@@ -16,6 +23,8 @@ import Stl.StlFileWriter(writeStlToFile)
 import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..), (|@+++#@|), (&+++#@), CornerPointsBuilder(..))
 
 
+
+
 {- |Process all 36 images, reducing down to MultiDegreeRadii of the red laser line.
 This is the red laser line in pixels Right of Left hand edge.
 It is written out to json as a MultiDegreeRadii, even though the data is
@@ -23,8 +32,11 @@ in the form of pixel indices RightOfLHS, in other words, not processed at all be
 
 This file is full of null values, as I am now attempting to have an open area above and below the shape being scanned. This is to
 make it easier to scan, by not having to worry about the scan object exactly filling the images.
+
+
 -}
-processImagesToRedLaserLineAsPixelsRightOfLHS = process10DegreeImagesToMultiDegreeRadii (getRedLaserLineSingleImage redLaserLine)
+--process10DegreeImagesToMultiDegreeRadii has now been replaced by processImagesIntoFull360DegreeMultiDegreeRadiiAt10DegreeIntervals
+--processImagesToRedLaserLineAsPixelsRightOfLHS = process10DegreeImagesToMultiDegreeRadii (getRedLaserLineSingleImage redLaserLine)
 
 
 {- |Now replace all the null values by supplying a starting value. All [Radius] which start with a null, will use this starting value.

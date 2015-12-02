@@ -3,14 +3,14 @@ module Main where
 import Fib(fib)
 import Control.Monad
 import Text.Printf
-import Scan.ParseJuicy(getRedLaserLineSingleImage, process10DegreeImagesToMultiDegreeRadiiBaseUsingMap )
+import Scan.ParseJuicy(getRedLaserLineSingleImage, processImagesIntoFull360DegreeMultiDegreeRadiiAt10DegreeIntervals )
 
 
 {-
 main_  =  forM_ [0..40] $ \i ->
             printf "n=%d => %d\n" i (fib i)
 -}
-main = process10DegreeImagesToMultiDegreeRadiiBaseUsingMap (getRedLaserLineSingleImage 175) "IMG_" "JPG" "src/Data/scanImages/" 2508
+main = processImagesIntoFull360DegreeMultiDegreeRadiiAt10DegreeIntervals (getRedLaserLineSingleImage 175) "IMG_" "JPG" "src/Data/scanImages/" 2508
                                                                                              --fileNamePrefix  fileExtension filePath starterNumber
 --main = putStrLn "hello"
 
