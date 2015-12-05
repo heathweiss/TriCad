@@ -22,8 +22,6 @@ Creates a radial shape using polar cood's.
 
  degrees is as the max neg y axis, and rotates clockwise into the pos x axis.
 
-For some reason, it has a slight drift. Eg: At 90 degrees, the y axis should be 0,
-but it drifts off the y-axis.
 
 safari books: Triginometry 3rd edition is a good ref.
 -}

@@ -1,6 +1,6 @@
 {-# LANGUAGE ParallelListComp #-}
 module CornerPoints.VerticalFaces(
-  createRightFaces, createRightFacesNoSlope,
+  createRightFaces, createRightFacesNoSlope, createVerticalFaces,
   createLeftFaces, createLeftFacesNoSlope,
   createHorizontallyAlignedCubes, createHorizontallyAlignedCubesNoSlope,
   createLeftFacesMultiColumns, createLeftFacesMultiColumnsNoSlope, createVerticalWalls,
@@ -59,7 +59,7 @@ ySlope:
 
 zTransposeFactor:
 -An array of the heights(z_axis value) associated with each face. This value will be subtracted
- from the topOrigin z_axis.
+ from the topOrigin z_axis, and so must be an ascending value. Can/should be infinite.
 
 inRadius:
 -The array of Radius, which is the value read in from the file, as was calculated openCV.
@@ -68,9 +68,6 @@ inRadius:
 ---------returns ----------
 An array of LeftFace or RightFace depending on data constructors passed in.
 -}
-
-
-
 createVerticalFaces :: Origin -> SingleDegreeRadii -> Slope -> Slope -> [TransposeFactor] -> (Point-> CornerPoints) ->
                        (Point-> CornerPoints) -> (Point-> CornerPoints) -> (Point-> CornerPoints) -> [CornerPoints]
 createVerticalFaces origin (SingleDegreeRadii degree' radii') xSlope ySlope zTransposeFactor topFrontConstructor topBackConstructor
@@ -153,7 +150,12 @@ createLeftFacesMultiColumnsNoSlope topOrigin (d:ds) zTransposeFactor =
 
 
 {- |Join a [RightFace] to [[LeftFace]]
-    Results in [[CornerPoints]] where each inner list represents horizontal layer..-}
+    Results in [[CornerPoints]] where each inner list represents horizontal layer..
+
+    Used to create cubes from all the faces generated from a MultiDegreeRadii.
+-}
+
+  
 {-
 
 Normally: RightFace +++> [LeftFaces], instead of  [RightFace] +++> [[LeftFace]],  so need recursion to work through the extra level of lists.
