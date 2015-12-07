@@ -80,10 +80,11 @@ newLoop = (Loop "outer loop" "endloop" )
 
 data Triangle = Triangle {v1 :: Vertex, v2 :: Vertex, v3 :: Vertex}
  | EmptyTriangle
-
+ deriving (Show) --added this in for testing. Make sure it still works.
 
 
 data Vertex = Vertex {vertexName :: String, point :: Point}
+ deriving (Show) --added this in for testing. Make sure it still works.
 newVertex :: Point -> Vertex
 newVertex point  = Vertex "vertex " point 
 

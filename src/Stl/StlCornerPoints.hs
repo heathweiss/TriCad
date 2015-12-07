@@ -1,4 +1,4 @@
-module Stl.StlCornerPoints((|+++^|), (||+++^||)) where
+module Stl.StlCornerPoints((|+++^|), (||+++^||), (+++^)) where
 
 import CornerPoints.CornerPoints (CornerPoints(..), Faces(..))
 import Stl.StlBase (Triangle(..), newVertex)

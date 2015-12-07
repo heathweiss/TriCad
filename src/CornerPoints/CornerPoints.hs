@@ -296,7 +296,12 @@ Ex: BackBottomLine +++ BottomFrontLine +++$ BackTopLine +++ FrontTopLine
 
 {- |A monadic style +++ that adds the result of f input to input.
 -}
--- +++>>   
+
+{- |Similar to +++> except that it can apply any function, rather than just f +++
+
+    So it applies a function to the first argument, and returns another CornerPoint based on that.
+
+    Eg: Transpose a [CornerPoints] upwards in order to create a new layer of [CornerPoints]-}  
 (@+++#@) :: CornerPoints -> (CornerPoints -> CornerPoints) -> CornerPoints
 (BottomFace b1 f1 b4 f4) @+++#@ f = (BottomFace b1 f1 b4 f4) +++ (f (BottomFace b1 f1 b4 f4))
 (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) @+++#@ f = (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) +++ (f (CubePoints f1 f2 f3 f4 b1 b2 b3 b4))
@@ -350,6 +355,9 @@ but
 
 (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) +++ (TopFace b2t f2t b3t f3t) =
    (BottomFace {b1=b2, b4=b3, f1=f2, f4=f3}) +++ (TopFace b2t f2t b3t f3t)
+---------------------------------------------------------------------------------------------
+(CubePoints f1 f2 f3 f4 b1 b2 b3 b4) +++ (BottomFace b1b   f1b b4b f4b) =
+   (BottomFace {b1=b1b, b4=b4b, f1=f1b, f4=f4b}) +++ (TopFace b1 f1 b4 f4)
 
 (TopFace b2t f2t b3t f3t) +++ (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) =
    CubePoints {b1=b2, b2=b2t, b3=b3t, b4=b3, f1=f2, f2=f2t, f3=f3t, f4=f3}

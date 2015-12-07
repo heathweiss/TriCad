@@ -20,7 +20,9 @@ library
                    CornerPoints.Create, CornerPoints.FaceConversions,
                    CornerPoints.FaceExtraction,  CornerPoints.Transpose,
                    CornerPoints.VerticalFaces, CornerPoints.HorizontalFaces,
-                   CornerPoints.Radius
+                   CornerPoints.Radius, CornerPoints.CornerPointsWithDegrees,
+                   CornerPoints.FaceExtractionWithDegrees, CornerPoints.VerticalFacesWithDegrees,
+                   CornerPoints.FaceConversionsWithDegrees, CornerPoints.Builder
                    --math
                    Math.Trigonometry,
                    --stl
@@ -32,11 +34,11 @@ library
                    Tests.MathTest, Tests.MathPolarTest, Tests.HorizontalFacesTest,
                    Tests.JsonTest, Tests.ListHelpersTest, Tests.RadiusTest,
                    Tests.VerticalFacesTest, Tests.ParseJuicyTest, Tests.ScanFilterTest,
-                   Tests.CubeLensesTest,
+                   Tests.CornerPointsWithDegreesTest, Tests.CornerPointsBuilderTest,
                    --Examples
                    -- Example ShoeLifts
                    Examples.ShoeLift.KeenToe, Examples.ShoeLift.KeenHeel,
-                   Examples.ShoeLift.SnowBoardBoot
+                   Examples.ShoeLift.SnowBoardBoot, Examples.ShoeLift.KangarooShoe
                    --HeelGenerators.SandalsToe, HeelGenerators.SandalsHeel
                    --HeelGenerators.BlackRunnerHeel,  HeelGenerators.BlackRunnerToe,
                      --Have not been redone for changes to MathPolar.
