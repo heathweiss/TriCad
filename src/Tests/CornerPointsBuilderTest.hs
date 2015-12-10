@@ -2,7 +2,7 @@
 module Tests.CornerPointsBuilderTest(cornerPointsBuilderTestDo ) where
 import Test.HUnit
 import CornerPoints.CornerPoints(CornerPoints(..), (+++), (+++>), (|+++|), (|@+++#@|), (@+++#@), Faces(..) )
-import CornerPoints.Builder(CornerPointsBuilder(..), (&+++#@), (@~+++^), (|@~?|+++^), FacesWithRange(..))
+import CornerPoints.Builder(CornerPointsBuilder(..), (&+++#@), (@~+++^), (|@~?+++^|), FacesWithRange(..),  )
 import CornerPoints.Points (Point(..))
 import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
 import CornerPoints.Transpose (transposeZ)
@@ -13,9 +13,6 @@ cornerPointsBuilderTestDo = do
   -- CornerPointsBuilder tests----
   
   
-
-  
--------------------------------------------- CornerPointsBuilder-------------------------------
   let cubePoints = (BottomFace
               {f1 = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}, f4 = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0},
                b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}, b4 = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 0.0}})
@@ -24,7 +21,19 @@ cornerPointsBuilderTestDo = do
 
       cubePointsWithDegrees = CubesWithStartEndDegrees cubePoints (DegreeRange 0.0 10.0)
              
-
+  {-
+  let getFacesWithRange = TestCase $ assertEqual
+        "Get the CubesWithStartEndDegrees that are within range"
+        3
+        ( let cubes =
+               [ CubesWithStartEndDegrees cubePoints (DegreeRange 0.0 10.0),
+                 CubesWithStartEndDegrees cubePoints (DegreeRange 10.0 20.0),
+                 CubesWithStartEndDegrees cubePoints (DegreeRange 20.0 30.0)
+               ]
+          in 
+        )
+ -}
+  
   --a very straight forward application
   let cornerPointsBldrTest1 = TestCase $ assertEqual
         "cornerPointsBldrTest1"
@@ -61,7 +70,7 @@ cornerPointsBuilderTestDo = do
         "make a list of triangles from a list of CornerPointsWithDegrees, if they are in range"
         "[[Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 0.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 0.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 0.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 1.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 1.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}}]]"
         ( show $ (FacesWithRange FacesAll (DegreeRange 0 10))
-                 |@~?|+++^ 
+                 |@~?+++^| 
                  [ CubesWithStartEndDegrees cubePoints (DegreeRange 0.0 10.0),
                    CubesWithStartEndDegrees cubePoints (DegreeRange 10.0 20.0),
                    CubesWithStartEndDegrees cubePoints (DegreeRange 20.0 30.0)

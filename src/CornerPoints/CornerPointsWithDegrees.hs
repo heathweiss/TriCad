@@ -4,10 +4,11 @@
      That is to say that all the CornerPoints have Degree information attached to them.
      The purpose is to make it much cleaner to create stl from CornerPoints.-}
 module CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (+++~), (+++~>), (|+++~|), (@~+++#@),(@~+++@),(|@~+++@|), (|@~+++#@|),
-                                            cubesWithinDegreeRange, DegreeRange(..)) where
+                                            cubeIsWithinDegreeRange, DegreeRange(..), newCornerPointsWithDegrees, newCornerPointsWithDegreesList) where
 
 
 import CornerPoints.CornerPoints(CornerPoints(..),(@+++#@),(+++), (+++>))
+import CornerPoints.Degree(Degree(..))
 {- |Wrap a CornerPoints to include Degree information.
 
 This is based on, like all CornerPoints work, on a radial structure that rotates clockwise.
@@ -21,7 +22,7 @@ Top, Bottom, Front, and Back Faces have to have both start and end degrees.
 Eg: The first cube that goes from 0 to 10 degrees will have start degree = 0 end end degree = 10-}
 
 --make signatures more readable
-type Degree = Double
+--type Degree = Double
 
 -- ToDo: Add in the rest of the faces.
 {-
@@ -35,6 +36,7 @@ data CornerPointsWithDegrees =
   | TopFacesWithDegrees {_topFace::CornerPoints, startDeg::Double, _endDeg::Double}
   deriving(Show, Eq)
 -}
+--ToDo: remove the 's' from Bottom/TopFaces & CubesWith
 data CornerPointsWithDegrees =
     CubesWithStartEndDegrees {_cube::CornerPoints, _degreeRange::DegreeRange}
   | FrontFaceWithStartEndDegrees {_frontFace::CornerPoints, _degreeRange::DegreeRange}
@@ -48,12 +50,27 @@ data CornerPointsWithDegrees =
 data DegreeRange = DegreeRange {_startDegree::Degree, _endDegree::Degree}
      deriving(Show, Eq)
 
-{- See if the start and end Degrees of the CubesWithStartEndDegrees are within the given start/end range.-} 
+{- |Instantiate a new CornerPointsWithDegrees based on CornerPoints constructor, and a start and end degree.
+Constructors such as LeftFace only require a single degree. Use the fst (start,end).-}
+-- ToDo: Finish pattern matching for all other CornerPoints constructors.
+newCornerPointsWithDegrees :: CornerPoints -> (Degree, Degree) -> CornerPointsWithDegrees
+newCornerPointsWithDegrees (TopFace b2 f2 b3 f3 ) (start,end) = TopFacesWithDegrees (TopFace b2 f2 b3 f3 ) (DegreeRange start end)
+newCornerPointsWithDegrees (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) (start,end) = CubesWithStartEndDegrees  (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) (DegreeRange start end)
 
+{-Used to instantiate a new [CornerPointsWithDegrees] for a full 360 deg shape starting at 0.-}
+
+
+newCornerPointsWithDegreesList :: [CornerPoints] -> [CornerPointsWithDegrees] 
+newCornerPointsWithDegreesList cornerPointsList =
+  let
+    degrees360Tuples :: [(Degree, Degree)]
+    degrees360Tuples = zipWith (,) [0,10..350] [10,20..360]
+  in
+   (zipWith newCornerPointsWithDegrees cornerPointsList  degrees360Tuples)
 
 {- |Filter a list of CornerPointsWithDegrees to get only those within a given degree range. -}
-cubesWithinDegreeRange :: DegreeRange -> [CornerPointsWithDegrees] -> [CornerPointsWithDegrees]
-cubesWithinDegreeRange    (DegreeRange start     end) cubesWithStartEndDegrees  =
+cubeIsWithinDegreeRange :: DegreeRange -> [CornerPointsWithDegrees] -> [CornerPointsWithDegrees]
+cubeIsWithinDegreeRange    (DegreeRange start     end) cubesWithStartEndDegrees  =
         let isWithinRange :: Degree -> Degree -> CornerPointsWithDegrees -> Bool
             isWithinRange    start     end (CubesWithStartEndDegrees _ (DegreeRange startDegree' endDegree')) = 
                startDegree' >= start && endDegree' <= end

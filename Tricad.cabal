@@ -22,7 +22,8 @@ library
                    CornerPoints.VerticalFaces, CornerPoints.HorizontalFaces,
                    CornerPoints.Radius, CornerPoints.CornerPointsWithDegrees,
                    CornerPoints.FaceExtractionWithDegrees, CornerPoints.VerticalFacesWithDegrees,
-                   CornerPoints.FaceConversionsWithDegrees, CornerPoints.Builder
+                   CornerPoints.FaceConversionsWithDegrees, CornerPoints.Builder,
+                   CornerPoints.Degree,
                    --math
                    Math.Trigonometry,
                    --stl

@@ -1,7 +1,8 @@
 
 module CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..),resetMultiDegreeRadiiIfNull,
                           extractSingle, extractList, rotateMDR, setRadiusIfNull, resetSingleDegreeRadiiIfNull,
-                          setRadiusWithPrecedingValueIfNull, resetMultiDegreeRadiiIfNullWithPreviousValue) where
+                          setRadiusWithPrecedingValueIfNull, resetMultiDegreeRadiiIfNullWithPreviousValue,
+                          buildSymmetricalRadius) where
 import CornerPoints.Transposable( TransposeLength, transpose)
 import Data.List(sortBy)
 import Data.Ord (Ordering(..), comparing)
@@ -43,6 +44,14 @@ instance Eq Radius where
 
 instance TransposeLength Radius where
   transpose f (Radius a) = Radius $ f a
+
+{- |Build the Radius for a full 360 degree shape that is symmetrical.
+    The halfDegrees represents 0-170 degrees. centerDegree is the 180 degree.
+
+Known uses: Creating the heel of a shoe, which is typically symmetrical.-}
+buildSymmetricalRadius :: [Degree] -> Degree -> [Radius]
+buildSymmetricalRadius    halfDegrees centerDegree =
+   map Radius $  halfDegrees ++ ( centerDegree : (reverse halfDegrees))
 
 -- | Reset all Radius Null to a Radius defaultValue
 resetSingleDegreeRadiiIfNull :: Double ->  SingleDegreeRadii -> SingleDegreeRadii

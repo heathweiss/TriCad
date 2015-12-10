@@ -1,34 +1,36 @@
 module Examples.ShoeLift.KangarooShoe where
-import CornerPoints.Radius(Radius(..))
+import CornerPoints.Radius(Radius(..), buildSymmetricalRadius)
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFaces)
 import CornerPoints.Points(Point(..))
 import CornerPoints.Create(Angle(..), flatXSlope, flatYSlope, Slope(..))
 import Test.HUnit
 import CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (@~+++#@),(@~+++@),(|@~+++@|), (|@~+++#@|),
-                                            DegreeRange(..),)
+                                            DegreeRange(..), newCornerPointsWithDegrees, newCornerPointsWithDegreesList)
 import Control.Lens
 import Stl.StlCornerPoints((|+++^|), (||+++^||))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
-import CornerPoints.CornerPoints(Faces(..))
+import CornerPoints.CornerPoints(Faces(..),(|@+++#@|))
 import CornerPoints.Transpose(transposeZ)
-import CornerPoints.Builder((&@~#@~), processCornerPointsWithDegreesAndStl, FacesWithRange(..),(&@~+++@), (&@~+++#@) )
+import CornerPoints.Builder(processCornerPointsWithDegreesAndStl, FacesWithRange(..), (&@~+++@), (&@~+++#@), (|||@~+++^|||) )
 import CornerPoints.FaceExtraction(extractTopFace, extractBottomFace)
 import Primitives.Cylindrical(cylinderSolidNoSlopeSquaredOff )
+import CornerPoints.FaceConversions(upperFaceFromLowerFace )
+import CornerPoints.Degree(Degree(..))
 
 --origin = Point 0 0 0
-angles = map Angle [0,10..360]
--- ===================================================== heel =====================================================
-{-The radius of half of the symetrical heel-}
-heelOfShoeHalf =
-  
+angles = map Angle [0,10..]
+
+-- ===================================================== heel of shoe =====================================================
+{--}
+heelOfShoeRadius = buildSymmetricalRadius
    [ 35.8,--0
      35.3,--10
      35.0,--20
      35.3,--30
      34.6,--40
      33.7,--50
-     33.7,--60
+     33.6,--60
      32.2,--70
      31.4,--80
      31.3,--90
@@ -41,60 +43,145 @@ heelOfShoeHalf =
      38.2,--160
      36.0  --170
    ]
+   35.1 --180
 
-{-To heelHalf: Add in the 180 degree, plus the second half of the heel-}
-heelOfShoeRadius = map Radius $  heelOfShoeHalf ++ ( 35.1 : (reverse heelOfShoeHalf))
+                 
 
-degrees = zipWith (,) [0,10..350] [10,20..360]
- 
-makeTopFacesWithDegrees cube (start,end) = TopFacesWithDegrees cube (DegreeRange start end)
-                  
-heelOfShoeCubesWithDegrees = [ (zipWith (makeTopFacesWithDegrees) (createTopFaces (Point 0 0 10) heelOfShoeRadius angles flatXSlope (NegYSlope 10))  degrees)
-                               |@~+++@|
-                               (createBottomFaces (Point 0 0 0) heelOfShoeRadius angles flatXSlope flatYSlope)
-                             ]
-                             &@~#@~
-                             (|@~+++#@| ((transposeZ(+(-10))).extractBottomFace))
-                             &@~+++@
-                             ((map (extractBottomFace) $ cylinderSolidNoSlopeSquaredOff (Radius 30) (Point 0 0 (-20)) angles 0 4) )
-                             &@~+++#@
-                             (transposeZ(+(-10)) . extractBottomFace)
-
-{-heelOfShoeCubesWithDegrees is made from bottom up so align FacesWithRange list same way.-}
-triangles' = concat $ zipWith (processCornerPointsWithDegreesAndStl)
-                              heelOfShoeCubesWithDegrees
+heelOfShoeTriangles =         (
+                               ( [  newCornerPointsWithDegreesList (createTopFaces (Point 0 0 15) heelOfShoeRadius angles flatXSlope (NegYSlope 20))
+                                    |@~+++@|
+                                    (createBottomFaces (Point 0 0 0) heelOfShoeRadius angles flatXSlope flatYSlope)
+                                 ]
+                               )
+                                &@~+++#@
+                                ((transposeZ(+(-5))).extractBottomFace)
+                                &@~+++@
+                                ((map (extractBottomFace) $ cylinderSolidNoSlopeSquaredOff (Radius 20) (Point 0 0 (-10)) angles 0 4) )
+                                &@~+++#@
+                                (transposeZ(+(-10)) . extractBottomFace)
+                              )
+                              |||@~+++^|||
+                              {-[CubesWithDegrees] is made from bottom up, so align [FacesWithRange] same way.-}
                               [  [ (FacesWithRange FacesBottomFront (DegreeRange 0 360))],
                                  [ (FacesWithRange FaceFront (DegreeRange 0 360))],
                                  [ (FacesWithRange FaceFront (DegreeRange 0 360))],
                                  [ (FacesWithRange FacesFrontTop    (DegreeRange 0 360))]
                               ]
 
-  --concat $  processCornerPointsWithDegreesAndStl  (head heelOfShoeCubesWithDegrees) [ (FacesWithRange FacesAll (DegreeRange 0 90)),(FacesWithRange FacesAll (DegreeRange 180 360))]
 
-cubesStl = newStlShape "test" triangles'
-  
-write = writeStlToFile cubesStl
-  
+writeHeelToShoe = writeStlToFile $ newStlShape "kangaroo heel to shoe" heelOfShoeTriangles
+
+-- =================================================== heel tread ===========================================
+heelOfTreadRadius =
+  buildSymmetricalRadius
+   [ 36.9, --0
+     36.7, --10
+     36.6, --20
+     36.1, --30
+     35.2, --40
+     33.8, --50
+     31.5, --60
+     29.9, --70
+     27.7, --80
+     27.5, --90
+     27.7, --100
+     28.5, --110
+     30.7, --120
+     34.1, --130
+     30.4, --140
+     26.4, --150
+     23.8, --160
+     22.5  --170
+   ]
+   22.2 --180
+
+heelOfTreadTriangles  =
+   
+    ([  newCornerPointsWithDegreesList
+         ( (createBottomFaces (Point 0 0 0) heelOfTreadRadius angles flatXSlope flatYSlope)  
+           |@+++#@|
+           ((transposeZ(+5)). upperFaceFromLowerFace)
+         )
+     ]
+     &@~+++@
+     ((map (extractTopFace) $ cylinderSolidNoSlopeSquaredOff (Radius 20) (Point 0 (-10) 15) angles 0 4) )
+     &@~+++#@
+     (transposeZ(+5) . extractTopFace)
+    )
+    |||@~+++^|||
+    [ [ (FacesWithRange FacesFrontTop (DegreeRange 0 360))],
+      [ (FacesWithRange FaceFront (DegreeRange 0 360))],
+      [ (FacesWithRange FacesBottomFront (DegreeRange 0 360))]
+       
+    ]        
+
+writeHeelOfTread = writeStlToFile $ newStlShape "kangaroo heel tread" heelOfTreadTriangles
+
+-- =============================================== toe tread ==============================================
+{-This is the top to the recycled tread. Will attach directly to shoe. Will need a wrapper around the top
+of it, to cover the wire used for attaching.-}
+
+{-The forward half of the toe is symmetrical, and that is all that is needed, so use symmetrical system.-}
+toeOfTreadRadius =
+  buildSymmetricalRadius
+   [37.6, --0
+    37.6, --10
+    36.3, --20
+    34.5, --30
+    33.4, --40
+    32.2, --50
+    31.8, --60
+    31.1, --70
+    31.3, --80
+    32.8, --90
+    34.9, --100
+    37.8, --110
+    42.1, --120
+    49.2, --130
+    42.3, --140
+    37.8, --150
+    34.7, --160
+    33.1 --170
+   ]
+   33.1 --180
+
+
 -- ==================================================== tests ==================================================
 kangarooShoeTestDo = do
-   
+  {- heelOfShoeCubesWithDegrees was merged into triangles'
   let seeBottomFacesWithDegrees = TestCase $ assertEqual
         "seeBottomFacesWithDegrees"
         []
-        heelOfShoeCubesWithDegrees
-  runTestTT seeBottomFacesWithDegrees
-  
-  let seeDegrees = TestCase $ assertEqual
-        "seeDegrees"
-        [(0,10),(10,20),(20,30),(30,40),(40,50),(50,60),(60,70),(70,80),(80,90),(90,100),(100,110),(110,120),(120,130),(130,140),(140,150),(150,160),(160,170),
-         (170,180),(180,190),(190,200),(200,210),(210,220),(220,230),(230,240),(240,250),(250,260),(260,270),(270,280),(280,290),(290,300),(300,310),(310,320),
-         (320,330),(330,340),(340,350),(350,360)]
-        degrees
-  runTestTT seeDegrees
-  
+  --runTestTT seeBottomFacesWithDegrees
   
 
+  
+  let seeLenghtOfTopLayerOfCubesList = TestCase $ assertEqual
+        "seeLenghtOfTopLayerOfCubesList"
+        36
+        (length $ head heelOfShoeCubesWithDegrees)
+  runTestTT seeLenghtOfTopLayerOfCubesList
 
+  let seeLenghtOfLastLayerOfCubesList = TestCase $ assertEqual
+        "seeLenghtOfLastLayerOfCubesList"
+        36
+        (length $ last heelOfShoeCubesWithDegrees)
+  runTestTT seeLenghtOfLastLayerOfCubesList
+  -}
+  
+  
+  
+  let seeRadiusLength = TestCase $ assertEqual
+        "seeRadiusLength"
+        37 --not 36 because starts at 0 instead of 1
+        (length heelOfShoeRadius)
+  runTestTT seeRadiusLength
+   
+  let seeRadius = TestCase $ assertEqual
+        "seeRadius"
+        [Radius {radius = 35.8},Radius {radius = 35.3},Radius {radius = 35.0},Radius {radius = 35.3},Radius {radius = 34.6},Radius {radius = 33.7},Radius {radius = 33.6},Radius {radius = 32.2},Radius {radius = 31.4},Radius {radius = 31.3},Radius {radius = 32.0},Radius {radius = 33.4},Radius {radius = 35.8},Radius {radius = 39.7},Radius {radius = 46.3},Radius {radius = 41.9},Radius {radius = 38.2},Radius {radius = 36.0},Radius {radius = 35.1},Radius {radius = 36.0},Radius {radius = 38.2},Radius {radius = 41.9},Radius {radius = 46.3},Radius {radius = 39.7},Radius {radius = 35.8},Radius {radius = 33.4},Radius {radius = 32.0},Radius {radius = 31.3},Radius {radius = 31.4},Radius {radius = 32.2},Radius {radius = 33.6},Radius {radius = 33.7},Radius {radius = 34.6},Radius {radius = 35.3},Radius {radius = 35.0},Radius {radius = 35.3},Radius {radius = 35.8}]
+        (heelOfShoeRadius)
+  runTestTT seeRadius
 
 
 

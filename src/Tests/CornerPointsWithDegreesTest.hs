@@ -1,6 +1,6 @@
-module Tests.CornerPointsWithDegreesTest where
+module Tests.CornerPointsWithDegreesTest(cornerPointsWithDegreesTest) where
 import Test.HUnit
-import CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (+++~), (+++~>), (|+++~|), (@~+++#@), DegreeRange(..), cubesWithinDegreeRange )
+import CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (+++~), (+++~>), (|+++~|), (@~+++#@), DegreeRange(..), cubeIsWithinDegreeRange )
 import CornerPoints.CornerPoints(CornerPoints(..),(@+++#@),(+++), (+++>))
 import CornerPoints.Points (Point(..))
 import CornerPoints.Transpose (transposeZ)
@@ -109,7 +109,7 @@ cornerPointsWithDegreesTest = do
            CubesWithStartEndDegrees testCube (DegreeRange 90 180) ,
            CubesWithStartEndDegrees testCube (DegreeRange 180 270)
         ]
-        (cubesWithinDegreeRange (DegreeRange 90 270)
+        (cubeIsWithinDegreeRange (DegreeRange 90 270)
          [
            (RightFaceWithDegrees testRightFace 0) +++~ (LeftFaceWithDegrees testLeftFace 90),
            (RightFaceWithDegrees testRightFace 90) +++~ (LeftFaceWithDegrees testLeftFace 180),
@@ -130,12 +130,13 @@ cornerPointsWithDegreesTest = do
   -}
   let  
        cubesWithStartEndDegreesTest = TestCase $ assertEqual
-        "CubesWithStartEndDegrees"
+        "get range of CubesWithStartEndDegrees, all but 1st "
         [
            CubesWithStartEndDegrees testCube (DegreeRange 90 180) ,
-           CubesWithStartEndDegrees testCube (DegreeRange 180 270)
+           CubesWithStartEndDegrees testCube (DegreeRange 180 270),
+           CubesWithStartEndDegrees testCube (DegreeRange 270 360)
         ]
-        (cubesWithinDegreeRange (DegreeRange 90 270)
+        (cubeIsWithinDegreeRange (DegreeRange 90 360)
          [
            CubesWithStartEndDegrees testCube (DegreeRange 0 90) ,
            CubesWithStartEndDegrees testCube (DegreeRange 90 180) ,
@@ -144,6 +145,43 @@ cornerPointsWithDegreesTest = do
          ]
         )
   runTestTT cubesWithStartEndDegreesTest
+
+
+  let  
+       cubesWithStartEndDegreesTest2 = TestCase $ assertEqual
+        "get range of CubesWithStartEndDegrees, all but last "
+        [  CubesWithStartEndDegrees testCube (DegreeRange 0 90),
+           CubesWithStartEndDegrees testCube (DegreeRange 90 180) ,
+           CubesWithStartEndDegrees testCube (DegreeRange 180 270)
+           
+        ]
+        (cubeIsWithinDegreeRange (DegreeRange 0 270)
+         [
+           CubesWithStartEndDegrees testCube (DegreeRange 0 90) ,
+           CubesWithStartEndDegrees testCube (DegreeRange 90 180) ,
+           CubesWithStartEndDegrees testCube (DegreeRange 180 270) ,
+           CubesWithStartEndDegrees testCube (DegreeRange 270 360) 
+         ]
+        )
+  runTestTT cubesWithStartEndDegreesTest2
+
+  let  
+       cubesWithStartEndDegreesTest3 = TestCase $ assertEqual
+        "get range of CubesWithStartEndDegrees, all"
+        [  CubesWithStartEndDegrees testCube (DegreeRange 0 90),
+           CubesWithStartEndDegrees testCube (DegreeRange 90 180) ,
+           CubesWithStartEndDegrees testCube (DegreeRange 180 270),
+           CubesWithStartEndDegrees testCube (DegreeRange 270 360)
+        ]
+        (cubeIsWithinDegreeRange (DegreeRange 0 360)
+         [
+           CubesWithStartEndDegrees testCube (DegreeRange 0 90) ,
+           CubesWithStartEndDegrees testCube (DegreeRange 90 180) ,
+           CubesWithStartEndDegrees testCube (DegreeRange 180 270) ,
+           CubesWithStartEndDegrees testCube (DegreeRange 270 360) 
+         ]
+        )
+  runTestTT cubesWithStartEndDegreesTest3
 
   let addLeftRigtFacesTest = TestCase $ assertEqual
         "addLeftRigtFacesTest"
@@ -154,4 +192,12 @@ cornerPointsWithDegreesTest = do
   runTestTT addLeftRigtFacesTest
 
 
-
+  {- degrees360Tuples has been moved inside of newCornerPointsWithDegreesList. Leave here in case further testing is needed.
+  let seeDegrees = TestCase $ assertEqual
+        "seeDegrees"
+        [(0,10),(10,20),(20,30),(30,40),(40,50),(50,60),(60,70),(70,80),(80,90),(90,100),(100,110),(110,120),(120,130),(130,140),(140,150),(150,160),(160,170),
+         (170,180),(180,190),(190,200),(200,210),(210,220),(220,230),(230,240),(240,250),(250,260),(260,270),(270,280),(280,290),(290,300),(300,310),(310,320),
+         (320,330),(330,340),(340,350),(350,360)]
+        degrees360Tuples
+  runTestTT seeDegrees
+  -}
