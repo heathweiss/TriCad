@@ -70,5 +70,14 @@ processCornerPointsWithDegreesAndStl cornerPointsList facesWithRangeList =
 cornerPointsWithDegreesList |||@~+++^||| facesWithRangeList = concat $
   zipWith processCornerPointsWithDegreesAndStl cornerPointsWithDegreesList facesWithRangeList
 
+{- |
+Used by numerous infix functions such as (&@~+++#@) for building up a [[CornerPointsWithDegrees]].
+Each layer of a stl shape is made up of [CornerPointsWithDegrees].
+This Builder allows these layer to be built up, by adding another top/bottome face to the top of the
+Builder list.
+
+The 10 instantiates the Builder list with CornerPointsWithDegrees based on a 10 degree spread of the radial shape.
+Eg: A scan that is taken at 10 degree intervals.
+-}
 newCornerPointsWith10DegreesBuilder :: [CornerPoints] -> [[CornerPointsWithDegrees]]
 newCornerPointsWith10DegreesBuilder    cornerPoints   = [newCornerPointsWith10DegreesList cornerPoints]

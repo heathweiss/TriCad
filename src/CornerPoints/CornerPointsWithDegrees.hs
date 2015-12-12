@@ -37,6 +37,7 @@ data CornerPointsWithDegrees =
   deriving(Show, Eq)
 -}
 --ToDo: remove the 's' from Bottom/TopFaces & CubesWith
+--ToDo: Make an instance of Monad, and try building shapes with Monad.
 data CornerPointsWithDegrees =
     CubesWithStartEndDegrees {_cube::CornerPoints, _degreeRange::DegreeRange}
   | FrontFaceWithStartEndDegrees {_frontFace::CornerPoints, _degreeRange::DegreeRange}
@@ -57,8 +58,7 @@ newCornerPointsWithDegrees :: CornerPoints -> (Degree, Degree) -> CornerPointsWi
 newCornerPointsWithDegrees (TopFace b2 f2 b3 f3 ) (start,end) = TopFacesWithDegrees (TopFace b2 f2 b3 f3 ) (DegreeRange start end)
 newCornerPointsWithDegrees (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) (start,end) = CubesWithStartEndDegrees  (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) (DegreeRange start end)
 
-{-Used to instantiate a new [CornerPointsWithDegrees] for a full 360 deg shape starting at 0.-}
-
+{- |Used to instantiate a new [CornerPointsWithDegrees] for a full 360 deg shape starting at 0.-}
 
 newCornerPointsWith10DegreesList :: [CornerPoints] -> [CornerPointsWithDegrees] 
 newCornerPointsWith10DegreesList cornerPointsList =

@@ -18,6 +18,11 @@ import CornerPoints.FaceExtraction(extractTopFace, extractBottomFace)
 import Primitives.Cylindrical(cylinderSolidNoSlopeSquaredOff, cylinderWallsNoSlope, cylinderWallsVariableRadiusNoSlope)
 import CornerPoints.FaceConversions(upperFaceFromLowerFace )
 import CornerPoints.Degree(Degree(..))
+import CornerPoints.Transposable(transpose)
+
+--make signatures more readable
+type Thickness = Double
+type Height    = Double
 
 --origin = Point 0 0 0
 angles = map Angle [0,10..]
@@ -132,18 +137,37 @@ writeToe =  writeStlToFile $ newStlShape "kangaroo toe" toeOfShoeTriangles
 -- ======================================== toe wire cover ===============================
 {-This will a thin wall to wrap around the bottom of the shoe tread and top of the riser, to cover the wire,
 and give extra vertical glue area.
-
-Need to create a Primitives.Cylindrical.cylinderWallsNoSlope that takes a [Radius]
 -}
+
+{-The front of the shoe slopes forward, so need a top outward slope for the front of the cover, for section on shoe.
+The sides do not need to slope outwards.-}
+toeWireCoverShoeRadius = zipWith (transpose)
+                          (concat
+                            [[(+2)| x <- [1..4]],
+                             [(+0)| x <- [5..32]],
+                             [(+2)| x <- [1..]]
+                            ]
+                          )
+                          toeOfShoeRadius
+
 toeWireCoverTriangles =
- (newCornerPointsWith10DegreesBuilder $
-   cylinderWallsVariableRadiusNoSlope toeOfTreadRadius 1  (Point 0 0 0) angles 5
+ ((newCornerPointsWith10DegreesBuilder $
+   cylinderWallsVariableRadiusNoSlope toeOfShoeRadius (1.0::Thickness)  (Point 0 0 0) angles (5::Height)
+  )
+  &@~+++@
+  (map (extractTopFace) (cylinderWallsVariableRadiusNoSlope toeWireCoverShoeRadius (1.0::Thickness)  (Point 0 0 5) angles (13::Height)))
  )
  |||@~+++^|||
- [ [(FacesWithRange FacesBackBottomFrontTop (DegreeRange 0 80)),       --
-   (FacesWithRange FacesBackBottomFrontLeftTop (DegreeRange 80 90)),     --
-   (FacesWithRange FacesBackBottomFrontRightTop (DegreeRange 270 280)),  --
-   (FacesWithRange FacesBackBottomFrontTop (DegreeRange 280 360))]     -- 
+ [ [(FacesWithRange FacesBackFrontTop (DegreeRange 0 80)),       --
+    (FacesWithRange FacesBackFrontLeftTop (DegreeRange 80 90)),     --
+    (FacesWithRange FacesBackFrontRightTop (DegreeRange 270 280)),  --
+    (FacesWithRange FacesBackFrontTop (DegreeRange 280 360))
+   ],
+   [(FacesWithRange FacesBackBottomFront (DegreeRange 0 80)),       --
+    (FacesWithRange FacesBackBottomFrontLeft (DegreeRange 80 90)),     --
+    (FacesWithRange FacesBackBottomFrontRight (DegreeRange 270 280)),  --
+    (FacesWithRange FacesBackBottomFront (DegreeRange 280 360))
+   ]     -- 
  ]
 
 writeToeWireCover = writeStlToFile $ newStlShape "kangaroo toe wire cover" toeWireCoverTriangles
@@ -288,7 +312,7 @@ kangarooShoeTestDo = do
   let seeRadius = TestCase $ assertEqual
         "seeRadius"
         [Radius {radius = 35.8},Radius {radius = 35.3},Radius {radius = 35.0},Radius {radius = 35.3},Radius {radius = 34.6},Radius {radius = 33.7},Radius {radius = 33.6},Radius {radius = 32.2},Radius {radius = 31.4},Radius {radius = 31.3},Radius {radius = 32.0},Radius {radius = 33.4},Radius {radius = 35.8},Radius {radius = 39.7},Radius {radius = 46.3},Radius {radius = 41.9},Radius {radius = 38.2},Radius {radius = 36.0},Radius {radius = 35.1},Radius {radius = 36.0},Radius {radius = 38.2},Radius {radius = 41.9},Radius {radius = 46.3},Radius {radius = 39.7},Radius {radius = 35.8},Radius {radius = 33.4},Radius {radius = 32.0},Radius {radius = 31.3},Radius {radius = 31.4},Radius {radius = 32.2},Radius {radius = 33.6},Radius {radius = 33.7},Radius {radius = 34.6},Radius {radius = 35.3},Radius {radius = 35.0},Radius {radius = 35.3},Radius {radius = 35.8}]
-        (heelOfShoeRadius)
+        (toeWireCoverShoeRadius)
   runTestTT seeRadius
 
 
