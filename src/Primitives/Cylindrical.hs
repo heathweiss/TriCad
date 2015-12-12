@@ -7,6 +7,7 @@ Includes:
 
 module Primitives.Cylindrical(cylinderWallsNoSlope,cylinderWallsNoSlopeSquaredOff,
   cylinderSolidNoSlope,
+  cylinderWallsVariableRadiusNoSlope,
   cylinderSolidNoSlopeSquaredOff,
   cylinderSolidNoSlopeLengthenY,
   cylinderSolidNoSlopeSquaredOffLengthenY,
@@ -22,25 +23,29 @@ import CornerPoints.FaceConversions(lowerFaceFromUpperFace, backBottomLineFromBo
                                     upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine, backFaceFromFrontFace)
 import CornerPoints.Radius(Radius(..))
 import CornerPoints.Transpose (transposeZ)
---import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
+import CornerPoints.Transposable(TransposePoint, transposeX, transposeY, transposeZ, TransposeLength, transpose)
 
 type Thickness = Double
 type Height = Double
 type Power = Double
 type LengthenFactor = Double
 
-
+{- |Create a cylindrical wall, based on a single radius.
+It is a convenience wrapper around cylinderWallsVariableRadiusNoSlope.-}
 cylinderWallsNoSlope :: Radius -> Thickness ->  Origin -> [Angle] -> Height -> [CornerPoints]
 cylinderWallsNoSlope    innerRadius    wallThickness origin    angles     height =
-        let  --innerCubes = createBottomFaces origin (map (Radius) [innerRadius,innerRadius..]) angles flatXSlope flatYSlope
-             innerCubes = createBottomFaces origin [innerRadius | x <-  [1..]] angles flatXSlope flatYSlope
+  cylinderWallsVariableRadiusNoSlope  [innerRadius | x<- [1..] ]    wallThickness origin    angles     height
+
+{- |Create a cylindrical wall, based on an [Radius].-}
+cylinderWallsVariableRadiusNoSlope :: [Radius] -> Thickness ->  Origin -> [Angle] -> Height -> [CornerPoints]
+cylinderWallsVariableRadiusNoSlope    innerRadii    wallThickness origin    angles     height =
+        let  innerCubes = createBottomFaces origin innerRadii angles flatXSlope flatYSlope
                          |@+++#@|
                          (upperFaceFromLowerFace . (transposeZ (+height)))
 
-             outerCubes = --createBottomFaces origin (map (Radius) [(innerRadius + wallThickness),(innerRadius + wallThickness)..]) angles flatXSlope flatYSlope
-                         createBottomFaces origin [Radius ((radius innerRadius) + wallThickness) |x <- [1..]] angles flatXSlope flatYSlope
-                         |@+++#@|
-                         (upperFaceFromLowerFace . (transposeZ (+height)))
+             outerCubes = createBottomFaces origin (map (transpose (+wallThickness )) innerRadii) angles flatXSlope flatYSlope
+                          |@+++#@|
+                          (upperFaceFromLowerFace . (transposeZ (+height)))
              cylinderCubes = [(backFaceFromFrontFace . extractFrontFace) currCube  |currCube <- innerCubes]
                              |+++|
                              [ (extractFrontFace) currCube    |currCube <- outerCubes]

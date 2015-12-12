@@ -4,7 +4,7 @@
      That is to say that all the CornerPoints have Degree information attached to them.
      The purpose is to make it much cleaner to create stl from CornerPoints.-}
 module CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (+++~), (+++~>), (|+++~|), (@~+++#@),(@~+++@),(|@~+++@|), (|@~+++#@|),
-                                            cubeIsWithinDegreeRange, DegreeRange(..), newCornerPointsWithDegrees, newCornerPointsWithDegreesList) where
+                                            cubeIsWithinDegreeRange, DegreeRange(..), newCornerPointsWithDegrees, newCornerPointsWith10DegreesList) where
 
 
 import CornerPoints.CornerPoints(CornerPoints(..),(@+++#@),(+++), (+++>))
@@ -60,8 +60,8 @@ newCornerPointsWithDegrees (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) (start,end) = Cu
 {-Used to instantiate a new [CornerPointsWithDegrees] for a full 360 deg shape starting at 0.-}
 
 
-newCornerPointsWithDegreesList :: [CornerPoints] -> [CornerPointsWithDegrees] 
-newCornerPointsWithDegreesList cornerPointsList =
+newCornerPointsWith10DegreesList :: [CornerPoints] -> [CornerPointsWithDegrees] 
+newCornerPointsWith10DegreesList cornerPointsList =
   let
     degrees360Tuples :: [(Degree, Degree)]
     degrees360Tuples = zipWith (,) [0,10..350] [10,20..360]
