@@ -1,12 +1,13 @@
 
 module Tests.CornerPointsBuilderTest(cornerPointsBuilderTestDo ) where
 import Test.HUnit
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (+++>), (|+++|), (|@+++#@|), (@+++#@), Faces(..) )
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (+++>), (|+++|), (|@+++#@|), (@+++#@) )
 import CornerPoints.Builder(CornerPointsBuilder(..), (&+++#@), (@~+++^), (|@~?+++^|), FacesWithRange(..),  )
 import CornerPoints.Points (Point(..))
 import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
 import CornerPoints.Transpose (transposeZ)
 import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..))
+import Stl.StlCornerPoints(Faces(..))
 
 
 cornerPointsBuilderTestDo = do

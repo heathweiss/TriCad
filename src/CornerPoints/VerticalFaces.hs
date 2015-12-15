@@ -6,7 +6,7 @@ module CornerPoints.VerticalFaces(
   createLeftFacesMultiColumns, createLeftFacesMultiColumnsNoSlope, createVerticalWalls,
   TransposeFactor(..)) where
 import CornerPoints.Create(Slope(..), Origin(..), createCornerPoint, Angle(..), flatXSlope, flatYSlope)
-import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (|+++|), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (|+++|))
 import CornerPoints.Transpose (transposeZ)
 import CornerPoints.Points(Point(..))
 import CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..))

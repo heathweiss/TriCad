@@ -10,7 +10,7 @@ module CornerPoints.HorizontalFaces(
   
   )where
 import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, createCornerPointSquaredOff, Angle(..),  flatXSlope, flatYSlope,)
-import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (|+++|), Faces(..), (|@+++#@|))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (|+++|), (|@+++#@|))
 import CornerPoints.Points(Point(..))
 import CornerPoints.Radius(Radius(..))
 import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBottomFace)

@@ -12,7 +12,7 @@ module CornerPoints.Create(
   getQuadrantAngle
   ) where
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), )
 import Math.Trigonometry(sinDegrees, cosDegrees)
 import CornerPoints.Transpose (transposeZ)
 import CornerPoints.Radius(Radius(..))

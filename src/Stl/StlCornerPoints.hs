@@ -1,6 +1,6 @@
-module Stl.StlCornerPoints((|+++^|), (||+++^||), (+++^)) where
+module Stl.StlCornerPoints((|+++^|), (||+++^||), (+++^), Faces(..)) where
 
-import CornerPoints.CornerPoints (CornerPoints(..), Faces(..))
+import CornerPoints.CornerPoints (CornerPoints(..), )
 import Stl.StlBase (Triangle(..), newVertex)
 import Control.Applicative
 
@@ -374,3 +374,66 @@ getTriangles (FacesLeftTop) c = concat
 
 
 
+------------------------------------------ Faces ----------------------------------------
+{- |
+Known uses: 
+zip together with a [CornerPoints] to output stl triangles
+-}
+data Faces =
+   FacesNada
+ | FacesAll 
+ | FacesAllButBack
+ | FacesAllButBottom
+ | FacesAllButFront
+ | FacesAllButLeft
+ | FacesAllButRight
+
+ | FacesBackBottom
+   
+ | FacesBackBottomFront
+ | FacesBackBottomFrontLeft
+ | FacesBackBottomFrontLeftTop
+ | FacesBackBottomFrontRight
+ | FacesBackBottomFrontRightTop
+ | FacesBackBottomFrontTop
+ | FacesBackBottomLeft
+ | FacesBackBottomLeftRight
+ | FacesBackBottomTop
+ | FacesBackFrontLeft
+ | FacesBackFrontRight
+ | FacesBackFront
+ | FacesBackFrontLeftRight
+ | FacesBackFrontLeftRightTop
+ | FacesBackFrontLeftTop
+ | FacesBackFrontTop
+ | FacesBottomFront
+ | FacesBackFrontRightTop
+ | FacesBottomTop
+ | FacesBottomFrontLeft
+ | FacesBottomFrontLeftRight
+ | FacesBottomFrontLeftTop
+ | FacesBottomFrontLeftRightTop
+ | FacesBottomFrontRight
+ | FacesBottomFrontRightTop
+ | FacesBottomFrontTop
+ | FacesBottomLeft
+ | FacesBottomLeftRight 
+ | FacesBottomRightTop
+ | FacesBackLeftRightTop
+ | FacesFrontLeftTop
+ | FacesFrontLeft
+ | FacesFrontLeftRightTop 
+ | FacesFrontRightTop
+ | FacesFrontRight
+ | FacesFrontTop
+ | FacesLeftRight
+ | FacesLeftTop
+ | FacesLeftRightTop
+ | FacesBottomLeftRightTop 
+ | FaceBack
+ | FaceBottom
+ | FaceFront
+ | FaceLeft
+ | FaceRight
+ | FaceTop
+ 

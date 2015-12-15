@@ -27,7 +27,7 @@ library
                    --math
                    Math.Trigonometry,
                    --stl
-                   Stl.StlBase, Stl.StlCornerPoints, Stl.StlFileWriter,
+                   Stl.StlBase, Stl.StlCornerPoints, Stl.StlFileWriter
                    --helpers
                    Helpers.List, Helpers.DSL
                    -- tests

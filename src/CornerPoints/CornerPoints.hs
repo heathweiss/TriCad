@@ -10,7 +10,6 @@ CornerPoints(..),
 scaleCornerPoints,
 scaleCornerPointsZ,
 CornerPointsBuilder(..),
-Faces(..)
 ) where
 import CornerPoints.Points (Point(..))
 import    Control.Applicative
@@ -546,69 +545,6 @@ scalePoint (Point x y z) scaleFactor = Point {x_axis=x*scaleFactor, y_axis=y*sca
 scalePointZ :: Point -> Double -> Point
 scalePointZ (Point x y z) scaleFactor = Point {x_axis=x, y_axis=y, z_axis=z*scaleFactor}
 
------------------------------------------- Faces ----------------------------------------
-{- |
-Known uses: 
-zip together with a [CornerPoints] to output stl triangles
--}
-data Faces =
-   FacesNada
- | FacesAll 
- | FacesAllButBack
- | FacesAllButBottom
- | FacesAllButFront
- | FacesAllButLeft
- | FacesAllButRight
-
- | FacesBackBottom
-   
- | FacesBackBottomFront
- | FacesBackBottomFrontLeft
- | FacesBackBottomFrontLeftTop
- | FacesBackBottomFrontRight
- | FacesBackBottomFrontRightTop
- | FacesBackBottomFrontTop
- | FacesBackBottomLeft
- | FacesBackBottomLeftRight
- | FacesBackBottomTop
- | FacesBackFrontLeft
- | FacesBackFrontRight
- | FacesBackFront
- | FacesBackFrontLeftRight
- | FacesBackFrontLeftRightTop
- | FacesBackFrontLeftTop
- | FacesBackFrontTop
- | FacesBottomFront
- | FacesBackFrontRightTop
- | FacesBottomTop
- | FacesBottomFrontLeft
- | FacesBottomFrontLeftRight
- | FacesBottomFrontLeftTop
- | FacesBottomFrontLeftRightTop
- | FacesBottomFrontRight
- | FacesBottomFrontRightTop
- | FacesBottomFrontTop
- | FacesBottomLeft
- | FacesBottomLeftRight 
- | FacesBottomRightTop
- | FacesBackLeftRightTop
- | FacesFrontLeftTop
- | FacesFrontLeft
- | FacesFrontLeftRightTop 
- | FacesFrontRightTop
- | FacesFrontRight
- | FacesFrontTop
- | FacesLeftRight
- | FacesLeftTop
- | FacesLeftRightTop
- | FacesBottomLeftRightTop 
- | FaceBack
- | FaceBottom
- | FaceFront
- | FaceLeft
- | FaceRight
- | FaceTop
- 
 
 
 

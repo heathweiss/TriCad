@@ -1,10 +1,10 @@
 module CornerPoints.Builder(CornerPointsBuilder(..),(&+++#@), (@~+++^), (|@~?+++^|), FacesWithRange(..), (&@~+++@),(&@~+++#@), (|||@~+++^|||),
                            processCornerPointsWithDegreesAndStl, newCornerPointsWith10DegreesBuilder) where
-import CornerPoints.CornerPoints(CornerPoints(..), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..))
 import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), cubeIsWithinDegreeRange, (@~+++#@), (|@~+++#@|), (|@~+++@|),
                                            newCornerPointsWith10DegreesList)
 import Stl.StlBase(Triangle(..))
-import Stl.StlCornerPoints((+++^))
+import Stl.StlCornerPoints((+++^), Faces(..))
 import CornerPoints.Degree(Degree(..))
 
 -- ======================================= CornerPointsBuilder ===============================

@@ -17,7 +17,7 @@ import CornerPoints.Create(slopeAdjustedForVerticalAngle, Slope(..), Angle(..), 
 import CornerPoints.HorizontalFaces(createTopFaces, createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,createBottomFacesSquaredOff,
                                    createBottomFacesWithVariableSlope,createBottomFacesSquaredOffLengthenY,createBottomFacesLengthenY)
 import CornerPoints.Points(Point(..))
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), (|@+++#@|), Faces(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), (|@+++#@|))
 import CornerPoints.FaceExtraction ( extractTopFace, extractBottomFrontLine, extractFrontTopLine, extractBackTopLine, extractBottomFace, extractBackBottomLine, extractFrontFace )
 import CornerPoints.FaceConversions(lowerFaceFromUpperFace, backBottomLineFromBottomFrontLine, backTopLineFromFrontTopLine, frontTopLineFromBackTopLine,
                                     upperFaceFromLowerFace, bottomFrontLineFromBackBottomLine, backFaceFromFrontFace)

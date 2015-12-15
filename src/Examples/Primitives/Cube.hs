@@ -1,6 +1,6 @@
 module Examples.Primitives.Cube() where
 import Stl.StlCornerPoints((|+++^|))
-import CornerPoints.CornerPoints( Faces(..))
+import Stl.StlCornerPoints( Faces(..))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
 import Primitives.Cubical( rectangularSolidNoSlope)

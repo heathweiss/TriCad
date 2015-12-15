@@ -7,10 +7,10 @@ import Test.HUnit
 import CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (@~+++#@),(@~+++@),(|@~+++@|), (|@~+++#@|),
                                             DegreeRange(..))
 import Control.Lens
-import Stl.StlCornerPoints((|+++^|), (||+++^||))
+import Stl.StlCornerPoints((|+++^|), (||+++^||), Faces(..))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
-import CornerPoints.CornerPoints(Faces(..),(|@+++#@|), (|+++|))
+import CornerPoints.CornerPoints((|@+++#@|), (|+++|))
 import CornerPoints.Transpose(transposeZ)
 import CornerPoints.Builder(processCornerPointsWithDegreesAndStl, FacesWithRange(..), (&@~+++@), (&@~+++#@), (|||@~+++^|||),
                            newCornerPointsWith10DegreesBuilder)

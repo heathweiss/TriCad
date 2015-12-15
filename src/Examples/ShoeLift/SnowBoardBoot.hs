@@ -17,10 +17,10 @@ import qualified Data.ByteString.Lazy as BL
 import Data.Aeson
 import Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe)
 import CornerPoints.VerticalFaces(createHorizontallyAlignedCubesNoSlope)
-import Stl.StlCornerPoints((|+++^|), (||+++^||))
+import Stl.StlCornerPoints((|+++^|), (||+++^||), Faces(..))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
-import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), Faces(..), (|@+++#@|), (&+++#@), CornerPointsBuilder(..))
+import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), (|@+++#@|), (&+++#@), CornerPointsBuilder(..))
 
 
 
