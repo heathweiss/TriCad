@@ -24,6 +24,10 @@ import Primitives.Cylindrical(cylinderSolidNoSlope)
 import Primitives.Cylindrical(cylinderWallsNoSlope)
 import CornerPoints.Transposable(transpose)
 import Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
+
+{-Global values such as commom measurements.-}
+plateRadius = 30
+
 {-
 read in the Multidegree json file, which has valid Radii,
 and process it into stl using whatever function required for the current shape. -}
@@ -34,7 +38,7 @@ loadMDRAndPassToProcessor = do
       removeDefectiveTopRow (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' [(SingleDegreeRadii degree'' (tail radii''))  | (SingleDegreeRadii degree'' radii'') <- degrees']
       rowReductionFactor = 100
       extensionHeight = 30
-      plateRadius = 30
+      
             
       extensionFaceBuilder :: (Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]
       extensionFaceBuilder leftFace emptyFaces rightFace fillerFaces =
@@ -45,8 +49,8 @@ loadMDRAndPassToProcessor = do
         let innerSleeveMDR = reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
             outerSleeveMDR = transpose (+2) innerSleeveMDR
         in  --mainSocketStl innerSleeveMDR outerSleeveMDR extensionFaceBuilder extensionHeight rowReductionFactor pixelsPerMM
-            --pushPlateStl outerSleeveMDR extensionFaceBuilder extensionHeight plateRadius
-              hoseAttachment plateRadius
+            pushPlateStl outerSleeveMDR extensionFaceBuilder extensionHeight plateRadius
+            
       Nothing                                ->
         putStrLn "File not decoded"
 
@@ -56,10 +60,10 @@ loadMDRAndPassToProcessor = do
                      ||  ||   
                     |||  |||  riser
               |||||||||||||||||||  innerHose riserBase outsideScrews
-
+This will be re-written in hoseAttachmentWithDegrees
 -}
-hoseAttachment :: PlateRadius -> IO ()
-hoseAttachment    plateRadius =
+hoseAttachment :: IO ()
+hoseAttachment     =
   let wallThickness = 3
       hoseInnerRadius = Radius 7.5
       hoseThickness = wallThickness
@@ -110,6 +114,16 @@ hoseAttachment    plateRadius =
       --putStrLn "temp"
       writeStlToFile cubesStl
         
+{- =============================================== hose attachement with degrees ======================================
+Re-write hose attachment for:
+-Use the new CornerPointsWithDegrees system, including the Builder that goes with it.
+-Make 4 support support spokes around the riser, instead of a single flared support, as it should print better.
+-}
+hoseAttachmentWithDegrees :: IO ()
+hoseAttachmentWithDegrees = putStrLn "on hold till a CornerPoints.Data.Sequence is built."
+  
+     
+
 {-
 
 
