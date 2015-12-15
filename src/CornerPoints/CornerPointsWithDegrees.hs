@@ -25,19 +25,8 @@ Eg: The first cube that goes from 0 to 10 degrees will have start degree = 0 end
 --type Degree = Double
 
 -- ToDo: Add in the rest of the faces.
-{-
-data CornerPointsWithDegrees =
-    CubesWithStartEndDegrees {_cube::CornerPoints, _startDeg::Double, _endDeg::Double}
-  | FrontFaceWithStartEndDegrees {_frontFace::CornerPoints, _startDeg::Double, _endDeg::Double}
-  | BackFaceWithStartEndDegrees {_backFace::CornerPoints, _startDeg::Double, _endDeg::Double}
-  | LeftFaceWithDegrees {_leftFace::CornerPoints, _degree::Double}
-  | RightFaceWithDegrees {_rightFace::CornerPoints, _degree::Double}
-  | BottomFacesWithDegrees {_bottomFace::CornerPoints, startDeg::Double, _endDeg::Double}
-  | TopFacesWithDegrees {_topFace::CornerPoints, startDeg::Double, _endDeg::Double}
-  deriving(Show, Eq)
--}
 --ToDo: remove the 's' from Bottom/TopFaces & CubesWith
---ToDo: Make an instance of Monad, and try building shapes with Monad.
+
 data CornerPointsWithDegrees =
     CubesWithStartEndDegrees {_cube::CornerPoints, _degreeRange::DegreeRange}
   | FrontFaceWithStartEndDegrees {_frontFace::CornerPoints, _degreeRange::DegreeRange}
