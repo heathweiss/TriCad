@@ -22,8 +22,10 @@ library
                    CornerPoints.VerticalFaces, CornerPoints.HorizontalFaces,
                    CornerPoints.Radius, CornerPoints.CornerPointsWithDegrees,
                    CornerPoints.FaceExtractionWithDegrees, CornerPoints.VerticalFacesWithDegrees,
-                   CornerPoints.FaceConversionsWithDegrees, CornerPoints.Builder,
-                   CornerPoints.Degree,
+                   CornerPoints.FaceConversionsWithDegrees,
+                   CornerPoints.Degree, 
+                   --Builder
+                   Builder.Sequence,  Builder.Builder,
                    --math
                    Math.Trigonometry,
                    --stl
@@ -35,7 +37,7 @@ library
                    Tests.MathTest, Tests.MathPolarTest, Tests.HorizontalFacesTest,
                    Tests.JsonTest, Tests.ListHelpersTest, Tests.RadiusTest,
                    Tests.VerticalFacesTest, Tests.ParseJuicyTest, Tests.ScanFilterTest,
-                   Tests.CornerPointsWithDegreesTest, Tests.CornerPointsBuilderTest,
+                   Tests.CornerPointsWithDegreesTest, Tests.BuilderTest,
                    --Examples
                    -- Example ShoeLifts
                    Examples.ShoeLift.KeenToe, Examples.ShoeLift.KeenHeel,

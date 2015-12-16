@@ -10,7 +10,7 @@ import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftF
                                   createHorizontallyAlignedCubesNoSlope, createHorizontallyAlignedCubes)
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), (|@+++#@|))
-import  CornerPoints.Builder(CornerPointsBuilder(..),(&+++#@))
+import Builder.Builder(CornerPointsBuilder(..),(&+++#@))
 import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope, Angle(..))
 import Stl.StlCornerPoints((|+++^|), (||+++^||), Faces(..))
 import Stl.StlBase (StlShape(..), newStlShape)

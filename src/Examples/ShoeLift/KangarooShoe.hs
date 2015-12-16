@@ -12,7 +12,7 @@ import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
 import CornerPoints.CornerPoints((|@+++#@|), (|+++|))
 import CornerPoints.Transpose(transposeZ)
-import CornerPoints.Builder(processCornerPointsWithDegreesAndStl, FacesWithRange(..), (&@~+++@), (&@~+++#@), (|||@~+++^|||),
+import Builder.Builder(processCornerPointsWithDegreesAndStl, FacesWithRange(..), (&@~+++@), (&@~+++#@), (|||@~+++^|||),
                            newCornerPointsWith10DegreesBuilder)
 import CornerPoints.FaceExtraction(extractTopFace, extractBottomFace)
 import Primitives.Cylindrical(cylinderSolidNoSlopeSquaredOff, cylinderWallsNoSlope, cylinderWallsVariableRadiusNoSlope)
