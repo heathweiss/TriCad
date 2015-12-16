@@ -4,21 +4,21 @@ import CornerPoints.HorizontalFaces(createBottomFaces, createTopFaces)
 import CornerPoints.Points(Point(..))
 import CornerPoints.Create(Angle(..), flatXSlope, flatYSlope, Slope(..))
 import Test.HUnit
-import CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (@~+++#@),(@~+++@),(|@~+++@|), (|@~+++#@|),
-                                            DegreeRange(..))
+import CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (@~+++#@),(@~+++@),(|@~+++@|), (|@~+++#@|), DegreeRange(..))
 import Control.Lens
 import Stl.StlCornerPoints((|+++^|), (||+++^||), Faces(..))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
 import CornerPoints.CornerPoints((|@+++#@|), (|+++|))
 import CornerPoints.Transpose(transposeZ)
-import Builder.Builder(processCornerPointsWithDegreesAndStl, FacesWithRange(..), (&@~+++@), (&@~+++#@), (||@~+++^||),
-                           newCornerPointsWith10DegreesBuilder)
+
 import CornerPoints.FaceExtraction(extractTopFace, extractBottomFace)
 import Primitives.Cylindrical(cylinderSolidNoSlopeSquaredOff, cylinderWallsNoSlope, cylinderWallsVariableRadiusNoSlope)
 import CornerPoints.FaceConversions(upperFaceFromLowerFace )
 import CornerPoints.Degree(Degree(..))
 import CornerPoints.Transposable(transpose)
+import Builder.Builder(FacesWithRange(..))
+import Builder.List((&@~+++@), (&@~+++#@), (||@~+++^||), newCornerPointsWith10DegreesBuilder)
 
 --make signatures more readable
 type Thickness = Double

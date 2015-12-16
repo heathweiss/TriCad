@@ -25,7 +25,7 @@ library
                    CornerPoints.FaceConversionsWithDegrees,
                    CornerPoints.Degree, 
                    --Builder
-                   Builder.Sequence,  Builder.Builder,
+                   Builder.Sequence,  Builder.Builder, Builder.List
                    --math
                    Math.Trigonometry,
                    --stl
@@ -78,6 +78,7 @@ library
                      , parallel >= 3.2.0.6
                      , containers >= 0.5.5.1
                      , lens >= 4.13
+                     , containers >=0.5.5.1
                      
   hs-source-dirs:  src    
   default-language:    Haskell2010
