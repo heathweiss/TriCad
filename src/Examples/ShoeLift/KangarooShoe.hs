@@ -201,7 +201,7 @@ heelOfShoeRadius = buildSymmetricalRadius
 
 heelOfShoeTriangles =         (
                                ( newCornerPointsWith10DegreesBuilder $
-                                    (createTopFaces (Point 0 0 15) heelOfShoeRadius angles flatXSlope (NegYSlope 20))
+                                    (createTopFaces (Point 0 0 10) heelOfShoeRadius angles flatXSlope (NegYSlope 15))
                                     |+++|
                                     (createBottomFaces (Point 0 0 0) heelOfShoeRadius angles flatXSlope flatYSlope)
                                )
@@ -262,7 +262,7 @@ heelOfTreadTriangles  =
           ((transposeZ(+5)). upperFaceFromLowerFace)
        )
       &@~+++@
-     ((map (extractTopFace) $ cylinderSolidNoSlopeSquaredOff (Radius 25) (Point 0 (-10) 15) angles 0 4) )
+     ((map (extractTopFace) $ cylinderSolidNoSlopeSquaredOff (Radius 25) (Point 0 (-7) 10) angles 0 4) )
      &@~+++#@
      (transposeZ(+5) . extractTopFace)
     )
