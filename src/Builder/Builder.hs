@@ -1,4 +1,4 @@
-module Builder.Builder(CornerPointsBuilder(..),(&+++#@), (@~+++^), (|@~?+++^|), FacesWithRange(..), (&@~+++@),(&@~+++#@), (|||@~+++^|||),
+module Builder.Builder(CornerPointsBuilder(..),(&+++#@), (@~+++^), (|@~?+++^|), FacesWithRange(..), (&@~+++@),(&@~+++#@), (||@~+++^||),
                            processCornerPointsWithDegreesAndStl, newCornerPointsWith10DegreesBuilder) where
 import CornerPoints.CornerPoints(CornerPoints(..))
 import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), cubeIsWithinDegreeRange, (@~+++#@), (|@~+++#@|), (|@~+++@|),
@@ -68,8 +68,8 @@ processCornerPointsWithDegreesAndStl cornerPointsList facesWithRangeList =
   concat $ facesWithRangeList  ||@~?+++^|| cornerPointsList
 
 {- | Process a shape made up of [[CornerPointsWithDegrees]] into stl [Triangle]'s for output to stl file. -}
-(|||@~+++^|||) :: [[CornerPointsWithDegrees]] -> [[FacesWithRange]] -> [Triangle]
-cornerPointsWithDegreesList |||@~+++^||| facesWithRangeList = concat $
+(||@~+++^||) :: [[CornerPointsWithDegrees]] -> [[FacesWithRange]] -> [Triangle]
+cornerPointsWithDegreesList ||@~+++^|| facesWithRangeList = concat $
   zipWith processCornerPointsWithDegreesAndStl cornerPointsWithDegreesList facesWithRangeList
 
 {- |

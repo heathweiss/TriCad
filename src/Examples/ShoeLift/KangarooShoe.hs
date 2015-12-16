@@ -12,7 +12,7 @@ import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
 import CornerPoints.CornerPoints((|@+++#@|), (|+++|))
 import CornerPoints.Transpose(transposeZ)
-import Builder.Builder(processCornerPointsWithDegreesAndStl, FacesWithRange(..), (&@~+++@), (&@~+++#@), (|||@~+++^|||),
+import Builder.Builder(processCornerPointsWithDegreesAndStl, FacesWithRange(..), (&@~+++@), (&@~+++#@), (||@~+++^||),
                            newCornerPointsWith10DegreesBuilder)
 import CornerPoints.FaceExtraction(extractTopFace, extractBottomFace)
 import Primitives.Cylindrical(cylinderSolidNoSlopeSquaredOff, cylinderWallsNoSlope, cylinderWallsVariableRadiusNoSlope)
@@ -126,7 +126,7 @@ toeOfShoeTriangles =
   &@~+++#@
   ((transposeZ (+5))  . extractTopFace) --tread of the shoe
  )
- |||@~+++^|||
+ ||@~+++^||
  [ [(FacesWithRange FacesFrontTop (DegreeRange 0 360))],   --riser meets shoe
    [(FacesWithRange FaceFront (DegreeRange 0 360))],       --riser to shoe converstion
    [(FacesWithRange FacesBottomFront (DegreeRange 0 360))] --original lift
@@ -157,7 +157,7 @@ toeWireCoverTriangles =
   &@~+++@
   (map (extractTopFace) (cylinderWallsVariableRadiusNoSlope toeWireCoverShoeRadius (1.0::Thickness)  (Point 0 0 5) angles (13::Height)))
  )
- |||@~+++^|||
+ ||@~+++^||
  [ [(FacesWithRange FacesBackFrontTop (DegreeRange 0 80)),       --
     (FacesWithRange FacesBackFrontLeftTop (DegreeRange 80 90)),     --
     (FacesWithRange FacesBackFrontRightTop (DegreeRange 270 280)),  --
@@ -212,7 +212,7 @@ heelOfShoeTriangles =         (
                                 &@~+++#@
                                 (transposeZ(+(-10)) . extractBottomFace)
                               )
-                              |||@~+++^|||
+                              ||@~+++^||
                               {-[CubesWithDegrees] is made from bottom up, so align [FacesWithRange] same way.-}
                               [  [ (FacesWithRange FacesBottomFront (DegreeRange 0 360))],
                                  [ (FacesWithRange FaceFront (DegreeRange 0 360))],
@@ -266,7 +266,7 @@ heelOfTreadTriangles  =
      &@~+++#@
      (transposeZ(+5) . extractTopFace)
     )
-    |||@~+++^|||
+    ||@~+++^||
     [ [ (FacesWithRange FacesFrontTop (DegreeRange 0 360))],
       [ (FacesWithRange FaceFront (DegreeRange 0 360))],
       [ (FacesWithRange FacesBottomFront (DegreeRange 0 360))]
