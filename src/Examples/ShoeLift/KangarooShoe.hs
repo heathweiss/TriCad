@@ -205,19 +205,21 @@ heelOfShoeTriangles =         (
                                     |+++|
                                     (createBottomFaces (Point 0 0 0) heelOfShoeRadius angles flatXSlope flatYSlope)
                                )
+                                
                                 &@~+++#@
                                 ((transposeZ(+(-5))).extractBottomFace)
                                 &@~+++@
                                 ((map (extractBottomFace) $ cylinderSolidNoSlopeSquaredOff (Radius 25) (Point 0 0 (-10)) angles 0 4) )
                                 &@~+++#@
                                 (transposeZ(+(-10)) . extractBottomFace)
+                                
                               )
                               ||@~+++^||
                               {-[CubesWithDegrees] is made from bottom up, so align [FacesWithRange] same way.-}
                               [  [ (FacesWithRange FacesBottomFront (DegreeRange 0 360))],
                                  [ (FacesWithRange FaceFront (DegreeRange 0 360))],
-                                 [ (FacesWithRange FaceFront (DegreeRange 0 360))],
-                                 [ (FacesWithRange FacesFrontTop    (DegreeRange 0 360))]
+                                 [ (FacesWithRange FacesFrontTop (DegreeRange 0 360))]{-,
+                                 [ (FacesWithRange FacesFrontTop    (DegreeRange 0 360))]-}
                               ]
 
 

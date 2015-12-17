@@ -1,6 +1,6 @@
 {- |Build up a shape using lists. Should be deleted once Builder.Sequence is done?-}
 module Builder.List((&@~+++@), (&@~+++#@), (||@~+++^||), newCornerPointsWith10DegreesBuilder) where
-import Builder.Builder(FacesWithRange(..), (||@~?+++^||))
+import Builder.Builder(FacesWithRange(..), (||@~?+++^||), processCornerPointsWithDegreesAndStl)
 import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), cubeIsWithinDegreeRange, (@~+++#@), (|@~+++#@|), (|@~+++@|),
                                            newCornerPointsWith10DegreesList)
 import CornerPoints.CornerPoints(CornerPoints(..))
@@ -18,10 +18,7 @@ cornerPointsWithDegreesListList &@~+++#@ f =
   ((head cornerPointsWithDegreesListList ) |@~+++#@| f)  : cornerPointsWithDegreesListList
 
 
-{- Process a [CornerPointsWithDegrees] into stl [Triangle]'s. Usally used via (||@~+++^||) to process an entire shape. -}
-processCornerPointsWithDegreesAndStl ::  [CornerPointsWithDegrees] -> [FacesWithRange] -> [Triangle]
-processCornerPointsWithDegreesAndStl cornerPointsList facesWithRangeList =
-  concat $ facesWithRangeList  ||@~?+++^|| cornerPointsList
+
 
 {- | Process a shape made up of [[CornerPointsWithDegrees]] into stl [Triangle]'s for output to stl file. -}
 (||@~+++^||) :: [[CornerPointsWithDegrees]] -> [[FacesWithRange]] -> [Triangle]
