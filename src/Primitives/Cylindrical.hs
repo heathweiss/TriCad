@@ -11,7 +11,9 @@ module Primitives.Cylindrical(cylinderWallsNoSlope,cylinderWallsNoSlopeSquaredOf
   cylinderSolidNoSlopeSquaredOff,
   cylinderSolidNoSlopeLengthenY,
   cylinderSolidNoSlopeSquaredOffLengthenY,
-  cylinderWallsNoSlopeSquaredOffLengthenY,) where
+  cylinderWallsNoSlopeSquaredOffLengthenY,
+  cylinderWallsVariableThicknessSloped,
+  cylinderWallsVariableThicknessNoSlope,) where
 
 import CornerPoints.Create(slopeAdjustedForVerticalAngle, Slope(..), Angle(..), flatXSlope, flatYSlope, Origin(..))
 import CornerPoints.HorizontalFaces(createTopFaces, createBottomFaces, createTopFacesWithVariableSlope, createTopFaces,createBottomFacesSquaredOff,
@@ -29,6 +31,41 @@ type Thickness = Double
 type Height = Double
 type Power = Double
 type LengthenFactor = Double
+
+{- |
+Create a no slope walled cylinder with different inner and outer radius.
+-}
+cylinderWallsVariableThicknessNoSlope :: [Radius] -> [Radius] -> [Angle] -> Height -> [CornerPoints]
+cylinderWallsVariableThicknessNoSlope    innerRadii  outerRadii  angles     height  =
+   ((--bottom faces
+      (map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces (Point 0 0 0) innerRadii angles flatXSlope flatYSlope)) --backFaces =
+      |+++|
+      (map (extractBottomFrontLine) (createBottomFaces (Point 0 0 0) outerRadii angles flatXSlope flatYSlope)) -- frontFaces =
+    )
+    |@+++#@|
+    ((transposeZ (+ height)) . upperFaceFromLowerFace)
+   )
+   {-
+   |+++|
+
+   (  --top Sloped faces
+     (map extractBackTopLine (createTopFaces (Point 0 0 slopeHeight) innerRadii angles xSlope ySlope))
+     |+++|
+     (map extractFrontTopLine (createTopFaces (Point 0 0 slopeHeight) outerRadii angles xSlope ySlope))
+   )
+   -}
+
+cylinderWallsVariableThicknessSloped :: [Radius] -> [Radius] -> [Angle] ->  Slope -> Slope -> Height -> [CornerPoints]
+cylinderWallsVariableThicknessSloped    innerRadii  outerRadii  angles      xSlope   ySlope   height  =
+  (  --top Sloped faces
+    (map (backTopLineFromFrontTopLine . extractFrontTopLine) (createTopFaces (Point 0 0 height) innerRadii angles xSlope ySlope))
+    |+++|
+    (map extractFrontTopLine (createTopFaces (Point 0 0 height) outerRadii angles xSlope ySlope))
+  )
+  |+++|
+  ( map extractBottomFace
+    (cylinderWallsVariableThicknessNoSlope innerRadii outerRadii angles (0::Height)  )
+  )
 
 {- |Create a cylindrical wall, based on a single radius.
 It is a convenience wrapper around cylinderWallsVariableRadiusNoSlope.-}

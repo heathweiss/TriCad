@@ -10,15 +10,17 @@ import Stl.StlCornerPoints((|+++^|), (||+++^||), Faces(..))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
 import CornerPoints.CornerPoints((|@+++#@|), (|+++|))
-import CornerPoints.Transpose(transposeZ)
+import CornerPoints.Transpose(transposeZ, transposeY)
 
-import CornerPoints.FaceExtraction(extractTopFace, extractBottomFace)
-import Primitives.Cylindrical(cylinderSolidNoSlopeSquaredOff, cylinderWallsNoSlope, cylinderWallsVariableRadiusNoSlope)
-import CornerPoints.FaceConversions(upperFaceFromLowerFace )
+import CornerPoints.FaceExtraction(extractTopFace, extractBottomFace, extractFrontFace)
+import Primitives.Cylindrical(cylinderSolidNoSlopeSquaredOff, cylinderWallsNoSlope, cylinderWallsVariableRadiusNoSlope,
+                              cylinderWallsVariableThicknessNoSlope, cylinderWallsVariableThicknessSloped)
+import CornerPoints.FaceConversions(upperFaceFromLowerFace, backFaceFromFrontFace )
 import CornerPoints.Degree(Degree(..))
 import CornerPoints.Transposable(transpose)
 import Builder.Builder(FacesWithRange(..))
 import Builder.List((&@~+++@), (&@~+++#@), (||@~+++^||), newCornerPointsWith10DegreesBuilder)
+import qualified Builder.Sequence as S (newCornerPointsWith10DegreesBuilder, (||@~+++^||), (@~+++#@|>), (@~+++@|>))
 
 --make signatures more readable
 type Thickness = Double
@@ -172,6 +174,118 @@ toeWireCoverTriangles =
 
 writeToeWireCover = writeStlToFile $ newStlShape "kangaroo toe wire cover" toeWireCoverTriangles
 
+-- ============================================== ankle brace ===========================================
+braceRadius = buildSymmetricalRadius
+  [ 35.7,--0
+    35.2,--10
+    35.2,--20
+    33.2,--30
+    32.4,--40
+    31.8,--50
+    32.2,--60
+    32.4,--70
+    33.5,--80
+    35.0,--90
+    37.3,--100
+    40.9,--110
+    44.8,--120
+    48.7,--130
+    --beyond here will not be printed
+    50.0,--140
+    50.0,--150
+    50.0,--160
+    50.0--170
+  ]
+  50.0 --180
+
+--The heelWireCoverOuterRadius + 3mm,  which will be the riser from heel to top brace
+ankleBraceRiserOuterRadius = map (transpose (+3)) heelWireCoverOuterRadius
+
+ankleBraceCubes =
+  --the wrapper around the ankle
+  ( S.newCornerPointsWith10DegreesBuilder $
+    cylinderWallsVariableRadiusNoSlope braceRadius (3::Thickness) (Point 0 0 70) angles (30::Height)                                 
+  )
+  S.@~+++@|>
+  --down to the top of the heel wire cover 
+  --(map ((transposeY (+(-20))) . extractBottomFace) (cylinderWallsVariableThicknessSloped heelOfShoeRadius heelWireCoverOuterRadius angles flatXSlope (NegYSlope 15)  (30::Height)))
+  (map ((transposeY (+(-20))) . extractBottomFace) (cylinderWallsVariableThicknessNoSlope heelWireCoverOuterRadius ankleBraceRiserOuterRadius angles (53::Height)))
+  --down to the bottom of the heel wire cover
+  S.@~+++#@|>
+  ( (transposeZ (+(-40))) .extractBottomFace )
+
+ancleBraceTriangles =
+  ankleBraceCubes
+  S.||@~+++^||
+  [ --ankle wrapper
+    [(FacesWithRange FacesBackFrontTop (DegreeRange 0 20)),
+    (FacesWithRange FacesBackBottomFrontTop (DegreeRange 20 120)),
+    (FacesWithRange FacesBackBottomFrontLeftTop (DegreeRange 120 130)),
+    (FacesWithRange FacesBackBottomFrontRightTop (DegreeRange 230 240)),
+    (FacesWithRange FacesBackBottomFrontTop (DegreeRange 240 340)),
+    (FacesWithRange  FacesBackFrontTop (DegreeRange 340 360))
+   ],
+    --riser between heel and wrapper
+   [ (FacesWithRange FacesBackFront (DegreeRange 0 10)),
+      (FacesWithRange FacesBackFrontLeft (DegreeRange 10 20)),
+      (FacesWithRange FacesBackFrontRight (DegreeRange 340 350)),
+      (FacesWithRange FacesBackFront (DegreeRange 350 360))
+   ],
+   --wire cover
+   [ (FacesWithRange FacesBackBottomFront (DegreeRange 0 10)),
+      (FacesWithRange FacesBackBottomFrontLeft (DegreeRange 10 20)),
+      (FacesWithRange FacesBackBottomFrontRight (DegreeRange 340 350)),
+      (FacesWithRange FacesBackBottomFront (DegreeRange 350 360))
+    ]
+  ]
+
+writeAnkleBrace = writeStlToFile $ newStlShape "kangaroo heel ankle brace" ancleBraceTriangles
+
+
+{- ====================================== heel of shoe wire cover===========================================
+A wrapper to cover the wire where riser meets shoe, and provide extra vertical glue area.
+Has the back modified for attachment to the ankle brace.-}
+
+heelWireCoverOuterRadius =
+  let transposeBy =
+        concat
+        [ [(+2) | x <- [0,1,2]],
+          [(+1) | x <- [3..33]],
+          [(+2) | x <- [34,35,36]]
+        ]
+  in  zipWith transpose  transposeBy  heelOfShoeRadius
+{-  
+backFaces = map (backFaceFromFrontFace . extractFrontFace) (createBottomFaces (Point 0 0 0) heelOfShoeRadius angles flatXSlope flatYSlope)
+frontFaces =  map (extractFrontFace) (createBottomFaces (Point 0 0 0) heelOfShoeRadius angles flatXSlope flatYSlope)
+btmFaces = backFaces |+++| frontFaces  
+-}
+
+heelWireCoverCubes =
+  (S.newCornerPointsWith10DegreesBuilder $
+    cylinderWallsVariableThicknessNoSlope heelOfShoeRadius heelWireCoverOuterRadius angles (5::Height)
+  )
+  S.@~+++@|>
+  (map extractTopFace (cylinderWallsVariableThicknessSloped heelOfShoeRadius heelWireCoverOuterRadius angles flatXSlope (NegYSlope 15)  (30::Height)))
+  
+
+heelWireCoverTriangles =
+  heelWireCoverCubes
+  S.||@~+++^||
+  [ [ (FacesWithRange FacesBackBottomFront (DegreeRange 0 130)),
+      (FacesWithRange FacesBackBottomFrontLeft (DegreeRange 130 140)),
+      (FacesWithRange FacesNada (DegreeRange 140 220)),
+      (FacesWithRange FacesBackBottomFrontRight (DegreeRange 220 230)),
+      (FacesWithRange FacesBackBottomFront (DegreeRange 230 360))
+    ],
+    [ (FacesWithRange FacesBackFrontTop (DegreeRange 0 130)),
+      (FacesWithRange FacesBackFrontLeftTop (DegreeRange 130 140)),
+      (FacesWithRange FacesNada (DegreeRange 140 220)),
+      (FacesWithRange FacesBackFrontRightTop (DegreeRange 220 230)),
+      (FacesWithRange FacesBackFrontTop (DegreeRange 230 360))
+    ]
+  ]
+
+writeHeelWireCover = writeStlToFile $ newStlShape "kangaroo heel wire cover" heelWireCoverTriangles
 -- ===================================================== heel of shoe =====================================================
 {-The top is the shape of the heel of the shoe.
 The bottom is a standard riser shape of squaredOff Radius 20 ^4-}
@@ -225,9 +339,6 @@ heelOfShoeTriangles =         (
 
 writeHeelToShoe = writeStlToFile $ newStlShape "kangaroo heel to shoe" heelOfShoeTriangles
 
-{- ====================================== heel of shoe wire cover===========================================
-A wrapper to cover the wire where riser meets shoe, and provide extra vertical glue area.
-Perhaps this should be combined with the ankle brace.-}
 
 
 -- =================================================== heel tread ===========================================

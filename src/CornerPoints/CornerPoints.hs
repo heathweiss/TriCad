@@ -319,7 +319,7 @@ data CornerPointsBuilder  = CornerPointsBuilder {getCornerPoints :: [[CornerPoin
 (&+++#@) :: CornerPointsBuilder -> ([CornerPoints] -> [CornerPoints]) -> CornerPointsBuilder
 (CornerPointsBuilder cornerPoints) &+++#@ f = CornerPointsBuilder ( (f $ head cornerPoints) : cornerPoints)
 
--- |Do a scanl on a list of cornerponts, using +++.
+-- |Add each face to the next face, left -> right, resulting in CubePoints.
 -- Ex: pass a RightFace into a list of LeftFaces, resulting in a list of CubePoints
 (+++>) :: CornerPoints -> [CornerPoints] -> [CornerPoints]
 a +++> bs =

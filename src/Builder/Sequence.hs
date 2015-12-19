@@ -1,5 +1,5 @@
 {-# LANGUAGE ViewPatterns #-}
-module Builder.Sequence where
+module Builder.Sequence(newCornerPointsWith10DegreesBuilder, (||@~+++^||), (@~+++#@|>), (@~+++@|>)) where
 import Builder.Builder(FacesWithRange(..), (||@~?+++^||), processCornerPointsWithDegreesAndStl)
 import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), cubeIsWithinDegreeRange, (@~+++#@), (|@~+++#@|), (|@~+++@|),
                                            newCornerPointsWith10DegreesList)
