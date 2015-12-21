@@ -4,7 +4,8 @@
      That is to say that all the CornerPoints have Degree information attached to them.
      The purpose is to make it much cleaner to create stl from CornerPoints.-}
 module CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (+++~), (+++~>), (|+++~|), (@~+++#@),(@~+++@),(|@~+++@|), (|@~+++#@|),
-                                            cubeIsWithinDegreeRange, DegreeRange(..), newCornerPointsWithDegrees, newCornerPointsWith10DegreesList) where
+                                            cubeIsWithinDegreeRange, DegreeRange(..), newCornerPointsWithDegrees, newCornerPointsWith10DegreesList,
+                                            newCornerPointsWith5DegreesList) where
 
 
 import CornerPoints.CornerPoints(CornerPoints(..),(@+++#@),(+++), (+++>))
@@ -41,14 +42,14 @@ data DegreeRange = DegreeRange {_startDegree::Degree, _endDegree::Degree}
      deriving(Show, Eq)
 
 {- |Instantiate a new CornerPointsWithDegrees based on CornerPoints constructor, and a start and end degree.
-Constructors such as LeftFace only require a single degree. Use the fst (start,end).-}
+Constructors such as LeftFace only require a single degree. Use the fst (start,end).
+This is used as a base for functions that set the degree intervals, such as every 10 degrees.-}
 -- ToDo: Finish pattern matching for all other CornerPoints constructors.
 newCornerPointsWithDegrees :: CornerPoints -> (Degree, Degree) -> CornerPointsWithDegrees
 newCornerPointsWithDegrees (TopFace b2 f2 b3 f3 ) (start,end) = TopFacesWithDegrees (TopFace b2 f2 b3 f3 ) (DegreeRange start end)
 newCornerPointsWithDegrees (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) (start,end) = CubesWithStartEndDegrees  (CubePoints f1 f2 f3 f4 b1 b2 b3 b4) (DegreeRange start end)
 
-{- |Used to instantiate a new [CornerPointsWithDegrees] for a full 360 deg shape starting at 0.-}
-
+{- |Used to instantiate a new [CornerPointsWithDegrees] for a full 360 deg shape starting at 0 to 360 degrees at 10 degree intervals..-}
 newCornerPointsWith10DegreesList :: [CornerPoints] -> [CornerPointsWithDegrees] 
 newCornerPointsWith10DegreesList cornerPointsList =
   let
@@ -56,6 +57,17 @@ newCornerPointsWith10DegreesList cornerPointsList =
     degrees360Tuples = zipWith (,) [0,10..350] [10,20..360]
   in
    (zipWith newCornerPointsWithDegrees cornerPointsList  degrees360Tuples)
+
+{- |Used to instantiate a new [CornerPointsWithDegrees] for a full 360 deg shape starting at 0 to 360 degrees at 5 degree intervals..-}
+newCornerPointsWith5DegreesList :: [CornerPoints] -> [CornerPointsWithDegrees] 
+newCornerPointsWith5DegreesList cornerPointsList =
+  let
+    degrees360Tuples :: [(Degree, Degree)]
+    degrees360Tuples = zipWith (,) [0,5..350] [5,10..360]
+  in
+   (zipWith newCornerPointsWithDegrees cornerPointsList  degrees360Tuples)
+
+   
 
 {- |Filter a list of CornerPointsWithDegrees to get only those within a given degree range. -}
 cubeIsWithinDegreeRange :: DegreeRange -> [CornerPointsWithDegrees] -> [CornerPointsWithDegrees]

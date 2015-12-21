@@ -209,7 +209,7 @@ ankleBraceCubes =
   S.@~+++@|>
   --down to the top of the heel wire cover 
   --(map ((transposeY (+(-20))) . extractBottomFace) (cylinderWallsVariableThicknessSloped heelOfShoeRadius heelWireCoverOuterRadius angles flatXSlope (NegYSlope 15)  (30::Height)))
-  (map ((transposeY (+(-20))) . extractBottomFace) (cylinderWallsVariableThicknessNoSlope heelWireCoverOuterRadius ankleBraceRiserOuterRadius angles (53::Height)))
+  (map ((transposeY (+(-20))) . extractBottomFace) (cylinderWallsVariableThicknessNoSlope heelWireCoverOuterRadius ankleBraceRiserOuterRadius angles (Point 0 0 0) (53::Height)))
   --down to the bottom of the heel wire cover
   S.@~+++#@|>
   ( (transposeZ (+(-40))) .extractBottomFace )
@@ -262,10 +262,10 @@ btmFaces = backFaces |+++| frontFaces
 
 heelWireCoverCubes =
   (S.newCornerPointsWith10DegreesBuilder $
-    cylinderWallsVariableThicknessNoSlope heelOfShoeRadius heelWireCoverOuterRadius angles (5::Height)
+    cylinderWallsVariableThicknessNoSlope heelOfShoeRadius heelWireCoverOuterRadius angles (Point 0 0 0) (5::Height)
   )
   S.@~+++@|>
-  (map extractTopFace (cylinderWallsVariableThicknessSloped heelOfShoeRadius heelWireCoverOuterRadius angles flatXSlope (NegYSlope 15)  (30::Height)))
+  (map extractTopFace (cylinderWallsVariableThicknessSloped heelOfShoeRadius heelWireCoverOuterRadius angles (Point 0 0 0) flatXSlope (NegYSlope 15)  (30::Height)))
   
 
 heelWireCoverTriangles =

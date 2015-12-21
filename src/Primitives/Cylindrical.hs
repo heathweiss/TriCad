@@ -1,3 +1,4 @@
+{-# LANGUAGE ParallelListComp #-}
 {---------------- intro -----------------------------
 Supplies basic cylindrical shapes as cad building blocks.
 Includes:
@@ -33,38 +34,50 @@ type Power = Double
 type LengthenFactor = Double
 
 {- |
+Create a solid cylinder with
+-variable Radius
+-variable Slope top
+-flat bottom
+-}
+cylinderSolidVariableRadiusVariableSlope :: [Radius] -> Origin -> [Angle] -> [Slope] -> [Slope] -> Height -> [CornerPoints]
+cylinderSolidVariableRadiusVariableSlope    radii       origin     angles     xSlopes    ySlopes    height  =
+  --top faces
+  (
+   createTopFacesWithVariableSlope (transposeZ (+ height) origin ) radii angles xSlopes ySlopes
+   
+  )
+  |+++|
+  --bottom faces
+  (
+    createBottomFaces origin radii  angles flatXSlope flatYSlope 
+   
+  )
+
+{- |
 Create a no slope walled cylinder with different inner and outer radius.
 -}
-cylinderWallsVariableThicknessNoSlope :: [Radius] -> [Radius] -> [Angle] -> Height -> [CornerPoints]
-cylinderWallsVariableThicknessNoSlope    innerRadii  outerRadii  angles     height  =
+cylinderWallsVariableThicknessNoSlope :: [Radius] -> [Radius] -> [Angle] -> Origin -> Height -> [CornerPoints]
+cylinderWallsVariableThicknessNoSlope    innerRadii  outerRadii  angles     origin    height  =
    ((--bottom faces
-      (map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces (Point 0 0 0) innerRadii angles flatXSlope flatYSlope)) --backFaces =
+      (map (backBottomLineFromBottomFrontLine . extractBottomFrontLine) (createBottomFaces {-(Point 0 0 0)-}origin innerRadii angles flatXSlope flatYSlope)) 
       |+++|
-      (map (extractBottomFrontLine) (createBottomFaces (Point 0 0 0) outerRadii angles flatXSlope flatYSlope)) -- frontFaces =
+      (map (extractBottomFrontLine) (createBottomFaces {-(Point 0 0 0)-}origin outerRadii angles flatXSlope flatYSlope)) 
     )
     |@+++#@|
     ((transposeZ (+ height)) . upperFaceFromLowerFace)
    )
-   {-
-   |+++|
+   
 
-   (  --top Sloped faces
-     (map extractBackTopLine (createTopFaces (Point 0 0 slopeHeight) innerRadii angles xSlope ySlope))
-     |+++|
-     (map extractFrontTopLine (createTopFaces (Point 0 0 slopeHeight) outerRadii angles xSlope ySlope))
-   )
-   -}
-
-cylinderWallsVariableThicknessSloped :: [Radius] -> [Radius] -> [Angle] ->  Slope -> Slope -> Height -> [CornerPoints]
-cylinderWallsVariableThicknessSloped    innerRadii  outerRadii  angles      xSlope   ySlope   height  =
+cylinderWallsVariableThicknessSloped :: [Radius] -> [Radius] -> [Angle] -> Origin -> Slope -> Slope -> Height -> [CornerPoints]
+cylinderWallsVariableThicknessSloped    innerRadii  outerRadii  angles     origin      xSlope   ySlope   height  =
   (  --top Sloped faces
-    (map (backTopLineFromFrontTopLine . extractFrontTopLine) (createTopFaces (Point 0 0 height) innerRadii angles xSlope ySlope))
+    (map (backTopLineFromFrontTopLine . extractFrontTopLine) (createTopFaces {-(Point 0 0 height)-}origin innerRadii angles xSlope ySlope))
     |+++|
-    (map extractFrontTopLine (createTopFaces (Point 0 0 height) outerRadii angles xSlope ySlope))
+    (map extractFrontTopLine (createTopFaces {-(Point 0 0 height)-}origin outerRadii angles xSlope ySlope))
   )
   |+++|
   ( map extractBottomFace
-    (cylinderWallsVariableThicknessNoSlope innerRadii outerRadii angles (0::Height)  )
+    (cylinderWallsVariableThicknessNoSlope innerRadii outerRadii angles origin (0::Height)  )
   )
 
 {- |Create a cylindrical wall, based on a single radius.

@@ -2,7 +2,7 @@
 module Builder.Sequence(newCornerPointsWith10DegreesBuilder, (||@~+++^||), (@~+++#@|>), (@~+++@|>)) where
 import Builder.Builder(FacesWithRange(..), (||@~?+++^||), processCornerPointsWithDegreesAndStl)
 import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), cubeIsWithinDegreeRange, (@~+++#@), (|@~+++#@|), (|@~+++@|),
-                                           newCornerPointsWith10DegreesList)
+                                           newCornerPointsWith10DegreesList, newCornerPointsWith5DegreesList)
 import CornerPoints.CornerPoints(CornerPoints(..))
 import Stl.StlBase(Triangle(..))
 import Stl.StlCornerPoints((+++^), Faces(..))
@@ -47,8 +47,20 @@ Each layer of a stl shape is made up of [CornerPointsWithDegrees].
 This Builder allows these layer to be built up, by adding another top/bottome face to the top of the
 Builder list.
 
-The 10 indicates it is based on a 10 degree spread of the radial shape.
+The 10 indicates it is based on a 10 degree interval of the radial shape.
 Eg: A scan that is taken at 10 degree intervals such as 0,10..360
 -}
 newCornerPointsWith10DegreesBuilder :: [CornerPoints] -> (S.Seq [CornerPointsWithDegrees])
 newCornerPointsWith10DegreesBuilder    cornerPoints   = S.singleton $ newCornerPointsWith10DegreesList cornerPoints
+
+{- |
+Used by numerous infix functions such as (&@~+++#@) for building up a [[CornerPointsWithDegrees]].
+Each layer of a stl shape is made up of [CornerPointsWithDegrees].
+This Builder allows these layer to be built up, by adding another top/bottome face to the top of the
+Builder list.
+
+The 5 indicates it is based on a 5 degree interval of the radial shape.
+Eg: A scan that is taken at 10 degree intervals such as 0,10..360
+-}
+newCornerPointsWith5DegreesBuilder :: [CornerPoints] -> (S.Seq [CornerPointsWithDegrees])
+newCornerPointsWith5DegreesBuilder    cornerPoints   = S.singleton $ newCornerPointsWith10DegreesList cornerPoints

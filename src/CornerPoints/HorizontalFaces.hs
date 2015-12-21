@@ -152,34 +152,35 @@ createTopFaces inOrigin inRadius inAngles xSlope ySlope  =
        | currRadius <- tail inRadius
     ]
 
-    
-createTopFacesWithVariableSlope inOrigin inRadius inAngles xSlope ySlope  =
+--ToDo: change over to [Angles] instead of  [Double]
+createTopFacesWithVariableSlope :: Origin -> [Radius] -> [Angle] -> [Slope] -> [Slope] -> [CornerPoints]
+createTopFacesWithVariableSlope    origin    radii        angles    xSlopes      ySlopes  =
     (createCornerPoint
       (F3)
-      inOrigin
-      (head inRadius) 
+      origin
+      (head radii) 
       
-      (Angle (head inAngles))
-      (head xSlope)
-      (head ySlope)
+      ((head angles))
+      (head xSlopes)
+      (head ySlopes)
     ) 
     +++
-    B3 inOrigin
+    B3 origin
     +++>
     [(createCornerPoint
       (F2)
-      inOrigin
+      origin
       currRadius
-      (Angle angle)
+      (currAngle)
       currXSlope
       currYSlope
      ) 
      +++
-     B2 inOrigin
-       | angle <- tail inAngles
-       | currRadius <- tail inRadius
-       | currXSlope <- tail xSlope
-       | currYSlope <- tail ySlope
+     B2 origin
+       | currAngle <- tail angles
+       | currRadius <- tail radii
+       | currXSlope <- tail xSlopes
+       | currYSlope <- tail ySlopes
     ]
 
 

@@ -31,13 +31,15 @@ library
                    --stl
                    Stl.StlBase, Stl.StlCornerPoints, Stl.StlFileWriter
                    --helpers
-                   Helpers.List, Helpers.DSL
+                   Helpers.List, Helpers.DSL,
+                   Helpers.Symmetrical.Sequence, Helpers.Symmetrical.List
                    -- tests
                    Tests.CornerPointsDebugTest, Tests.CornerPointsTest, Tests.AllTestsRun,
                    Tests.MathTest, Tests.MathPolarTest, Tests.HorizontalFacesTest,
                    Tests.JsonTest, Tests.ListHelpersTest, Tests.RadiusTest,
                    Tests.VerticalFacesTest, Tests.ParseJuicyTest, Tests.ScanFilterTest,
                    Tests.CornerPointsWithDegreesTest, Tests.BuilderTest,
+                   Tests.Symmetrical.SequenceTest
                    --Examples
                    -- Example ShoeLifts
                    Examples.ShoeLift.KeenToe, Examples.ShoeLift.KeenHeel,
