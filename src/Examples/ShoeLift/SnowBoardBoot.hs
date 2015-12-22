@@ -1,10 +1,8 @@
 {-# LANGUAGE ParallelListComp #-}
 {- |
-Should be deleted as I am no longer going to scan the boot.
-Leave it here for now, as it is the latest use of ParseJuicy, including things such as removeNulls.
-Once I have used them in a new project, then delete this file.
+Snowboard boot.
 
-Also has an example of filtering the MDR down to a single section.
+A single piece lift, done by measuring the radii off of graph paper.
 -}
 module Examples.ShoeLift.SnowBoardBoot () where
 
@@ -24,146 +22,83 @@ import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), (|@+++#@|), (
 
 
 
+bootRadius = map Radius
+  [ 126.4,--0
+    126.0,--5
+    124.7,--10
+    119.2,--15
+    109.1,--20
+    93.9,--25
+    81.5,--30
+    71.2,--35
+    64.0,--40
+    57.3,--45
+    52.8,--50
+    49.0,--55
+    46.6,--60
+    45.6,--65
+    44.8,--70
+    44.7,--75
+    44.4,--80
+    44.7,--85
+    44.2,--90
+    46.0,--95
+    47.6,--100
+    48.7,--105
+    51.0,--110
+    54.1,--115
+    58.3,--120
+    63.0,--125
+    67.4,--130
+    72.9,--135
+    79.5,--140
+    88.2,--145
+    96.4,--150
+    104.7,--155
+    113.8,--160
+    121.5,--165
+    125.7,--170
+    130.0,--175
+    131.9,--180
+    133.3,--185
+    134.4,--190
+    132.9,--195
+    130.2,--200
+    122.6,--205
+    111.2,--210
+    96.9,--215
+    87.7,--220
+    76.7,--225
+    69.2,--230
+    63.5,--235
+    58.4,--240
+    52.6,--245
+    48.8,--250
+    46.0,--255
+    43.8,--260
+    41.4,--265
+    40.4,--270
+    39.7,--275
+    38.5,--280
+    38.5,--285
+    38.5,--290
+    39.5,--295
+    40.8,--300
+    42.3,--305
+    44.7,--310
+    50.7,--315
+    57.6,--320
+    66.8,--325
+    80.8,--330
+    96.2,--335
+    112.0,--340
+    122.7,--345
+    127.5,--350
+    126.8,--355
+    126.4--360
 
-{- |Process all 36 images, reducing down to MultiDegreeRadii of the red laser line.
-This is the red laser line in pixels Right of Left hand edge.
-It is written out to json as a MultiDegreeRadii, even though the data is
-in the form of pixel indices RightOfLHS, in other words, not processed at all beyond finding the laser line.
+  ]
 
-This file is full of null values, as I am now attempting to have an open area above and below the shape being scanned. This is to
-make it easier to scan, by not having to worry about the scan object exactly filling the images.
-
-
--}
---process10DegreeImagesToMultiDegreeRadii has now been replaced by processImagesIntoFull360DegreeMultiDegreeRadiiAt10DegreeIntervals
---processImagesToRedLaserLineAsPixelsRightOfLHS = process10DegreeImagesToMultiDegreeRadii (getRedLaserLineSingleImage redLaserLine)
-
-
-{- |Now replace all the null values by supplying a starting value. All [Radius] which start with a null, will use this starting value.
-After that, each null value will use the preceding Radius.
-I chose the value 2500 as it is larger than any value found on the original scan. So when I view this object, I can tell that the
-largest cicumferences will be the null values that were replaced.
-
-Write the file back to json.
-
--}
-removeNullValues = do
-  contents <- BL.readFile "src/Data/scanFullData.json"
-  case (decode contents) of
-      Just (MultiDegreeRadii name' degrees') ->
-        let multiDegreeRadii = resetMultiDegreeRadiiIfNullWithPreviousValue 2500 $ MultiDegreeRadii name' degrees'
-        in  BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
-        
-      Nothing                              -> putStrLn "scanFullData.json not read"
-
-
-{-Now convert the average pixel position of the red laser line, as measured from lhs, into radius as millimeters.
-This has to calculate:
- -where the center position is for the current row
- -how many pixels right of center is the measured pixel location
- -convert this value into millimeters by using calibration measurements, and the angle of the laser/camera.
--}
-convertPixelsToRadiiForMultiDegreeRadii ::   IO ()
-convertPixelsToRadiiForMultiDegreeRadii   = do
-  contents <- BL.readFile "src/Data/scanFullData.json"
-  
-  case (decode contents) of
-   
-      Just (MultiDegreeRadii name' degrees') ->
-        let multiDegreeRadii =
-              MultiDegreeRadii
-                name'
-                [ convertPixelsToRadiiForASingleDegreeRadii currSingleDegreeRadii
-                  | currSingleDegreeRadii <- degrees'
-                ]
-               
-        in
-           BL.writeFile "src/Data/scanFullData.json" $ encode $ multiDegreeRadii
-           
-      Nothing                              -> putStrLn "Nothing"
-
-
-toeStl :: Double ->  MultiDegreeRadii -> IO ()
-toeStl  rowReductionFactor multiDegreeRadii = 
-  let triangles = 
-                   [FacesBackFront | x <- [1..]] :
-                   [[FacesAll | x <- [1..]] | y <- [1..]]
-                  
-                  ||+++^||
-                  (createHorizontallyAlignedCubesNoSlope (Point 0 0 100) multiDegreeRadii [0,pixelsPerMM..])
-                  
-      stlFile = newStlShape "snowboard toe"  triangles
-  in  writeStlToFile stlFile
-      --putStrLn "file written"
-
-
-{-
-read in the Multidegree json file, which has valid Radii,
-and process it into stl using whatever function required for the current shape. -}
-loadMDRAndPassToProcessor :: IO ()
-loadMDRAndPassToProcessor = do
-  contents <- BL.readFile "src/Data/scanFullData.json"
-  let takeTopRows :: MultiDegreeRadii -> MultiDegreeRadii
-      takeTopRows (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' [(SingleDegreeRadii degree'' (take 10 $ drop 1500 radii''))  | (SingleDegreeRadii degree'' radii'') <- degrees']
-      rowReductionFactor = 100
-      --extensionHeight = 30
-      --plateRadius = 30
-      --power = 2.5
-      --lengthenYFactor = 20
-      --extensionFaceBuilder :: (Faces) -> (Faces) -> (Faces) -> (Faces) -> [Faces]
-      --extensionFaceBuilder leftFace emptyFaces rightFace fillerFaces =
-      --  [leftFace] ++ [emptyFaces | x <- [2..30]] ++ [rightFace]   ++  [fillerFaces | x <- [31..]]
-  case (decode contents) of
-   
-      Just (MultiDegreeRadii name' degrees') ->
-        let --enlarge it to fit over the socket already printed with WalkerSocket. 1st attempt at +2 was not quite big enough, trying 3.
-            --rotate it to line up better with the riser
-            --innerSleeveMDR = rotateMDR $ rotateMDR $ rotateMDR $ transpose (+3) $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
-            --give it a thickness of 3 mm
-            --outerSleeveMDR = transpose (+3) innerSleeveMDR
-            --plateRadius = 24
-            
-        in  --mainSocketStl innerSleeveMDR outerSleeveMDR extensionFaceBuilder extensionHeight rowReductionFactor pixelsPerMM
-            --pushPlate plateRadius power lengthenYFactor
-            --hosePlate plateRadius power lengthenYFactor
-            toeStl 1 $  takeTopRows  (MultiDegreeRadii name' degrees')
-            
-      Nothing                                ->
-        putStrLn "File not decoded"
-
--- ================================================ support functions =====================================
-convertPixelsToRadiiForASingleDegreeRadii :: SingleDegreeRadii -> SingleDegreeRadii
-convertPixelsToRadiiForASingleDegreeRadii    (SingleDegreeRadii degree' radii')    =
-  let adjustForCenter = getThePixelsRightOfCenter $ andThen  (removeLeftOfCenterPixels btmCenterIndex topCenterIndex imageHeightPx)
-  in
-      SingleDegreeRadii degree'
-         [
-          let currLaserLineIndex = round $ radius currDegree
-              rightOfCenterPixelDistanceOfLaser = adjustForCenter  (forThe currLaserLineIndex ) (ofThe currRow)
-              radius'' = calculateRadiusFrom  rightOfCenterPixelDistanceOfLaser (adjustedFor pixelsPerMM) $ andThe cameraAngle
-              
-          in radius''
-         | currDegree <- radii'
-         | currRow <- [0..]
-         ]
-
-
-
-
-type TargetValue = Word8
-type RowReductionFactor = Int
-
-redLaserLine :: TargetValue
-redLaserLine = 175
-
-cameraAngle = 30 --but was it 30.
---The red laser line index from center.jpg as found by Scan.ParseJuicy.showFirstAndLastCenterOfRedLaser
-topCenterIndex = 1293.5
-btmCenterIndex = 1403.3
-
-
-imageHeightPx = 1944
-
-pixelsPerMM = calculatePixelsPerMillmeter 2592 390 37 107
-
-
+--Where the lift meets the boot.
+bootCubes = newCornerPointsWith5DegreesBuilder
+  ()

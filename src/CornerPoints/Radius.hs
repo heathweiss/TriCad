@@ -198,7 +198,7 @@ type RotateFactor = Double
   ]
 
 
-  [ ,--0
+   [ ,--0
     ,--5
     ,--10
     ,--15
