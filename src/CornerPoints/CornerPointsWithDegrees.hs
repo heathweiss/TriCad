@@ -63,7 +63,7 @@ newCornerPointsWith5DegreesList :: [CornerPoints] -> [CornerPointsWithDegrees]
 newCornerPointsWith5DegreesList cornerPointsList =
   let
     degrees360Tuples :: [(Degree, Degree)]
-    degrees360Tuples = zipWith (,) [0,5..350] [5,10..360]
+    degrees360Tuples = zipWith (,) [0,5..355] [5,10..360]
   in
    (zipWith newCornerPointsWithDegrees cornerPointsList  degrees360Tuples)
 

@@ -121,6 +121,12 @@ instance TransposePoint CornerPoints where
                 b1=(transposeY f b1),
                 b4=(transposeY f b4)}
 
+  transposeY f (TopFace b2 f2 b3 f3)= 
+    TopFace    {f2=(transposeY f f2),
+                f3=(transposeY f f3),
+                b2=(transposeY f b2),
+                b3=(transposeY f b3)}
+
 
 
   transposeY f (B1 b1 ) =

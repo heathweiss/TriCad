@@ -1,5 +1,5 @@
 {-# LANGUAGE ViewPatterns #-}
-module Builder.Sequence(newCornerPointsWith10DegreesBuilder, (||@~+++^||), (@~+++#@|>), (@~+++@|>)) where
+module Builder.Sequence(newCornerPointsWith10DegreesBuilder, newCornerPointsWith5DegreesBuilder, (||@~+++^||), (@~+++#@|>), (@~+++@|>)) where
 import Builder.Builder(FacesWithRange(..), (||@~?+++^||), processCornerPointsWithDegreesAndStl)
 import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), cubeIsWithinDegreeRange, (@~+++#@), (|@~+++#@|), (|@~+++@|),
                                            newCornerPointsWith10DegreesList, newCornerPointsWith5DegreesList)
@@ -60,7 +60,7 @@ This Builder allows these layer to be built up, by adding another top/bottome fa
 Builder list.
 
 The 5 indicates it is based on a 5 degree interval of the radial shape.
-Eg: A scan that is taken at 10 degree intervals such as 0,10..360
+Eg: A scan that is taken at 5 degree intervals such as 0,5..360
 -}
 newCornerPointsWith5DegreesBuilder :: [CornerPoints] -> (S.Seq [CornerPointsWithDegrees])
-newCornerPointsWith5DegreesBuilder    cornerPoints   = S.singleton $ newCornerPointsWith10DegreesList cornerPoints
+newCornerPointsWith5DegreesBuilder    cornerPoints   = S.singleton $ newCornerPointsWith5DegreesList cornerPoints

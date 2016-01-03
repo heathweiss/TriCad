@@ -7,7 +7,7 @@ module CornerPoints.HorizontalFaces(
   createBottomFacesSquaredOff,
   createBottomFacesSquaredOffLengthenY,
   createBottomFacesLengthenY,
-  
+  createBottomFacesSquaredOffLengthenYSeparately,
   )where
 import CornerPoints.Create( Slope(..), Origin(..), createCornerPoint, createCornerPointSquaredOff, Angle(..),  flatXSlope, flatYSlope,)
 import CornerPoints.CornerPoints(CornerPoints(..), (+++>), (+++), (|+++|), (|@+++#@|))
@@ -239,9 +239,11 @@ createBottomFacesLengthenY inOrigin radii angles xSlope ySlope lengthenFactor =
 {-
 Used to expand a radial shape along the y-axis. Expands away from the origin to keep it centered.
 -}
+--ToDo: Replace all logic to a call to the new createBottomFacesSquaredOffLengthenYSeparately, pasing in lengthenFactor/2
 createBottomFacesSquaredOffLengthenY :: Origin -> [Radius] -> [Angle] -> Slope -> Slope -> Power -> LengthenFactor  -> [CornerPoints]
 createBottomFacesSquaredOffLengthenY inOrigin radii angles xSlope ySlope power lengthenFactor  =
-  let createRightLine (Angle angle') cube
+  let --should this have been createLeftLine
+      createLeftLine (Angle angle') cube
         | angle' <= 90 =
             F1 (transposeY ((+)(negate $ lengthenFactor/2)) $ f1 cube)
             +++ (B1 $ b1 cube)
@@ -267,7 +269,61 @@ createBottomFacesSquaredOffLengthenY inOrigin radii angles xSlope ySlope power l
       +++
       B4 inOrigin
      +++>
-     [ createRightLine angle
+     [ createLeftLine angle
+       (
+        (createCornerPointSquaredOff 
+         (F1)
+          inOrigin
+          radius
+          angle
+          xSlope
+          ySlope
+          power
+        ) 
+        +++
+        B1 inOrigin
+       )
+      
+       | angle <- tail angles
+       | radius <- tail radii
+     ]
+
+
+{- |
+Used to expand a radial shape along the y-axis. Expands away from the origin to keep it centered like createBottomFacesSquaredOffLengthenYSeparately,
+except that the amount it moves in the pos and neg y directions, can be done separately.
+-}
+
+createBottomFacesSquaredOffLengthenYSeparately :: Origin -> [Radius] -> [Angle] -> Slope -> Slope -> Power -> LengthenFactor -> LengthenFactor  -> [CornerPoints]
+createBottomFacesSquaredOffLengthenYSeparately inOrigin radii angles xSlope ySlope power lengthenNegYFactor lengthenPosYFactor =
+  let --should this have been createLeftLine
+      createLeftLine (Angle angle') cube
+        | angle' <= 90 =
+            F1 (transposeY ((+)(negate $ lengthenNegYFactor/2)) $ f1 cube)
+            +++ (B1 $ b1 cube)
+        | angle' <= 270 =
+            F1 (transposeY (+(lengthenPosYFactor/2)) $ f1 cube)
+            +++ (B1 $ b1 cube)
+        | otherwise =
+            F1 (transposeY ((+)(negate $lengthenNegYFactor/2)) $ f1 cube)
+            +++ (B1 $ b1 cube)
+  in
+    
+     (transposeY ((+)(negate $ lengthenNegYFactor/2))
+      (createCornerPointSquaredOff 
+        (F4)
+        inOrigin
+        (head radii)
+        (head angles)
+        xSlope
+        ySlope
+        power
+      )
+     )
+      +++
+      B4 inOrigin
+     +++>
+     [ createLeftLine angle
        (
         (createCornerPointSquaredOff 
          (F1)
