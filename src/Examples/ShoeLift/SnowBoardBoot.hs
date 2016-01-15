@@ -30,7 +30,7 @@ import CornerPoints.FaceExtraction(extractBottomFace, extractTopFace  )
 import CornerPoints.FaceConversions(lowerFaceFromUpperFace, upperFaceFromLowerFace)
 import CornerPoints.Transpose(transposeZ, transposeY)
 
-import Builder.Sequence(newCornerPointsWith5DegreesBuilder, (||@~+++^||), (@~+++@|>) )
+import Builder.Sequence(newCornerPointsWith5DegreesBuilder, newCornerPointsWithDegreesBuilder, (||@~+++^||), (@~+++@|>) )
 import Builder.Builder(FacesWithRange(..))
 
 import Primitives.Cylindrical(cylinderSolidVariableRadiusVariableTopSlope, cylinderSolidVariableRadiusVariableBottomSlope,
@@ -47,9 +47,28 @@ type LengthenFactor = Double
 origin = Point 0 0 0
 angles = map Angle [x | x <-[0,5..]]
 
+-- ======================================================== triangles for printing rear/forward sections ============================
+{-
+To big to print as a single print. Create triangles that can print the front 270-90 degrees section and the rear 90-270 section.
+Also works out well, because this will server as a natural flex point, by printing in 2 sections..
+-}
+forwardFaces =
+  [[FacesWithRange FacesBottomFrontRightTop (DegreeRange 90 95)] ++
+   [FacesWithRange FacesBottomFrontTop (DegreeRange 95 265)] ++
+   [FacesWithRange FacesBottomFrontLeftTop (DegreeRange 265 270)]
+  ]
+
+rearFaces =
+  [[FacesWithRange FacesBottomFrontTop (DegreeRange 0 85)] ++
+   [FacesWithRange FacesBottomFrontLeftTop (DegreeRange 85 90)] ++
+   [FacesWithRange FacesBottomFrontRightTop (DegreeRange 270 275)] ++
+   [FacesWithRange FacesBottomFrontTop (DegreeRange 275 360)]
+  ]
 -- ============================================================== boot to tread adaptor  ========================================
 {-
 Convert from the shape of the boot, to the shape of the tread.
+
+To big to print as a single piece, so print back half and front half separate.
 -}
 --riserRadius = map Radius [35 | x <- [0,5..360]]
 
@@ -58,17 +77,23 @@ bootToTreadAdaptorCubes =
     (
      (map ((transposeY(+15)) . (transposeZ(+50)) . upperFaceFromLowerFace . extractBottomFace)  bootCubes)
      |+++|
-     (map (  lowerFaceFromUpperFace  . extractTopFace) treadCubes)
+     (map (  lowerFaceFromUpperFace  . extractTopFace) treadRoundedToeCubes)
     )
    
    
    
 
-bootToTreadAdaptorTriangles = bootToTreadAdaptorCubes
+bootToTreadAdaptorRearTriangles = bootToTreadAdaptorCubes
                               ||@~+++^||
-                              [[FacesWithRange FacesBottomFrontTop (DegreeRange 0 360)]]
+                              rearFaces
 
-writeBootToTreadAdaptor = writeStlToFile $ newStlShape "adaptor" bootToTreadAdaptorTriangles                              
+writeBootToTreadAdaptorRear = writeStlToFile $ newStlShape "adaptor" bootToTreadAdaptorRearTriangles
+
+bootToTreadAdaptorFrontTriangles = bootToTreadAdaptorCubes
+                              ||@~+++^||
+                              forwardFaces
+
+writeBootToTreadAdaptorForward = writeStlToFile $ newStlShape "adaptor" bootToTreadAdaptorFrontTriangles                              
 -- ============================================================ tread ================================================
 {-
 Round the toe up to make it easier to walk.
@@ -154,22 +179,40 @@ treadYSlopes = mirrorPlusMidPoint
  (
   [ flatYSlope | x <- [0,5..90]]
   ++
-  [ PosYSlope 25 | x <- [95,100..270]]
+  [ PosYSlope 0 | x <- [95,100..270]]
   ++
   [ flatYSlope | x <- [275,280..360]]
  )
- (PosYSlope 25)
+ (PosYSlope 0)
 
---create separately from the builder so that can be easily re-used in the adaptor
-treadCubes = cylinderSolidVariableRadiusVariableBottomSlope treadRadius origin angles [flatXSlope | x <- [1..]] treadYSlopes (40::Height)
+{-
+Create separately from the builder so that can be easily re-used in the adaptor.
 
-treadTriangles = (newCornerPointsWith5DegreesBuilder treadCubes)
+This has the 90-270 degree section with a bottom upwards slope to have a rounded toe.
+-}
+treadRoundedToeCubes = cylinderSolidVariableRadiusVariableBottomSlope treadRadius origin angles [flatXSlope | x <- [1..]] treadYSlopes (20::Height)
+
+treadRearTriangles = (newCornerPointsWith5DegreesBuilder treadRoundedToeCubes)
                  ||@~+++^||
-                 [[FacesWithRange FacesBottomFrontTop (DegreeRange 0 360)],
-                  [FacesWithRange FacesBottomFrontTop (DegreeRange 0 360)]
-                 ]
-                
-writeTread = writeStlToFile $ newStlShape "tread" treadTriangles
+                 rearFaces
+
+writeRearRoundedToeTread = writeStlToFile $ newStlShape "tread rear" treadRearTriangles
+
+treadForwardTriangles = (newCornerPointsWith5DegreesBuilder treadRoundedToeCubes)
+                 ||@~+++^||
+                 forwardFaces
+
+writeForwardRoundedToeTread = writeStlToFile $ newStlShape "tread forward" treadForwardTriangles
+
+-- ==== print the back again, to fit better into the tread. Needs a sloped top
+
+treadRearSlopedCubes = cylinderSolidVariableRadiusVariableTopSlope treadRadius origin angles [flatXSlope | x <- [1..]] [NegYSlope 2 | x <- [1..]] (5::Height)
+
+treadRearSlopedTriangles = (newCornerPointsWith5DegreesBuilder treadRearSlopedCubes)
+                 ||@~+++^||
+                 rearFaces
+
+writeRearSlopedTread  = writeStlToFile $ newStlShape "tread rear sloped " treadRearSlopedTriangles                 
 -- ================================================================ riser meets boot ======================================================
 
 -- radius is centered near toe, where slope changes
@@ -265,22 +308,15 @@ bootYSlopes = mirrorPlusMidPoint
 bootCubes =  cylinderSolidVariableRadiusVariableTopSlope bootRadius origin angles [flatXSlope | x <- [1..]] bootYSlopes (20::Height)
 
 --print 0-90, 270-360 to split the print as it is too big for my printer.
-bootRearTriangles = newCornerPointsWith5DegreesBuilder bootCubes
+bootRearTriangles = newCornerPointsWithDegreesBuilder 5 bootCubes
                 ||@~+++^||
-                [[FacesWithRange FacesBottomFrontTop (DegreeRange 0 85)] ++
-                 [FacesWithRange FacesBottomFrontLeftTop (DegreeRange 85 90)] ++
-                 [FacesWithRange FacesBottomFrontRightTop (DegreeRange 270 275)] ++
-                 [FacesWithRange FacesBottomFrontTop (DegreeRange 275 360)]
-                ]
+                rearFaces
 
 writeRearBoot = writeStlToFile $ newStlShape "the rear boot" bootRearTriangles
                 
 bootForwardTriangles =  newCornerPointsWith5DegreesBuilder bootCubes
                 ||@~+++^||
-                [[FacesWithRange FacesBottomFrontRightTop (DegreeRange 90 95)] ++
-                 [FacesWithRange FacesBottomFrontTop (DegreeRange 95 265)] ++
-                 [FacesWithRange FacesBottomFrontLeftTop (DegreeRange 265 270)]
-                ]             
+                forwardFaces            
 
 writeForwardBoot = writeStlToFile $ newStlShape "the forward boot" bootForwardTriangles
 

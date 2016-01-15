@@ -1,13 +1,18 @@
 {-# LANGUAGE ViewPatterns #-}
-module Builder.Sequence(newCornerPointsWith10DegreesBuilder, newCornerPointsWith5DegreesBuilder, (||@~+++^||), (@~+++#@|>), (@~+++@|>)) where
+module Builder.Sequence(newCornerPointsWith10DegreesBuilder, newCornerPointsWith5DegreesBuilder, newCornerPointsWithDegreesBuilder,
+                        (||@~+++^||), (@~+++#@|>), (@~+++@|>)) where
 import Builder.Builder(FacesWithRange(..), (||@~?+++^||), processCornerPointsWithDegreesAndStl)
 import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), cubeIsWithinDegreeRange, (@~+++#@), (|@~+++#@|), (|@~+++@|),
-                                           newCornerPointsWith10DegreesList, newCornerPointsWith5DegreesList)
+                                           newCornerPointsWith10DegreesList, newCornerPointsWith5DegreesList, newCornerPointsWithDegreesList)
 import CornerPoints.CornerPoints(CornerPoints(..))
 import Stl.StlBase(Triangle(..))
 import Stl.StlCornerPoints((+++^), Faces(..))
 import qualified Data.Sequence as S
 import qualified Data.Foldable as F
+
+--make type signatures more readable
+--degrees from right to left of a cube. Eg: Each radius is 5 degrees apart resulting in a cube with a DegreeSpread 5
+type DegreeSpread = Double
 
 data CornerPointsWithDegreesList = CornerPointsWithDegreesList {cornerPointsWithDegreesList::[CornerPointsWithDegrees]}
 
@@ -50,6 +55,7 @@ Builder list.
 The 10 indicates it is based on a 10 degree interval of the radial shape.
 Eg: A scan that is taken at 10 degree intervals such as 0,10..360
 -}
+--ToDo: get rid of in favor of newCornerPointsWithDegreesBuilder
 newCornerPointsWith10DegreesBuilder :: [CornerPoints] -> (S.Seq [CornerPointsWithDegrees])
 newCornerPointsWith10DegreesBuilder    cornerPoints   = S.singleton $ newCornerPointsWith10DegreesList cornerPoints
 
@@ -62,5 +68,15 @@ Builder list.
 The 5 indicates it is based on a 5 degree interval of the radial shape.
 Eg: A scan that is taken at 5 degree intervals such as 0,5..360
 -}
+--ToDo: get rid of in favor of newCornerPointsWithDegreesBuilder
 newCornerPointsWith5DegreesBuilder :: [CornerPoints] -> (S.Seq [CornerPointsWithDegrees])
 newCornerPointsWith5DegreesBuilder    cornerPoints   = S.singleton $ newCornerPointsWith5DegreesList cornerPoints
+
+{- |
+Do the equivalent of newCornerPointsWith5(or 10)DegreesBuilder, but pass in the degrees spread
+-}
+--ToDo: write tests.
+newCornerPointsWithDegreesBuilder :: DegreeSpread -> [CornerPoints] -> (S.Seq [CornerPointsWithDegrees])
+newCornerPointsWithDegreesBuilder    spread    cornerPoints   = S.singleton $ newCornerPointsWithDegreesList spread cornerPoints
+
+
