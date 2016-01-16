@@ -25,6 +25,12 @@ import Primitives.Cylindrical(cylinderWallsNoSlope)
 import CornerPoints.Transposable(transpose)
 import Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
 
+{----------------------------------------------------- overview------------------------------------------------------------
+This is the original walker socket module. It includes the scanning work, which is the only thing that is important here.
+
+The rest of the work, for designing the socket is outdated. Refer to WalkerSocketSquared for more up to date design.
+-}
+
 {-Global values such as commom measurements.-}
 plateRadius = 30
 

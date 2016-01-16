@@ -1,3 +1,4 @@
+{-# LANGUAGE ParallelListComp #-}
 module Examples.Scan.WalkerSocketSquared where
 
 import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(..),extractSingle, extractList, rotateMDR)
@@ -5,20 +6,26 @@ import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftF
                                   createHorizontallyAlignedCubesNoSlope, createHorizontallyAlignedCubes)
 import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), (|@+++#@|))
-import Builder.Builder(CornerPointsBuilder(..),(&+++#@))
 import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope, Angle(..), Origin(..))
-import Stl.StlCornerPoints((|+++^|), (||+++^||), Faces(..))
-import Stl.StlBase (StlShape(..), newStlShape)
-import Stl.StlFileWriter(writeStlToFile)
-import Scan.Filter(runningAverage, runningAvgSingleDegreeRadii)
 import CornerPoints.FaceExtraction (extractFrontFace, extractTopFace,extractBottomFace, extractBackFace)
 import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
 import CornerPoints.Transpose (transposeZ, transposeY, transposeX)
+import CornerPoints.Transposable(transpose)
+import CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (@~+++#@),(@~+++@),(|@~+++@|), (|@~+++#@|), DegreeRange(..))
+
+
+import Stl.StlCornerPoints((|+++^|), (||+++^||), Faces(..))
+import Stl.StlBase (StlShape(..), newStlShape)
+import Stl.StlFileWriter(writeStlToFile)
+
+import Scan.Filter(runningAverage, runningAvgSingleDegreeRadii)
+
 import Helpers.List((++:))
+
 import Primitives.Cylindrical(cylinderWallsNoSlopeSquaredOff, cylinderSolidNoSlopeSquaredOff,
                                    cylinderWallsNoSlopeSquaredOffLengthenY, cylinderSolidNoSlopeSquaredOffLengthenY)
 import Primitives.Cylindrical(cylinderWallsNoSlope)
-import CornerPoints.Transposable(transpose)
+
 import Data.Word(Word8)
 import qualified Data.ByteString.Lazy as BL
 import Data.Aeson
@@ -26,9 +33,20 @@ import Scan.ParseJuicy(getRedLaserLineSingleImage, removeLeftOfCenterPixels, get
                       calculateRadiusFrom)
 import  Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
 
+import Builder.Sequence((@~+++@|>))
+import Builder.List (newCornerPointsWith10DegreesBuilder, (||@~+++^||))
+import Builder.Builder(CornerPointsBuilder(..),(&+++#@), FacesWithRange(..))
+{------------------------------------------------------------- overview ---------------------------------------------------
+The original scan work is in WalkerSocket module.
+
+
+-}
+
 {-
 read in the Multidegree json file, which has valid Radii,
-and process it into stl using whatever function required for the current shape. -}
+and process it into stl using whatever function required for the current shape.
+I have this master function, as the individual shapes all have common requirements that can be passed in. Keep it DRY.
+For example: The top row is bad, and has to be removed. Use a rowReductionFactor of 100 for all shapes.-}
 loadMDRAndPassToProcessor :: IO ()
 loadMDRAndPassToProcessor = do
   contents <- BL.readFile "src/Data/scanFullData.json"
@@ -45,19 +63,72 @@ loadMDRAndPassToProcessor = do
   case (decode contents) of
    
       Just (MultiDegreeRadii name' degrees') ->
-        let --enlarge it to fit over the socket already printed with WalkerSocket. 1st attempt at +2 was not quite big enough, trying 3.
+        let ----------------------------for the socket that has the bottom extension to attach to the walker
+            --enlarge it to fit over the socket already printed with WalkerSocket. 1st attempt at +2 was not quite big enough, trying 3.
             --rotate it to line up better with the riser
             innerSleeveMDR = rotateMDR $ rotateMDR $ rotateMDR $ transpose (+3) $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
             --give it a thickness of 3 mm
             outerSleeveMDR = transpose (+3) innerSleeveMDR
             plateRadius = 24
-        in  --mainSocketStl innerSleeveMDR outerSleeveMDR extensionFaceBuilder extensionHeight rowReductionFactor pixelsPerMM
-            pushPlate plateRadius power lengthenYFactor
+
+            ------------------------------------- for the socket with the quick-release mounted on the side
+            --innerSleeveMDR = transpose (+3) $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
+        in  ------------------------------------choose the shape to process---------------------------------------------.
+            ---------socket attached to walker       
+            mainSocketStl innerSleeveMDR outerSleeveMDR extensionFaceBuilder extensionHeight rowReductionFactor pixelsPerMM
+            --pushPlate plateRadius power lengthenYFactor
             --hosePlate plateRadius power lengthenYFactor
+
+            ---------socket with sidemount quick releas
+            --sideMountQuickReleaseSocket innerSleeveMDR rowReductionFactor pixelsPerMM
             
       Nothing                                ->
         putStrLn "File not decoded"
 
+{-=========================================================== side mounted quick-releas socket================================================
+==============================================================================================================================================-}
+{-
+
+
+-}
+sideMountQuickReleaseSocket :: MultiDegreeRadii ->  RowReductionFactor -> PixelsPerMillimeter ->  IO ()
+sideMountQuickReleaseSocket      mainSocketInnerMDR             rowReductionFactor    pixelsPerMillimeter  =
+  let
+    mainSocketWallThickness = 3
+    quickReleaseWallThickness = 15
+    mainSocketOuterMDR = transpose (+mainSocketWallThickness) mainSocketInnerMDR
+    quickReleaseOuterMDR = transpose (+quickReleaseWallThickness) mainSocketInnerMDR 
+    origin = (Point{x_axis=0, y_axis=0, z_axis=50})
+    transposeFactors = [0,heightPerPixel.. ]
+    heightPerPixel = 1/pixelsPerMM * (fromIntegral rowReductionFactor)
+
+    
+    verticalWalls = drop 6  (createVerticalWalls  mainSocketInnerMDR mainSocketOuterMDR origin transposeFactors)
+    --innerCubesWithDegrees = newCornerPointsWith10DegreesBuilder $ head verticalWalls
+    innerCubesWithDegrees = [ newCornerPointsWith10DegreesBuilder currWalls | currWalls <- verticalWalls]
+    
+    mainSocketFaces =
+                          [[FacesWithRange FacesBackBottomFrontTop (DegreeRange 0 220)] ++
+                           [FacesWithRange FacesBackBottomFrontTop (DegreeRange 220 290)] ++
+                           [FacesWithRange FacesBackBottomFrontTop (DegreeRange 290 360)]
+                          ]
+    mainSocketTriangles =    concat
+                             [ currCubes ||@~+++^|| currFaces
+                               | currCubes <- innerCubesWithDegrees
+                               | currFaces <- [mainSocketFaces | x <-[1..]]
+                             ]
+       
+
+    {-
+    quickReleaseCubes = newCornerPointsWith10DegreesBuilder $ drop 6  (createVerticalWalls  mainSocketInnerMDR quickReleaseOuterMDR origin transposeFactors)
+    -}
+    
+  in
+    
+    writeStlToFile $ newStlShape "socket with quick release" mainSocketTriangles   
+    
+{-========================================================== socket attached to walker=====================================================
+===========================================================================================================================================-}
 {-
 The attaches to the pushPlate and the hose
                      ||  ||   hose
