@@ -38,8 +38,11 @@ import Builder.List (newCornerPointsWith10DegreesBuilder, (||@~+++^||))
 import Builder.Builder(CornerPointsBuilder(..),(&+++#@), FacesWithRange(..))
 {------------------------------------------------------------- overview ---------------------------------------------------
 The original scan work is in WalkerSocket module.
-
-
+++++++
+***********************************    important *******************************************************
+********************************************************************************************************
+Remember to use WalkerSocket.processMultiDegreeRadii if I have to get the json file from storage(Dropbox/3D/MDRFiles/walkerSocket.json
+The one in storage is in pixels, rather than millimeters.
 -}
 
 {-
@@ -72,15 +75,16 @@ loadMDRAndPassToProcessor = do
             plateRadius = 24
 
             ------------------------------------- for the socket with the quick-release mounted on the side
-            --innerSleeveMDR = transpose (+3) $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
+            --need to adjust transposefactor, as +3 was a loose fit for his walker. Try +2
+            innerSleeveMDRForSideMount = transpose (+2) $ reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
         in  ------------------------------------choose the shape to process---------------------------------------------.
             ---------socket attached to walker       
-            mainSocketStl innerSleeveMDR outerSleeveMDR extensionFaceBuilder extensionHeight rowReductionFactor pixelsPerMM
+            --mainSocketStl innerSleeveMDR outerSleeveMDR extensionFaceBuilder extensionHeight rowReductionFactor pixelsPerMM
             --pushPlate plateRadius power lengthenYFactor
             --hosePlate plateRadius power lengthenYFactor
 
             ---------socket with sidemount quick releas
-            --sideMountQuickReleaseSocket innerSleeveMDR rowReductionFactor pixelsPerMM
+            sideMountQuickReleaseSocket innerSleeveMDRForSideMount rowReductionFactor pixelsPerMM
             
       Nothing                                ->
         putStrLn "File not decoded"
@@ -95,37 +99,100 @@ sideMountQuickReleaseSocket :: MultiDegreeRadii ->  RowReductionFactor -> Pixels
 sideMountQuickReleaseSocket      mainSocketInnerMDR             rowReductionFactor    pixelsPerMillimeter  =
   let
     mainSocketWallThickness = 3
-    quickReleaseWallThickness = 15
     mainSocketOuterMDR = transpose (+mainSocketWallThickness) mainSocketInnerMDR
-    quickReleaseOuterMDR = transpose (+quickReleaseWallThickness) mainSocketInnerMDR 
+
+    quickReleaseInnerMDR = mainSocketOuterMDR
+    quickReleaseWallThickness = 15
+    quickReleaseOuterMDR = transpose (+quickReleaseWallThickness) mainSocketInnerMDR
+    
     origin = (Point{x_axis=0, y_axis=0, z_axis=50})
     transposeFactors = [0,heightPerPixel.. ]
     heightPerPixel = 1/pixelsPerMM * (fromIntegral rowReductionFactor)
 
+    mainSocketWalls =
+      [ newCornerPointsWith10DegreesBuilder currWalls | currWalls <-
+           drop 6  (createVerticalWalls  mainSocketInnerMDR mainSocketOuterMDR origin transposeFactors)]
     
-    verticalWalls = drop 6  (createVerticalWalls  mainSocketInnerMDR mainSocketOuterMDR origin transposeFactors)
-    --innerCubesWithDegrees = newCornerPointsWith10DegreesBuilder $ head verticalWalls
-    innerCubesWithDegrees = [ newCornerPointsWith10DegreesBuilder currWalls | currWalls <- verticalWalls]
-    
-    mainSocketFaces =
-                          [[FacesWithRange FacesBackBottomFrontTop (DegreeRange 0 220)] ++
-                           [FacesWithRange FacesBackBottomFrontTop (DegreeRange 220 290)] ++
-                           [FacesWithRange FacesBackBottomFrontTop (DegreeRange 290 360)]
+    mainSocketFaces = 
+                          [
+                           [[FacesWithRange FacesBackFrontTop (DegreeRange 0 220)] ++
+                            [FacesWithRange FacesBackTop (DegreeRange 220 270)] ++
+                            [FacesWithRange FacesBackFrontTop (DegreeRange 270 360)]
+                           ]
                           ]
+                          ++
+                          [
+                           [[FacesWithRange FacesBackFront (DegreeRange 0 220)] ++
+                            [FacesWithRange FaceBack (DegreeRange 220 270)] ++
+                            [FacesWithRange FacesBackFront (DegreeRange 270 360)]
+                           ] | x <- [1..4]
+                          ]
+                          ++
+                          [
+                           [[FacesWithRange FacesBackFront (DegreeRange 0 220)] ++
+                            [FacesWithRange FacesBackFront (DegreeRange 220 270)] ++
+                            [FacesWithRange FacesBackFront (DegreeRange 270 360)]
+                           ] | x <- [1..6]
+                          ]
+                          ++
+                          [
+                           [[FacesWithRange FacesBackBottomFront (DegreeRange 0 220)] ++
+                            [FacesWithRange FacesBackBottomFront (DegreeRange 220 290)] ++
+                            [FacesWithRange FacesBackBottomFront (DegreeRange 290 360)]
+                           ]
+                          ] 
     mainSocketTriangles =    concat
                              [ currCubes ||@~+++^|| currFaces
-                               | currCubes <- innerCubesWithDegrees
-                               | currFaces <- [mainSocketFaces | x <-[1..]]
+                               | currCubes <- mainSocketWalls
+                               | currFaces <- mainSocketFaces 
                              ]
        
 
-    {-
-    quickReleaseCubes = newCornerPointsWith10DegreesBuilder $ drop 6  (createVerticalWalls  mainSocketInnerMDR quickReleaseOuterMDR origin transposeFactors)
+    {- ------------ quick release
+     The walls, faces, triangles for the quick release section.
     -}
+    quickReleaseWalls =
+      [ newCornerPointsWith10DegreesBuilder currWalls | currWalls <-
+           drop 6  (createVerticalWalls  quickReleaseInnerMDR quickReleaseOuterMDR origin transposeFactors)]
+
+    quickReleaseFaces = 
+                          [
+                           [[FacesWithRange FacesNada (DegreeRange 0 220)] ++
+                            [FacesWithRange FacesFrontRightTop (DegreeRange 220 230)] ++
+                            [FacesWithRange FacesFrontTop (DegreeRange 230 260)] ++
+                            [FacesWithRange FacesFrontLeftTop (DegreeRange 260 270)] ++
+                            [FacesWithRange FacesNada (DegreeRange 270 360)]
+                           ]
+                          ]
+                          ++
+                          [
+                           [[FacesWithRange FacesNada (DegreeRange 0 220)] ++
+                            [FacesWithRange FacesFrontRight (DegreeRange 220 230)] ++
+                            [FacesWithRange FaceFront (DegreeRange 230 260)] ++
+                            [FacesWithRange FacesFrontLeft (DegreeRange 260 270)] ++
+                            [FacesWithRange FacesNada (DegreeRange 270 360)]
+                           ] | x <- [1..3]
+                          ]
+                          ++
+                          [
+                           [[FacesWithRange FacesNada (DegreeRange 0 220)] ++
+                            [FacesWithRange FacesBottomFrontRight (DegreeRange 220 230)] ++
+                            [FacesWithRange FacesBottomFront (DegreeRange 230 260)] ++
+                            [FacesWithRange FacesBottomFrontLeft (DegreeRange 260 270)] ++
+                            [FacesWithRange FacesNada (DegreeRange 270 360)]
+                           ]
+                          ]
+                           
+    quickReleaseTriangles =    concat
+                             [ currCubes ||@~+++^|| currFaces
+                               | currCubes <- quickReleaseWalls
+                               | currFaces <- quickReleaseFaces 
+                             ]
     
   in
     
-    writeStlToFile $ newStlShape "socket with quick release" mainSocketTriangles   
+    --writeStlToFile $ newStlShape "socket with quick release" mainSocketTriangles
+    writeStlToFile $ newStlShape "socket with quick release" $ mainSocketTriangles ++ quickReleaseTriangles   
     
 {-========================================================== socket attached to walker=====================================================
 ===========================================================================================================================================-}
@@ -284,7 +351,8 @@ riserFaceBuilder :: (Faces) -> (Faces) -> (Faces) -> (Faces) -> (Faces) -> [Face
 riserFaceBuilder faces1 faces2 faces3 faces4 faces5 =
  [faces1| x <- [1..8]] ++ [faces2] ++ [faces3| x <- [10..28]] ++ [faces4]   ++  [faces5 | x <- [11..]]
 
-pixelsPerMM = 696/38 
+pixelsPerMM = 696/38
+
 
 type RowReductionFactor = Int
 --type Origin = Point

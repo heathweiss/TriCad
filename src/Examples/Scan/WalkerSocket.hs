@@ -54,8 +54,8 @@ loadMDRAndPassToProcessor = do
       Just (MultiDegreeRadii name' degrees') ->
         let innerSleeveMDR = reduceScan rowReductionFactor $ removeDefectiveTopRow (MultiDegreeRadii name' degrees')
             outerSleeveMDR = transpose (+2) innerSleeveMDR
-        in  --mainSocketStl innerSleeveMDR outerSleeveMDR extensionFaceBuilder extensionHeight rowReductionFactor pixelsPerMM
-            pushPlateStl outerSleeveMDR extensionFaceBuilder extensionHeight plateRadius
+        in  mainSocketStl innerSleeveMDR outerSleeveMDR extensionFaceBuilder extensionHeight rowReductionFactor pixelsPerMM
+            --pushPlateStl outerSleeveMDR extensionFaceBuilder extensionHeight plateRadius
             
       Nothing                                ->
         putStrLn "File not decoded"
