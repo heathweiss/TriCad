@@ -19,6 +19,7 @@ import Helpers.Symmetrical.List(mirrorPlusMidPoint)
 import Stl.StlCornerPoints((|+++^|), (||+++^||), Faces(..))
 import Stl.StlBase (StlShape(..), newStlShape)
 import Stl.StlFileWriter(writeStlToFile)
+import Stl.StlCornerPointsWithDegrees(FacesWithRange(..))
 
 import CornerPoints.CornerPoints(CornerPoints(..), (+++), (|+++|), (|@+++#@|), (&+++#@), CornerPointsBuilder(..))
 import CornerPoints.Create(Slope(..), flatXSlope, flatYSlope, Angle(..))
@@ -31,7 +32,7 @@ import CornerPoints.FaceConversions(lowerFaceFromUpperFace, upperFaceFromLowerFa
 import CornerPoints.Transpose(transposeZ, transposeY)
 
 import Builder.Sequence(newCornerPointsWith5DegreesBuilder, newCornerPointsWithDegreesBuilder, (||@~+++^||), (@~+++@|>) )
-import Builder.Builder(FacesWithRange(..))
+
 
 import Primitives.Cylindrical(cylinderSolidVariableRadiusVariableTopSlope, cylinderSolidVariableRadiusVariableBottomSlope,
                               cylinderSolidNoSlopeSquaredOffLengthenY, cylinderSolidNoSlopeSquaredOffLengthenYSeparately)

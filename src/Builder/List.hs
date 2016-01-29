@@ -1,11 +1,14 @@
 {- |Build up a shape using lists. Should be deleted once Builder.Sequence is done?-}
 module Builder.List((&@~+++@), (&@~+++#@), (||@~+++^||), newCornerPointsWith10DegreesBuilder) where
-import Builder.Builder(FacesWithRange(..), (||@~?+++^||), processCornerPointsWithDegreesAndStl)
-import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), cubeIsWithinDegreeRange, (@~+++#@), (|@~+++#@|), (|@~+++@|),
+
+
+import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..),  (@~+++#@), (|@~+++#@|), (|@~+++@|),
                                            newCornerPointsWith10DegreesList)
 import CornerPoints.CornerPoints(CornerPoints(..))
+
 import Stl.StlBase(Triangle(..))
 import Stl.StlCornerPoints((+++^), Faces(..))
+import Stl.StlCornerPointsWithDegrees( (|@~?+++^|), FacesWithRange(..),  {-(||@~?+++^||)-}cornerPointsWithDegeesToTriangles)
 
 --add a CornerPoint to the head of the [[CornerPointsWithDegrees]] in list fashion
 (&@~+++@) :: [[CornerPointsWithDegrees]] -> [CornerPoints] -> [[CornerPointsWithDegrees]]
@@ -21,9 +24,10 @@ cornerPointsWithDegreesListList &@~+++#@ f =
 
 
 {- | Process a shape made up of [[CornerPointsWithDegrees]] into stl [Triangle]'s for output to stl file. -}
+--ToDo: create module Stl.StlCornerPointsWithDegreesList and move this there.
 (||@~+++^||) :: [[CornerPointsWithDegrees]] -> [[FacesWithRange]] -> [Triangle]
 cornerPointsWithDegreesList ||@~+++^|| facesWithRangeList = concat $
-  zipWith processCornerPointsWithDegreesAndStl cornerPointsWithDegreesList facesWithRangeList
+  zipWith cornerPointsWithDegeesToTriangles cornerPointsWithDegreesList facesWithRangeList
 
 {- |
 Used by numerous infix functions such as (&@~+++#@) for building up a [[CornerPointsWithDegrees]].

@@ -1,8 +1,8 @@
-module Builder.Builder(CornerPointsBuilder(..),(&+++#@), (@~+++^), (|@~?+++^|), FacesWithRange(..), (||@~?+++^||), processCornerPointsWithDegreesAndStl
+module Builder.Builder(CornerPointsBuilder(..),(&+++#@),{- (@~+++^),-} {-(|@~?+++^|),-} {-FacesWithRange(..), (||@~?+++^||), processCornerPointsWithDegreesAndStl-}
                        {-, (&@~+++@),(&@~+++#@), (||@~+++^||),
                        , newCornerPointsWith10DegreesBuilder-}) where
 import CornerPoints.CornerPoints(CornerPoints(..))
-import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), cubeIsWithinDegreeRange, (@~+++#@), (|@~+++#@|), (|@~+++@|),
+import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), cornerPointsWithDegreesWithinRange, (@~+++#@), (|@~+++#@|), (|@~+++@|),
                                            newCornerPointsWith10DegreesList)
 import Stl.StlBase(Triangle(..))
 import Stl.StlCornerPoints((+++^), Faces(..))
@@ -30,70 +30,3 @@ data CornerPointsBuilder   = CornerPointsBuilder {getCornerPoints :: [[CornerPoi
 (CornerPointsBuilder cornerPoints) &+++#@ f = CornerPointsBuilder ( (f $ head cornerPoints) : cornerPoints)
 
 
--- ======================================= CornerPointsWithDegrees ================================
-data FacesWithRange = FacesWithRange {_face::Faces, _range::DegreeRange}
-
-
-
-
-(@~+++^) :: Faces -> CornerPointsWithDegrees -> [Triangle]
-face @~+++^ (CubesWithStartEndDegrees cPnt _) = face +++^ cPnt
-
-(|@~?+++^|) :: FacesWithRange -> [CornerPointsWithDegrees] -> [[Triangle]] 
-(FacesWithRange face range) |@~?+++^| cornerPointsWithDegrees   =
-     [face @~+++^  x | x <-  cubeIsWithinDegreeRange range  cornerPointsWithDegrees]
-
-(||@~?+++^||) :: [FacesWithRange] -> [CornerPointsWithDegrees] -> [[Triangle]]
-facesWithRanges ||@~?+++^|| cornerPointsWithDegrees =
-  concat  [x |@~?+++^| cornerPointsWithDegrees | x <- facesWithRanges]
-
-
-
-
---add a CornerPoint to the head of the [[CornerPointsWithDegrees]] in list fashion
---ToDo: remove as it has been added to Builder.List
-{-
-(&@~+++@) :: [[CornerPointsWithDegrees]] -> [CornerPoints] -> [[CornerPointsWithDegrees]]
-cornerPointsWithDegreesListList &@~+++@ cornerPointsList =
-   ((head cornerPointsWithDegreesListList )  |@~+++@| cornerPointsList) : cornerPointsWithDegreesListList
--}
-
---ToDo: remove as it has been added to Builder.List
-{-
-(&@~+++#@) :: [[CornerPointsWithDegrees]] -> (CornerPoints -> CornerPoints) -> [[CornerPointsWithDegrees]]
-cornerPointsWithDegreesListList &@~+++#@ f =
-  ((head cornerPointsWithDegreesListList ) |@~+++#@| f)  : cornerPointsWithDegreesListList
--}
-
-{-A builder which uses a CornerPointsWithDegrees-}
---     ------------------------------------------------------- probably delete everything below here -----------------------------------
-data CornerPointsWithDegreesAndStl =
-  CornerPointsWithDegreesAndStl {_cornerPoints:: [CornerPointsWithDegrees],
-                                 _facesWithRange:: [FacesWithRange] }
-
-{- Process a [CornerPointsWithDegrees] into stl [Triangle]'s. Usally used via (||@~+++^||) to process an entire shape. 
-processCornerPointsWithDegreesAndStl ::  [CornerPointsWithDegrees] -> [FacesWithRange] -> [Triangle]
-processCornerPointsWithDegreesAndStl cornerPointsList facesWithRangeList =
-  concat $ facesWithRangeList  ||@~?+++^|| cornerPointsList
-
-
-
-
-
-{- |
-Used by numerous infix functions such as (&@~+++#@) for building up a [[CornerPointsWithDegrees]].
-Each layer of a stl shape is made up of [CornerPointsWithDegrees].
-This Builder allows these layer to be built up, by adding another top/bottome face to the top of the
-Builder list.
-
-The 10 indicates it is based on a 10 degree spread of the radial shape.
-Eg: A scan that is taken at 10 degree intervals such as 0,10..360
--}
-newCornerPointsWith10DegreesBuilder :: [CornerPoints] -> [[CornerPointsWithDegrees]]
-newCornerPointsWith10DegreesBuilder    cornerPoints   = [newCornerPointsWith10DegreesList cornerPoints]
--}
-
-{- Process a [CornerPointsWithDegrees] into stl [Triangle]'s. Usally used via (||@~+++^||) to process an entire shape. -}
-processCornerPointsWithDegreesAndStl ::  [CornerPointsWithDegrees] -> [FacesWithRange] -> [Triangle]
-processCornerPointsWithDegreesAndStl cornerPointsList facesWithRangeList =
-  concat $ facesWithRangeList  ||@~?+++^|| cornerPointsList

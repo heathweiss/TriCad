@@ -4,6 +4,10 @@ import CornerPoints.CornerPoints (CornerPoints(..), )
 import Stl.StlBase (Triangle(..), newVertex)
 import Control.Applicative
 
+{- |
+Convert [CornerPoints] to [Triangle] for writing out to an stl file. 
+-}
+
 
 -- | Create triangles for a single CornerPoints
 (+++^) :: Faces -> CornerPoints -> [Triangle]

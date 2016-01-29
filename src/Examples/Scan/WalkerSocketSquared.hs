@@ -35,7 +35,9 @@ import  Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
 
 import Builder.Sequence((@~+++@|>))
 import Builder.List (newCornerPointsWith10DegreesBuilder, (||@~+++^||))
-import Builder.Builder(CornerPointsBuilder(..),(&+++#@), FacesWithRange(..))
+import Builder.Builder(CornerPointsBuilder(..),(&+++#@))
+
+import Stl.StlCornerPointsWithDegrees(FacesWithRange(..))
 {------------------------------------------------------------- overview ---------------------------------------------------
 The original scan work is in WalkerSocket module.
 ++++++

@@ -4,7 +4,7 @@
      That is to say that all the CornerPoints have Degree information attached to them.
      The purpose is to make it much cleaner to create stl from CornerPoints.-}
 module CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (+++~), (+++~>), (|+++~|), (@~+++#@),(@~+++@),(|@~+++@|), (|@~+++#@|),
-                                            cubeIsWithinDegreeRange, DegreeRange(..), newCornerPointsWithDegrees, newCornerPointsWith10DegreesList,
+                                            cornerPointsWithDegreesWithinRange,  DegreeRange(..), newCornerPointsWithDegrees, newCornerPointsWith10DegreesList,
                                             newCornerPointsWith5DegreesList, newCornerPointsWithDegreesList) where
 
 
@@ -83,8 +83,8 @@ newCornerPointsWithDegreesList    spread    cornerPointsList =
 
 
 {- |Filter a list of CornerPointsWithDegrees to get only those within a given degree range. -}
-cubeIsWithinDegreeRange :: DegreeRange -> [CornerPointsWithDegrees] -> [CornerPointsWithDegrees]
-cubeIsWithinDegreeRange    (DegreeRange start     end) cubesWithStartEndDegrees  =
+cornerPointsWithDegreesWithinRange :: DegreeRange -> [CornerPointsWithDegrees] -> [CornerPointsWithDegrees]
+cornerPointsWithDegreesWithinRange    (DegreeRange start     end) cubesWithStartEndDegrees  =
         let isWithinRange :: Degree -> Degree -> CornerPointsWithDegrees -> Bool
             isWithinRange    start     end (CubesWithStartEndDegrees _ (DegreeRange startDegree' endDegree')) = 
                startDegree' >= start && endDegree' <= end

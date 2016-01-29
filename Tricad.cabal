@@ -29,7 +29,7 @@ library
                    --math
                    Math.Trigonometry,
                    --stl
-                   Stl.StlBase, Stl.StlCornerPoints, Stl.StlFileWriter
+                   Stl.StlBase, Stl.StlCornerPoints, Stl.StlFileWriter, Stl.StlCornerPointsWithDegrees
                    --helpers
                    Helpers.List, Helpers.DSL,
                    Helpers.Symmetrical.Sequence, Helpers.Symmetrical.List

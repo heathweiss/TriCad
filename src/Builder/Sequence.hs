@@ -1,12 +1,17 @@
 {-# LANGUAGE ViewPatterns #-}
 module Builder.Sequence(newCornerPointsWith10DegreesBuilder, newCornerPointsWith5DegreesBuilder, newCornerPointsWithDegreesBuilder,
                         (||@~+++^||), (@~+++#@|>), (@~+++@|>)) where
-import Builder.Builder(FacesWithRange(..), (||@~?+++^||), processCornerPointsWithDegreesAndStl)
-import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), cubeIsWithinDegreeRange, (@~+++#@), (|@~+++#@|), (|@~+++@|),
+
+
+import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..),  (@~+++#@), (|@~+++#@|), (|@~+++@|),
                                            newCornerPointsWith10DegreesList, newCornerPointsWith5DegreesList, newCornerPointsWithDegreesList)
 import CornerPoints.CornerPoints(CornerPoints(..))
+
 import Stl.StlBase(Triangle(..))
 import Stl.StlCornerPoints((+++^), Faces(..))
+import Stl.StlCornerPointsWithDegrees( (|@~?+++^|), FacesWithRange(..), {-(||@~?+++^||)-}cornerPointsWithDegeesToTriangles)
+
+
 import qualified Data.Sequence as S
 import qualified Data.Foldable as F
 
@@ -43,7 +48,7 @@ Process a shape made up of Seq[CornerPointsWithDegrees] into stl [Triangle]'s fo
 -}
 (||@~+++^||) :: (S.Seq[CornerPointsWithDegrees]) -> [[FacesWithRange]] -> [Triangle]
 cornerPointsWithDegreesSeq ||@~+++^|| facesWithRangeList = concat $
-  zipWith processCornerPointsWithDegreesAndStl (F.toList cornerPointsWithDegreesSeq) facesWithRangeList
+  zipWith cornerPointsWithDegeesToTriangles (F.toList cornerPointsWithDegreesSeq) facesWithRangeList
 
 
 {- |

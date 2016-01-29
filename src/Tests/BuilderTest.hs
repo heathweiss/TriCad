@@ -1,13 +1,17 @@
 
 module Tests.BuilderTest(builderTestDo ) where
 import Test.HUnit
+
 import CornerPoints.CornerPoints(CornerPoints(..), (+++), (+++>), (|+++|), (|@+++#@|), (@+++#@) )
-import Builder.Builder(CornerPointsBuilder(..), (&+++#@), (@~+++^), (|@~?+++^|), FacesWithRange(..),  )
 import CornerPoints.Points (Point(..))
 import CornerPoints.FaceConversions(backFaceFromFrontFace, upperFaceFromLowerFace, lowerFaceFromUpperFace )
 import CornerPoints.Transpose (transposeZ)
 import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..))
+
 import Stl.StlCornerPoints(Faces(..))
+import Stl.StlCornerPointsWithDegrees( (|@~?+++^|), FacesWithRange(..))
+
+import Builder.Builder(CornerPointsBuilder(..), (&+++#@),   )
 
 
 builderTestDo = do
@@ -79,9 +83,12 @@ builderTestDo = do
         )
   runTestTT trianglesFormCornerPointsWithDegreesWithinRange      
 
+{------------------------------------------ no need to export @~+++^, but leave this test here for future use-----------------------------------------}
+{-
   --make stl triangles from a CornerPointsWithDegrees
   let trianglesFromASingleCornerPointsWithDegrees = TestCase $ assertEqual
         "trianglesFromASingleCornerPointsWithDegrees"
         ( "[Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 0.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 0.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 0.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 0.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 1.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 1.0}}},Triangle {v1 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 0.0, y_axis = 1.0, z_axis = 1.0}}, v2 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 1.0, z_axis = 1.0}}, v3 = Vertex {vertexName = \"vertex \", point = Point {x_axis = 1.0, y_axis = 0.0, z_axis = 1.0}}}]")
         (show $ FacesAll @~+++^  cubePointsWithDegrees)
   runTestTT trianglesFromASingleCornerPointsWithDegrees
+-}

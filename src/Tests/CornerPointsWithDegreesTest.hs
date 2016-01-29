@@ -1,6 +1,6 @@
 module Tests.CornerPointsWithDegreesTest(cornerPointsWithDegreesTest) where
 import Test.HUnit
-import CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (+++~), (+++~>), (|+++~|), (@~+++#@), DegreeRange(..), cubeIsWithinDegreeRange )
+import CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (+++~), (+++~>), (|+++~|), (@~+++#@), DegreeRange(..), cornerPointsWithDegreesWithinRange )
 import CornerPoints.CornerPoints(CornerPoints(..),(@+++#@),(+++), (+++>))
 import CornerPoints.Points (Point(..))
 import CornerPoints.Transpose (transposeZ)
@@ -109,7 +109,7 @@ cornerPointsWithDegreesTest = do
            CubesWithStartEndDegrees testCube (DegreeRange 90 180) ,
            CubesWithStartEndDegrees testCube (DegreeRange 180 270)
         ]
-        (cubeIsWithinDegreeRange (DegreeRange 90 270)
+        (cornerPointsWithDegreesWithinRange (DegreeRange 90 270)
          [
            (RightFaceWithDegrees testRightFace 0) +++~ (LeftFaceWithDegrees testLeftFace 90),
            (RightFaceWithDegrees testRightFace 90) +++~ (LeftFaceWithDegrees testLeftFace 180),
@@ -136,7 +136,7 @@ cornerPointsWithDegreesTest = do
            CubesWithStartEndDegrees testCube (DegreeRange 180 270),
            CubesWithStartEndDegrees testCube (DegreeRange 270 360)
         ]
-        (cubeIsWithinDegreeRange (DegreeRange 90 360)
+        (cornerPointsWithDegreesWithinRange (DegreeRange 90 360)
          [
            CubesWithStartEndDegrees testCube (DegreeRange 0 90) ,
            CubesWithStartEndDegrees testCube (DegreeRange 90 180) ,
@@ -155,7 +155,7 @@ cornerPointsWithDegreesTest = do
            CubesWithStartEndDegrees testCube (DegreeRange 180 270)
            
         ]
-        (cubeIsWithinDegreeRange (DegreeRange 0 270)
+        (cornerPointsWithDegreesWithinRange (DegreeRange 0 270)
          [
            CubesWithStartEndDegrees testCube (DegreeRange 0 90) ,
            CubesWithStartEndDegrees testCube (DegreeRange 90 180) ,
@@ -173,7 +173,7 @@ cornerPointsWithDegreesTest = do
            CubesWithStartEndDegrees testCube (DegreeRange 180 270),
            CubesWithStartEndDegrees testCube (DegreeRange 270 360)
         ]
-        (cubeIsWithinDegreeRange (DegreeRange 0 360)
+        (cornerPointsWithDegreesWithinRange (DegreeRange 0 360)
          [
            CubesWithStartEndDegrees testCube (DegreeRange 0 90) ,
            CubesWithStartEndDegrees testCube (DegreeRange 90 180) ,

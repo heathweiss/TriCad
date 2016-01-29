@@ -1,26 +1,35 @@
 module Examples.ShoeLift.KangarooShoe where
+
+import Test.HUnit
+
 import CornerPoints.Radius(Radius(..), buildSymmetricalRadius)
 import CornerPoints.HorizontalFaces(createBottomFaces, createTopFaces)
 import CornerPoints.Points(Point(..))
 import CornerPoints.Create(Angle(..), flatXSlope, flatYSlope, Slope(..))
-import Test.HUnit
 import CornerPoints.CornerPointsWithDegrees(CornerPointsWithDegrees(..), (@~+++#@),(@~+++@),(|@~+++@|), (|@~+++#@|), DegreeRange(..))
 import Control.Lens
-import Stl.StlCornerPoints((|+++^|), (||+++^||), Faces(..))
-import Stl.StlBase (StlShape(..), newStlShape)
-import Stl.StlFileWriter(writeStlToFile)
+
 import CornerPoints.CornerPoints((|@+++#@|), (|+++|))
 import CornerPoints.Transpose(transposeZ, transposeY)
 
 import CornerPoints.FaceExtraction(extractTopFace, extractBottomFace, extractFrontFace)
-import Primitives.Cylindrical(cylinderSolidNoSlopeSquaredOff, cylinderWallsNoSlope, cylinderWallsVariableRadiusNoSlope,
-                              cylinderWallsVariableThicknessNoSlope, cylinderWallsVariableThicknessSloped)
+
 import CornerPoints.FaceConversions(upperFaceFromLowerFace, backFaceFromFrontFace )
 import CornerPoints.Degree(Degree(..))
 import CornerPoints.Transposable(transpose)
-import Builder.Builder(FacesWithRange(..))
+
+
+
 import Builder.List((&@~+++@), (&@~+++#@), (||@~+++^||), newCornerPointsWith10DegreesBuilder)
 import qualified Builder.Sequence as S (newCornerPointsWith10DegreesBuilder, (||@~+++^||), (@~+++#@|>), (@~+++@|>))
+
+import Stl.StlCornerPoints((|+++^|), (||+++^||), Faces(..))
+import Stl.StlBase (StlShape(..), newStlShape)
+import Stl.StlFileWriter(writeStlToFile)
+import Stl.StlCornerPointsWithDegrees(FacesWithRange(..))
+
+import Primitives.Cylindrical(cylinderSolidNoSlopeSquaredOff, cylinderWallsNoSlope, cylinderWallsVariableRadiusNoSlope,
+                              cylinderWallsVariableThicknessNoSlope, cylinderWallsVariableThicknessSloped)
 
 --make signatures more readable
 type Thickness = Double
