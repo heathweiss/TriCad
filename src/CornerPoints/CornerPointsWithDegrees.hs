@@ -14,9 +14,13 @@ import CornerPoints.Degree(Degree(..))
 
 This is based on, like all CornerPoints work, on a radial structure that rotates clockwise.
 
-A RigthFace is always the trailing side of the cube, and so has a start degree.
+A RigthFace is always the trailing side of the cube,and so has a start degree. In order to make it
+consistent with all other constructors, it uses a DegreeRange with matching start/end degree.
+Allows a CornerPointsWithDegrees map to be made based on DegreeRange as a key.
 
-A LeftFace is always the leadiong side of the cube, and so has an end degree.
+A LeftFace is always the leadiong side of the cube, and so has an end degree. In order to make it
+consistent with all other constructors, it uses a DegreeRange with matching start/end degree.
+Allows a CornerPointsWithDegrees map to be made based on DegreeRange as a key.
 
 Top, Bottom, Front, and Back Faces have to have both start and end degrees.
 
@@ -28,13 +32,15 @@ type DegreeSpread = Double
 
 -- ToDo: Add in the rest of the faces.
 --ToDo: remove the 's' from Bottom/TopFaces & CubesWith
-
+{- |
+Adds degrees information to CornerPoints
+-}
 data CornerPointsWithDegrees =
     CubesWithStartEndDegrees {_cube::CornerPoints, _degreeRange::DegreeRange}
   | FrontFaceWithStartEndDegrees {_frontFace::CornerPoints, _degreeRange::DegreeRange}
   | BackFaceWithStartEndDegrees {_backFace::CornerPoints, _degreeRange::DegreeRange}
-  | LeftFaceWithDegrees {_leftFace::CornerPoints, _degree::Double}
-  | RightFaceWithDegrees {_rightFace::CornerPoints, _degree::Double}
+  | LeftFaceWithDegrees {_leftFace::CornerPoints, _degreeRange::DegreeRange}
+  | RightFaceWithDegrees {_rightFace::CornerPoints, _degreeRange::DegreeRange}
   | BottomFacesWithDegrees {_bottomFace::CornerPoints, _degreeRange::DegreeRange}
   | TopFacesWithDegrees {_topFace::CornerPoints, _degreeRange::DegreeRange}
   deriving(Show, Eq)
@@ -95,13 +101,23 @@ cornerPointsWithDegreesWithinRange    (DegreeRange start     end) cubesWithStart
 
 --genStlFromCubesWithDegreesAndFaces :: 
 
-
+{-
+need to 
+-}
+(+++~) :: CornerPointsWithDegrees ->           CornerPointsWithDegrees               -> CornerPointsWithDegrees
+--The _start/_endDegree of Right/LeftFaceWithDegrees are equal. They both are supplied for Builder.Map
+(RightFaceWithDegrees faceRight rightDeg) +++~ (LeftFaceWithDegrees faceLeft leftDeg) =
+                            CubesWithStartEndDegrees (faceRight +++ faceLeft ) (DegreeRange (_startDegree rightDeg) (_endDegree leftDeg))
+(CubesWithStartEndDegrees cube (DegreeRange startDegree' endDegree')) +++~ (LeftFaceWithDegrees faceLeft leftDeg) =
+                            CubesWithStartEndDegrees (cube +++ faceLeft) (DegreeRange (endDegree') (_endDegree leftDeg))
+{-
 (+++~) :: CornerPointsWithDegrees ->           CornerPointsWithDegrees               -> CornerPointsWithDegrees
 (RightFaceWithDegrees faceRight rightDeg) +++~ (LeftFaceWithDegrees faceLeft leftDeg) =
                             CubesWithStartEndDegrees (faceRight +++ faceLeft ) (DegreeRange rightDeg leftDeg)
 (CubesWithStartEndDegrees cube (DegreeRange startDegree' endDegree')) +++~ (LeftFaceWithDegrees faceLeft leftDeg) =
                             CubesWithStartEndDegrees (cube +++ faceLeft) (DegreeRange endDegree' leftDeg)
 
+-}
 
 {-Add a CornerPoints to a CornerPointsWithDegrees. The start/end degrees will come form the CornerPointsWithDegrees
 Good for adding things like top/bottom faces, so as to know for sure, which start/end degrees is used.-}

@@ -63,7 +63,7 @@ cornerPointsWithDegreesTest = do
                        b3 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 10.0},
                        b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 9.0}
                       },
-              _degreeRange = DegreeRange 0.0 10.0},
+              _degreeRange = (DegreeRange 0.0 10.0)},
          CubesWithStartEndDegrees 
            {_cube = CubePoints {f1 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 8.0},
                        f2 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 9.0},
@@ -73,24 +73,24 @@ cornerPointsWithDegreesTest = do
                        b2 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 9.0},
                        b3 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 10.0},
                        b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 9.0}},
-              _degreeRange = DegreeRange 10.0 20.0}
+              _degreeRange = (DegreeRange 10.0 20.0)}
         ]
         (let listOfLeftFacesWithDegrees =
                 [LeftFaceWithDegrees
                   {_leftFace = LeftFace {b2 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 10.0}, b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 9.0},
                                          f2 = Point {x_axis = 0.0, y_axis = -1.0, z_axis = 10.0}, f1 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 9.0}},
-                  _degree = 10.0},
+                  _degreeRange = (DegreeRange 10.0 10.0)},
                  LeftFaceWithDegrees
                   {_leftFace = LeftFace {b2 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 9.0}, b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 8.0},
                               f2 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 9.0}, f1 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 8.0}},
-                   _degree = 20.0}
+                 _degreeRange = (DegreeRange 20.0 20.0)}
                 ]
   
              rightFaceWithDegrees =
                 RightFaceWithDegrees
                   {_rightFace = RightFace {b3 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 10.0}, b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 9.0},
                                            f3 = Point {x_axis = 0.0, y_axis = -1.0, z_axis = 10.0}, f4 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 9.0}},
-                   _degree = 0.0}
+                   _degreeRange = (DegreeRange 0.0 0.0)}
   
          in rightFaceWithDegrees +++~> listOfLeftFacesWithDegrees
            
@@ -111,10 +111,10 @@ cornerPointsWithDegreesTest = do
         ]
         (cornerPointsWithDegreesWithinRange (DegreeRange 90 270)
          [
-           (RightFaceWithDegrees testRightFace 0) +++~ (LeftFaceWithDegrees testLeftFace 90),
-           (RightFaceWithDegrees testRightFace 90) +++~ (LeftFaceWithDegrees testLeftFace 180),
-           (RightFaceWithDegrees testRightFace 180) +++~ (LeftFaceWithDegrees testLeftFace 270),
-           (RightFaceWithDegrees testRightFace 270) +++~ (LeftFaceWithDegrees testLeftFace 360)
+           (RightFaceWithDegrees testRightFace (DegreeRange 0 0)) +++~ (LeftFaceWithDegrees testLeftFace (DegreeRange 90 90)),
+           (RightFaceWithDegrees testRightFace (DegreeRange 90 90)) +++~ (LeftFaceWithDegrees testLeftFace (DegreeRange 180 180)),
+           (RightFaceWithDegrees testRightFace (DegreeRange 180 180)) +++~ (LeftFaceWithDegrees testLeftFace (DegreeRange 270 270)),
+           (RightFaceWithDegrees testRightFace (DegreeRange 270 270)) +++~ (LeftFaceWithDegrees testLeftFace (DegreeRange 360 360))
          ]
         )
   runTestTT createCubesWithStartEndDegreesFromFaceWithDegrees
@@ -187,7 +187,7 @@ cornerPointsWithDegreesTest = do
         "addLeftRigtFacesTest"
         (CubesWithStartEndDegrees (testRightFace +++ testLeftFace) (DegreeRange 0 90))
         (
-           (RightFaceWithDegrees testRightFace 0) +++~ (LeftFaceWithDegrees testLeftFace 90)
+           (RightFaceWithDegrees testRightFace (DegreeRange 0 0)) +++~ (LeftFaceWithDegrees testLeftFace (DegreeRange 90 90))
         )
   runTestTT addLeftRigtFacesTest
 

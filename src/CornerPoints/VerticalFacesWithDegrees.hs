@@ -22,7 +22,7 @@ type Degree = Double
 createLeftFaces :: Degree -> Origin -> SingleDegreeRadii -> Slope -> Slope -> [Vertical.TransposeFactor] -> [CornerPointsWithDegrees]
 createLeftFaces degrees origin singleDegreeRadii xSlope ySlope zTransposeFactor =
   let leftFaces = Vertical.createLeftFaces origin singleDegreeRadii xSlope ySlope zTransposeFactor
-  in [LeftFaceWithDegrees face degrees | face <- leftFaces]
+  in [LeftFaceWithDegrees face (DegreeRange degrees degrees) | face <- leftFaces]
 
 
 createLeftFacesNoSlope :: Origin -> SingleDegreeRadii -> [Vertical.TransposeFactor] -> [CornerPointsWithDegrees]
@@ -32,7 +32,7 @@ createLeftFacesNoSlope origin singleDegreeRadii zTransposeFactor  =
 createRightFaces :: Degree -> Origin -> SingleDegreeRadii -> Slope -> Slope -> [Vertical.TransposeFactor] -> [CornerPointsWithDegrees]
 createRightFaces degrees origin singleDegreeRadii xSlope ySlope zTransposeFactor =
   let rightFaces = Vertical.createRightFaces origin singleDegreeRadii xSlope ySlope zTransposeFactor
-  in [RightFaceWithDegrees face degrees | face <- rightFaces]
+  in [RightFaceWithDegrees face (DegreeRange degrees degrees) | face <- rightFaces]
 
 createRightFacesNoSlope :: Origin -> SingleDegreeRadii -> [Vertical.TransposeFactor] -> [CornerPointsWithDegrees]
 createRightFacesNoSlope origin singleDegreeRadii zTransposeFactor  =
@@ -76,7 +76,8 @@ createLeftVerticalFaces origin (SingleDegreeRadii degree' radii') xSlope ySlope 
   
   let verticalFaces = Vertical.createVerticalFaces origin (SingleDegreeRadii degree' radii') xSlope ySlope zTransposeFactor topFrontConstructor topBackConstructor
                             btmFrontConstructor btmBackConstructor
-  in  [LeftFaceWithDegrees  x degree' | x <- verticalFaces ]
+  --in  [LeftFaceWithDegrees  x degree' | x <- verticalFaces ]
+  in  [LeftFaceWithDegrees  x (DegreeRange degree' degree') | x <- verticalFaces ]
 
 {-RightFace version of createVerticalFaces-}
 createRightVerticalFaces :: Origin -> SingleDegreeRadii -> Slope -> Slope -> [Vertical.TransposeFactor] -> (Point-> CornerPoints) ->
@@ -86,7 +87,7 @@ createRightVerticalFaces origin (SingleDegreeRadii degree' radii') xSlope ySlope
   
   let verticalFaces = Vertical.createVerticalFaces origin (SingleDegreeRadii degree' radii') xSlope ySlope zTransposeFactor topFrontConstructor topBackConstructor
                             btmFrontConstructor btmBackConstructor
-  in  [RightFaceWithDegrees  x degree' | x <- verticalFaces ]
+  in  [RightFaceWithDegrees  x (DegreeRange degree' degree') | x <- verticalFaces ]
 
 
 
@@ -113,11 +114,11 @@ verticalFacesWithDegreesTest = do
         ( [LeftFaceWithDegrees
            {_leftFace = LeftFace {b2 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 10.0}, b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 9.0},
                               f2 = Point {x_axis = 0.0, y_axis = -1.0, z_axis = 10.0}, f1 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 9.0}},
-            _degree = 0.0},
+            _degreeRange = (DegreeRange 0.0 0.0)}, 
            LeftFaceWithDegrees
             {_leftFace = LeftFace {b2 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 9.0}, b1 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 8.0},
                               f2 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 9.0}, f1 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 8.0}},
-            _degree = 0.0}
+            _degreeRange = (DegreeRange 0.0 0.0)} 
           ]
 
         )
@@ -132,11 +133,11 @@ verticalFacesWithDegreesTest = do
         ( [RightFaceWithDegrees
            {_rightFace = RightFace {b3 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 10.0}, b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 9.0},
                               f3 = Point {x_axis = 0.0, y_axis = -1.0, z_axis = 10.0}, f4 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 9.0}},
-            _degree = 0.0},
+             _degreeRange = (DegreeRange 0.0 0.0)}, 
            RightFaceWithDegrees
             {_rightFace = RightFace {b3 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 9.0}, b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 8.0},
                               f3 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 9.0}, f4 = Point {x_axis = 0.0, y_axis = -2.0, z_axis = 8.0}},
-            _degree = 0.0}
+            _degreeRange = (DegreeRange 0.0 0.0)} 
           ]
 
         )
