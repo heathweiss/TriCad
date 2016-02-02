@@ -3,8 +3,9 @@ module Tests.RadiusTest(radisuTestDo) where
 import Test.HUnit
 import CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..), resetMultiDegreeRadiiIfNull,
                           extractSingle, extractList, rotateMDR, setRadiusIfNull,  resetSingleDegreeRadiiIfNull,
-                          setRadiusWithPrecedingValueIfNull, resetMultiDegreeRadiiIfNullWithPreviousValue)
-import CornerPoints.Transposable(transpose)
+                          setRadiusWithPrecedingValueIfNull, resetMultiDegreeRadiiIfNullWithPreviousValue, transposeSDRList,
+                          transposeMDRList)
+import CornerPoints.Transposable(transpose, transposeWithList)
 import Scan.ParseJuicy(averageValueOf)
 
 
@@ -17,6 +18,9 @@ radisuTestDo = do
  runTestTT transposeRadiusTest
  runTestTT transposeSDRTest
  runTestTT transposeSDRTest2
+ runTestTT transposeListOfRadiusWithListOfFxTest
+ runTestTT transposeSDRWithListTest
+ runTestTT transposeMDRWithListTest
 
  runTestTT rotateMultiDegreeRadiiTest
 
@@ -113,6 +117,11 @@ transposeRadiusTest = TestCase $ assertEqual
   (Radius 4)
   (transpose (+3) (Radius 1))
 
+transposeListOfRadiusWithListOfFxTest = TestCase $ assertEqual
+  "transposeListOfRadiusWithListOfFxTest"
+  ([Radius 2, Radius 4])
+  (transposeWithList [(+1),(+2)] [Radius 1, Radius 2])
+
 transposeSDRTest = TestCase $ assertEqual
   "transposeSDRTest"
   (SingleDegreeRadii 1 [ Radius 5])
@@ -122,7 +131,16 @@ transposeSDRTest2 = TestCase $ assertEqual
   "transposeSDRTest2"
   (SingleDegreeRadii 1 [Radius 4, Radius 5])
   (transpose (+2) (SingleDegreeRadii 1 [Radius 2, Radius 3])  )
-  
+
+transposeSDRWithListTest = TestCase $ assertEqual
+  "transposeSDRWithListTest"
+  ([SingleDegreeRadii 1 [Radius 2, Radius 4]])
+  (transposeSDRList [[(+1), (+2)]] [(SingleDegreeRadii 1 [Radius 1, Radius 2])]  )
+
+transposeMDRWithListTest = TestCase $ assertEqual
+  "transposeMDRWithListTest"
+  (MultiDegreeRadii "name" [SingleDegreeRadii 1 [Radius 2, Radius 4]])
+  (transposeMDRList [[(+1), (+2)]] (MultiDegreeRadii "name" [(SingleDegreeRadii 1 [Radius 1, Radius 2])])  ) 
 
 extractRadiusFromMultiDegreeRadiiTest = TestCase $ assertEqual
   "extractRadiusFromMultiDegreeRadiiTest"

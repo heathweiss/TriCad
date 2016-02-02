@@ -1,7 +1,7 @@
 {-# LANGUAGE ParallelListComp #-}
-module Examples.Scan.WalkerSocketSquared where
+module Examples.Scan.WalkerSocketSquared(sideMountQuickReleaseSocket) where
 
-import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(..),extractSingle, extractList, rotateMDR)
+import CornerPoints.Radius(MultiDegreeRadii(..), SingleDegreeRadii(..), Radius(..),extractSingle, extractList, rotateMDR, transposeMDRList)
 import CornerPoints.VerticalFaces(createRightFaces, createLeftFaces, createLeftFacesMultiColumns, createVerticalWalls,
                                   createHorizontallyAlignedCubesNoSlope, createHorizontallyAlignedCubes)
 import CornerPoints.Points(Point(..))
@@ -32,12 +32,17 @@ import Data.Aeson
 import Scan.ParseJuicy(getRedLaserLineSingleImage, removeLeftOfCenterPixels, getThePixelsRightOfCenter,  reduceScanRows, reduceScan,
                       calculateRadiusFrom)
 import  Helpers.DSL (ofThe, forThe, andThen, adjustedFor, andThe,)
+import Helpers.List((++:),(++::))
 
 import Builder.Sequence((@~+++@|>))
 import Builder.List (newCornerPointsWith10DegreesBuilder, (||@~+++^||))
 import Builder.Builder(CornerPointsBuilder(..),(&+++#@))
 
 import Stl.StlCornerPointsWithDegrees(FacesWithRange(..))
+
+import Test.HUnit
+
+import qualified Data.Sequence as S
 {------------------------------------------------------------- overview ---------------------------------------------------
 The original scan work is in WalkerSocket module.
 ++++++
@@ -91,111 +96,76 @@ loadMDRAndPassToProcessor = do
       Nothing                                ->
         putStrLn "File not decoded"
 
-{-=========================================================== side mounted quick-releas socket================================================
-==============================================================================================================================================-}
-{-
 
-
+{-=========================================================== side mounted quick-release socket ================================================
+Generate the socket with a thicker section of wall, into which a hole can be drilled for a quick coupler.
 -}
 sideMountQuickReleaseSocket :: MultiDegreeRadii ->  RowReductionFactor -> PixelsPerMillimeter ->  IO ()
 sideMountQuickReleaseSocket      mainSocketInnerMDR             rowReductionFactor    pixelsPerMillimeter  =
   let
-    mainSocketWallThickness = 3
-    mainSocketOuterMDR = transpose (+mainSocketWallThickness) mainSocketInnerMDR
+    mainWallThickness = 3
+    quickReleaseWallThickness = 10
+    --mainSocketInnerMDR: degrees length == 37
+    --mainSocketInnerMDR: radii length = 19
 
-    quickReleaseInnerMDR = mainSocketOuterMDR
-    quickReleaseWallThickness = 15
-    quickReleaseOuterMDR = transpose (+quickReleaseWallThickness) mainSocketInnerMDR
+    --transpose mainSocketInnerMDR to create the outer wall, including the wider section for the quick coupler.
+    outerMDR =
+           transposeMDRList
+                  (
+                   -- 0-22
+                   [[(+3) | y <- [1..]] | x <- [1..22]]
+                   ++:
+                   -- 23
+                   [(+7) | y <- [1..12]] ++ [(+3) | y <- [1..7]]
+                   ++::
+                   -- 24-27 
+                   [[(+15) | y <- [1..12]] ++ [(+3) | y <- [1..7]] | x <- [24..27]]
+                   ++:
+                   -- 28
+                   [(+9) | y <- [1..12]] ++ [(+3) | y <- [1..7]]
+                    ++::
+                   -- 29-end
+                   [[(+3) | y <- [1..]] | x <- [29..]]
+                  )
+                  mainSocketInnerMDR
+
     
+                 
     origin = (Point{x_axis=0, y_axis=0, z_axis=50})
     transposeFactors = [0,heightPerPixel.. ]
     heightPerPixel = 1/pixelsPerMM * (fromIntegral rowReductionFactor)
-
+           
     mainSocketWalls =
       [ newCornerPointsWith10DegreesBuilder currWalls | currWalls <-
-           drop 6  (createVerticalWalls  mainSocketInnerMDR mainSocketOuterMDR origin transposeFactors)]
-    
+           drop 6  (createVerticalWalls  mainSocketInnerMDR outerMDR origin transposeFactors)]
+
+    --todo: Get rid of lots of []
     mainSocketFaces = 
                           [
-                           [[FacesWithRange FacesBackFrontTop (DegreeRange 0 220)] ++
-                            [FacesWithRange FacesBackTop (DegreeRange 220 270)] ++
-                            [FacesWithRange FacesBackFrontTop (DegreeRange 270 360)]
-                           ]
+                           [[FacesWithRange FacesBackFrontTop (DegreeRange 0 360)]]
                           ]
                           ++
                           [
-                           [[FacesWithRange FacesBackFront (DegreeRange 0 220)] ++
-                            [FacesWithRange FaceBack (DegreeRange 220 270)] ++
-                            [FacesWithRange FacesBackFront (DegreeRange 270 360)]
-                           ] | x <- [1..4]
+                           [[FacesWithRange FacesBackFront (DegreeRange 0 360)]] | x <- [1..10]
                           ]
                           ++
                           [
-                           [[FacesWithRange FacesBackFront (DegreeRange 0 220)] ++
-                            [FacesWithRange FacesBackFront (DegreeRange 220 270)] ++
-                            [FacesWithRange FacesBackFront (DegreeRange 270 360)]
-                           ] | x <- [1..6]
+                           [[FacesWithRange FacesBackBottomFront (DegreeRange 0 360)]]
                           ]
-                          ++
-                          [
-                           [[FacesWithRange FacesBackBottomFront (DegreeRange 0 220)] ++
-                            [FacesWithRange FacesBackBottomFront (DegreeRange 220 290)] ++
-                            [FacesWithRange FacesBackBottomFront (DegreeRange 290 360)]
-                           ]
-                          ] 
+
+                          
     mainSocketTriangles =    concat
                              [ currCubes ||@~+++^|| currFaces
                                | currCubes <- mainSocketWalls
                                | currFaces <- mainSocketFaces 
                              ]
-       
-
-    {- ------------ quick release
-     The walls, faces, triangles for the quick release section.
-    -}
-    quickReleaseWalls =
-      [ newCornerPointsWith10DegreesBuilder currWalls | currWalls <-
-           drop 6  (createVerticalWalls  quickReleaseInnerMDR quickReleaseOuterMDR origin transposeFactors)]
-
-    quickReleaseFaces = 
-                          [
-                           [[FacesWithRange FacesNada (DegreeRange 0 220)] ++
-                            [FacesWithRange FacesFrontRightTop (DegreeRange 220 230)] ++
-                            [FacesWithRange FacesFrontTop (DegreeRange 230 260)] ++
-                            [FacesWithRange FacesFrontLeftTop (DegreeRange 260 270)] ++
-                            [FacesWithRange FacesNada (DegreeRange 270 360)]
-                           ]
-                          ]
-                          ++
-                          [
-                           [[FacesWithRange FacesNada (DegreeRange 0 220)] ++
-                            [FacesWithRange FacesFrontRight (DegreeRange 220 230)] ++
-                            [FacesWithRange FaceFront (DegreeRange 230 260)] ++
-                            [FacesWithRange FacesFrontLeft (DegreeRange 260 270)] ++
-                            [FacesWithRange FacesNada (DegreeRange 270 360)]
-                           ] | x <- [1..3]
-                          ]
-                          ++
-                          [
-                           [[FacesWithRange FacesNada (DegreeRange 0 220)] ++
-                            [FacesWithRange FacesBottomFrontRight (DegreeRange 220 230)] ++
-                            [FacesWithRange FacesBottomFront (DegreeRange 230 260)] ++
-                            [FacesWithRange FacesBottomFrontLeft (DegreeRange 260 270)] ++
-                            [FacesWithRange FacesNada (DegreeRange 270 360)]
-                           ]
-                          ]
-                           
-    quickReleaseTriangles =    concat
-                             [ currCubes ||@~+++^|| currFaces
-                               | currCubes <- quickReleaseWalls
-                               | currFaces <- quickReleaseFaces 
-                             ]
     
   in
-    
-    --writeStlToFile $ newStlShape "socket with quick release" mainSocketTriangles
-    writeStlToFile $ newStlShape "socket with quick release" $ mainSocketTriangles ++ quickReleaseTriangles   
-    
+     writeStlToFile $ newStlShape "socket with quick release" $ mainSocketTriangles
+
+test =   [[3 | y <- [1,2]] | x <- [1,2]]
+         ++ [[4,4]]
+
 {-========================================================== socket attached to walker=====================================================
 ===========================================================================================================================================-}
 {-

@@ -1,9 +1,9 @@
-
+{-# LANGUAGE ParallelListComp #-}
 module CornerPoints.Radius(Radius(..), SingleDegreeRadii(..), Degree(..), MultiDegreeRadii(..),resetMultiDegreeRadiiIfNull,
                           extractSingle, extractList, rotateMDR, setRadiusIfNull, resetSingleDegreeRadiiIfNull,
                           setRadiusWithPrecedingValueIfNull, resetMultiDegreeRadiiIfNullWithPreviousValue,
-                          buildSymmetricalRadius) where
-import CornerPoints.Transposable( TransposeLength, transpose)
+                          buildSymmetricalRadius, transposeSDRList, transposeMDRList) where
+import CornerPoints.Transposable( TransposeLength, transpose, TransposeWithList, transposeWithList)
 import Data.List(sortBy)
 import Data.Ord (Ordering(..), comparing)
 import CornerPoints.CornerPoints(CornerPoints(..))
@@ -45,6 +45,13 @@ instance Eq Radius where
 instance TransposeLength Radius where
   transpose f (Radius a) = Radius $ f a
 
+instance TransposeWithList Radius where
+  transposeWithList f radii =
+    [ transpose currF currRadius
+      | currF <- f
+      | currRadius <- radii
+    ]
+
 {- |Build the Radius for a full 360 degree shape that is symmetrical.
     The halfDegrees represents 0-170 degrees. centerDegree is the 180 degree.
 
@@ -66,7 +73,8 @@ resetSingleDegreeRadiiIfNull resetValue    (SingleDegreeRadii degree' radii') =
 resetSingleDegreeRadiiIfNullWithPreviousValue :: Double ->  SingleDegreeRadii -> SingleDegreeRadii
 resetSingleDegreeRadiiIfNullWithPreviousValue resetValue    (SingleDegreeRadii degree' radii') =
   SingleDegreeRadii degree' $ setRadiusWithPrecedingValueIfNull resetValue radii'
- 
+
+  -- ===================================== Single Degree Radii ========================================
 {-
 Contains the [Radius] associated with a single degree from a vertical scan.
 
@@ -84,6 +92,16 @@ data SingleDegreeRadii = SingleDegreeRadii {degree::Degree, radii::[Radius]}
 instance TransposeLength SingleDegreeRadii  where
   transpose f (SingleDegreeRadii degree' radii') = SingleDegreeRadii degree' (map (transpose f) radii')
 
+{- |
+Transpose all the Radii in a list of SingleDegreeRadii.
+Each list of Radius, will be transposed using a list of functions, so that each Radius can have it's own transpose function.
+-}
+transposeSDRList :: [[(Double -> Double) ]] -> [SingleDegreeRadii]  -> [SingleDegreeRadii]
+transposeSDRList    fx                         singleDegreeRadii    =
+  [SingleDegreeRadii (degree currSDR) (transposeWithList currFx $ radii currSDR)
+   | currSDR <- singleDegreeRadii
+   | currFx  <- fx
+  ]
 
 
 -- |Degree of a circle.
@@ -103,6 +121,18 @@ data MultiDegreeRadii = MultiDegreeRadii {name::String, degrees::[SingleDegreeRa
 
 instance TransposeLength MultiDegreeRadii  where
   transpose f (MultiDegreeRadii name' degrees') = MultiDegreeRadii name' (map (transpose f) degrees')
+
+{- |
+Transpose all the Radii in all the SingleDegreeRadii within a MultiDegreeRadii.
+Each list of Radius, will be transposed using a list of functions, so that each Radius can have it's own transpose function.
+-}
+transposeMDRList :: [[(Double -> Double) ]] -> MultiDegreeRadii  -> MultiDegreeRadii
+transposeMDRList    fx                         multiDegreeRadii    =
+  MultiDegreeRadii (name multiDegreeRadii)
+   [SingleDegreeRadii (degree currSDR) (transposeWithList currFx $ radii currSDR)
+    | currSDR <- degrees multiDegreeRadii
+    | currFx  <- fx
+   ]
 
 -- |Rotate the radii clockwise on the xy plane.
 --  Shifts the [Radius] up to the next SingleDegreeRadii in the degrees field,
