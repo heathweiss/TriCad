@@ -139,7 +139,7 @@ sideMountQuickReleaseSocket      mainSocketInnerMDR             rowReductionFact
       [ newCornerPointsWith10DegreesBuilder currWalls | currWalls <-
            drop 6  (createVerticalWalls  mainSocketInnerMDR outerMDR origin transposeFactors)]
 
-    --todo: Get rid of lots of []
+    --todo: Get rid of lots of []. Does there need to be so much nesting.
     mainSocketFaces = 
                           [
                            [[FacesWithRange FacesBackFrontTop (DegreeRange 0 360)]]

@@ -1,4 +1,4 @@
-module Stl.StlCornerPointsWithDegrees( (|@~?+++^|), FacesWithRange(..), {-(||@~?+++^||),-} cornerPointsWithDegeesToTriangles{- (@~+++^)-}) where
+module Stl.StlCornerPointsWithDegrees( (|@~?+++^|), FacesWithRange(..), {-(||@~?+++^||),-} cornerPointsWithDegreesToTriangles{- (@~+++^)-}) where
 
 import Stl.StlCornerPoints((+++^), Faces(..))
 import Stl.StlBase(Triangle(..))
@@ -41,6 +41,6 @@ facesWithRanges ||@~?+++^|| cornerPointsWithDegrees =
 
 {- Process a [CornerPointsWithDegrees] into stl [Triangle]'s. Usally used via (||@~+++^||) to process an entire shape. -}
 --ToDo: Should this be moved to Stl.StlCornerPointsWithDegrees, and is it really required, as all it does is supply a 'concat' to  ||@~?+++^||
-cornerPointsWithDegeesToTriangles ::  [CornerPointsWithDegrees] -> [FacesWithRange] -> [Triangle]
-cornerPointsWithDegeesToTriangles cornerPointsList facesWithRangeList =
+cornerPointsWithDegreesToTriangles ::  [CornerPointsWithDegrees] -> [FacesWithRange] -> [Triangle]
+cornerPointsWithDegreesToTriangles cornerPointsList facesWithRangeList =
   concat $ facesWithRangeList  ||@~?+++^|| cornerPointsList

@@ -39,7 +39,7 @@ library
                    Tests.JsonTest, Tests.ListHelpersTest, Tests.RadiusTest,
                    Tests.VerticalFacesTest, Tests.ParseJuicyTest, Tests.ScanFilterTest,
                    Tests.CornerPointsWithDegreesTest, Tests.BuilderTest,
-                   Tests.Symmetrical.SequenceTest
+                   Tests.Symmetrical.SequenceTest, Tests.FaceConversionsTest
                    --Examples
                    -- Example ShoeLifts
                    Examples.ShoeLift.KeenToe, Examples.ShoeLift.KeenHeel,
@@ -61,6 +61,8 @@ library
                    Examples.Primitives.Cylinders
                    --adaptors
                    Examples.Adaptors.HockeyStick
+                   --try out removing a cylinder from a cylinder
+                   Examples.Diffs.FirstDiff
                    --Shapes
                    Primitives.Cylindrical, Primitives.Cubical
                    --Scanning

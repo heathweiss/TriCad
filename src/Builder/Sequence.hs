@@ -9,7 +9,7 @@ import CornerPoints.CornerPoints(CornerPoints(..))
 
 import Stl.StlBase(Triangle(..))
 import Stl.StlCornerPoints((+++^), Faces(..))
-import Stl.StlCornerPointsWithDegrees( (|@~?+++^|), FacesWithRange(..), {-(||@~?+++^||)-}cornerPointsWithDegeesToTriangles)
+import Stl.StlCornerPointsWithDegrees( (|@~?+++^|), FacesWithRange(..), {-(||@~?+++^||)-}cornerPointsWithDegreesToTriangles)
 
 
 import qualified Data.Sequence as S
@@ -48,8 +48,7 @@ Process a shape made up of Seq[CornerPointsWithDegrees] into stl [Triangle]'s fo
 -}
 (||@~+++^||) :: (S.Seq[CornerPointsWithDegrees]) -> [[FacesWithRange]] -> [Triangle]
 cornerPointsWithDegreesSeq ||@~+++^|| facesWithRangeList = concat $
-  zipWith cornerPointsWithDegeesToTriangles (F.toList cornerPointsWithDegreesSeq) facesWithRangeList
-
+  zipWith cornerPointsWithDegreesToTriangles  (F.toList cornerPointsWithDegreesSeq) facesWithRangeList
 
 {- |
 Used by numerous infix functions such as (&@~+++#@) for building up a [[CornerPointsWithDegrees]].

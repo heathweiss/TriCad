@@ -5,9 +5,30 @@ import Stl.StlBase (Triangle(..), newVertex)
 import Control.Applicative
 
 {- |
-Convert [CornerPoints] to [Triangle] for writing out to an stl file. 
+Convert [CornerPoints] to [Triangle] for writing out to an stl file.
+
+Each CornerPoint will only show those faces as dictated by Faces. These will be
+the faces of the CornerPoints which on the outer boundary of the total shape.
+Eg: 2 cubes combined end to end, will hide the FrontFace of 1 cube, and the BackFace of the other cube, where they join.
+
+Triangulation of faces:
+Faces are made up of squares. To make sure that each triangle is within the boundary region of the square, including
+squares with a reflex angle, the following triangulation is followed.
+1st triangle: start at any vertex and follow the boundary in the required direction.
+2nd triangle: start at the last vertex from 1st triangle, and continue around the boundary in required direction.
+
+The inner/outer aspect of the face is determined by direction of triangulation, rather than using normals.
+This varies, depending on the face in question. Eg: FrontFace vs BackFace. See each 'getTriangles' pattern match
+for the particular implementation.
 -}
 
+{- ============================= to do =============================================
+Any faces which have been reduced to a line, should not be shown.
+EG: On a solid radial shape, the center is made up of BackFace, all of which are a single line.
+Currently, used Faces constructor without a BackFace, fixes this. But it should be automatic,
+and for all faces.
+Regardless of whether a BackFace is used, Netfabb has no errors, but Slic3r has errors which it repairs without a problem.
+-}
 
 -- | Create triangles for a single CornerPoints
 (+++^) :: Faces -> CornerPoints -> [Triangle]
@@ -33,37 +54,37 @@ getTriangles (FacesNada) c = []
 getTriangles (FaceBack)  (CubePoints _ _ _ _ b1 b2 b3 b4) = 
  [
   (Triangle (newVertex b1) (newVertex b2) (newVertex b3)),
-  (Triangle (newVertex b1) (newVertex b3) (newVertex b4))
+  (Triangle (newVertex b3) (newVertex b4) (newVertex b1))
  ]
 
 getTriangles (FaceBottom)  (CubePoints f1 _ _ f4 b1 _ _ b4) = 
  [
-  (Triangle (newVertex f1) (newVertex b1) (newVertex f4)),
-  (Triangle (newVertex f4) (newVertex b1) (newVertex b4))
+  (Triangle (newVertex f1) (newVertex b1) (newVertex b4)),
+  (Triangle (newVertex b4) (newVertex f4) (newVertex f1))
  ]
 
 getTriangles (FaceFront)  (CubePoints f1 f2 f3 f4 _ _ _ _) = 
  [
-  (Triangle (newVertex f1) (newVertex f3) (newVertex f2)),
-  (Triangle (newVertex f1) (newVertex f4) (newVertex f3))
+  (Triangle (newVertex f1) (newVertex f4) (newVertex f3)),
+  (Triangle (newVertex f3) (newVertex f2) (newVertex f1))
  ]
 
 getTriangles (FaceLeft)  (CubePoints f1 f2 _ _ b1 b2 _ _) = 
  [
   (Triangle (newVertex f1) (newVertex f2) (newVertex b2)),
-  (Triangle (newVertex f1) (newVertex b2) (newVertex b1))
+  (Triangle (newVertex b2) (newVertex b1) (newVertex f1))
  ]
- 
+
 getTriangles (FaceRight)  (CubePoints _ _ f3 f4 _ _ b3 b4) = 
  [
-  (Triangle (newVertex f4) (newVertex b3) (newVertex f3)),
-  (Triangle (newVertex f4) (newVertex b4) (newVertex b3))
+  (Triangle (newVertex f4) (newVertex b4) (newVertex b3)),
+  (Triangle (newVertex b3) (newVertex f3) (newVertex f4))
  ] 
 
 getTriangles (FaceTop)  (CubePoints _ f2 f3 _ _ b2 b3 _) = 
  [
-  (Triangle (newVertex f2) (newVertex b3) (newVertex b2)),
-  (Triangle (newVertex f2) (newVertex f3) (newVertex b3))
+  (Triangle (newVertex f2) (newVertex f3) (newVertex b3)),
+  (Triangle (newVertex b3) (newVertex b2) (newVertex f2))
  ]
 
 getTriangles (FacesAll) c = concat

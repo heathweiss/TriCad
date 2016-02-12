@@ -8,7 +8,7 @@ import CornerPoints.CornerPoints(CornerPoints(..))
 
 import Stl.StlBase(Triangle(..))
 import Stl.StlCornerPoints((+++^), Faces(..))
-import Stl.StlCornerPointsWithDegrees( (|@~?+++^|), FacesWithRange(..),  {-(||@~?+++^||)-}cornerPointsWithDegeesToTriangles)
+import Stl.StlCornerPointsWithDegrees( (|@~?+++^|), FacesWithRange(..),  {-(||@~?+++^||)-}cornerPointsWithDegreesToTriangles)
 
 --add a CornerPoint to the head of the [[CornerPointsWithDegrees]] in list fashion
 (&@~+++@) :: [[CornerPointsWithDegrees]] -> [CornerPoints] -> [[CornerPointsWithDegrees]]
@@ -27,7 +27,7 @@ cornerPointsWithDegreesListList &@~+++#@ f =
 --ToDo: create module Stl.StlCornerPointsWithDegreesList and move this there.
 (||@~+++^||) :: [[CornerPointsWithDegrees]] -> [[FacesWithRange]] -> [Triangle]
 cornerPointsWithDegreesList ||@~+++^|| facesWithRangeList = concat $
-  zipWith cornerPointsWithDegeesToTriangles cornerPointsWithDegreesList facesWithRangeList
+  zipWith cornerPointsWithDegreesToTriangles cornerPointsWithDegreesList facesWithRangeList
 
 {- |
 Used by numerous infix functions such as (&@~+++#@) for building up a [[CornerPointsWithDegrees]].

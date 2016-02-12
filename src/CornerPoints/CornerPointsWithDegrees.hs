@@ -48,6 +48,14 @@ data CornerPointsWithDegrees =
 data DegreeRange = DegreeRange {_startDegree::Degree, _endDegree::Degree}
      deriving(Show, Eq)
 
+instance Ord DegreeRange where
+  dr1 < dr2 = (_startDegree dr1) < (_startDegree dr2)
+  dr1 `compare` dr2 | dr1 < dr2 = LT
+                    | dr1 == dr2 = EQ
+                    | otherwise = GT
+  dr1 <= dr2 = (dr1 < dr2) || (dr1 == dr2)
+  dr1 > dr2 = (_startDegree dr1) > (_startDegree dr2)
+
 {- |Instantiate a new CornerPointsWithDegrees based on CornerPoints constructor, and a start and end degree.
 Constructors such as LeftFace only require a single degree. Use the fst (start,end).
 This is used as a base for functions that set the degree intervals, such as every 10 degrees.-}

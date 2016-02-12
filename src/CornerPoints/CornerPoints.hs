@@ -112,9 +112,25 @@ data CornerPoints =
                 f1 :: Point
         }
         |
+        BackRightLine
+        {
+                b3 :: Point,
+                b4 :: Point
+        }
+        |
         BottomRightLine
         {
                 b4 :: Point,
+                f4 :: Point
+        }
+        |
+        FrontLeftLine
+        {       f1 :: Point,
+                f2 :: Point
+        }
+        |
+        FrontRightLine
+        {       f3 :: Point,
                 f4 :: Point
         }
         |
@@ -253,6 +269,10 @@ instance Eq CornerPoints where
 
 
     ------------------------------- faces ---------------------------
+    FrontFace f1 f2 f3 f4 == FrontFace f1a f2a f3a f4a
+      | (f1 == f1a) && (f2 == f2a) && (f3 == f3a) && (f4 == f4a) = True
+      | otherwise = False
+    
     BottomFace b1 f1 b4 f4 == BottomFace b1a f1a b4a f4a
       | (b1 == b1a) && (f1 == f1a) && (b4 == b4a) && (f4 == f4a) = True
       | otherwise = False
@@ -267,6 +287,10 @@ instance Eq CornerPoints where
 
     LeftFace b1 b2 f1 f2 == LeftFace b1a b2a f1a f2a
       | (b1 == b1a) && (b2 == b2a) && (f1 == f1a) && (f2 == f2a) = True
+      | otherwise = False
+
+    BackFace b1 b2 b3 b4 == BackFace b1a b2a b3a b4a
+      | (b1 == b1a) && (b2 == b2a) && (b3 == b3a) && (b4 == b4a)  = True
       | otherwise = False
     ---------------------------------- cubes --------------------
     CubePoints f1 f2 f3 f4 b1 b2 b3 b4 == CubePoints f1a f2a f3a f4a b1a b2a b3a b4a

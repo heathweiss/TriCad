@@ -15,6 +15,7 @@ import Tests.RadiusTest(radisuTestDo)
 import Tests.BuilderTest(builderTestDo )
 import Tests.CornerPointsWithDegreesTest(cornerPointsWithDegreesTest)
 import Tests.Symmetrical.SequenceTest(sequenceTestDo)
+import Tests.FaceConversionsTest(faceConversionsTestDo)
 
 runAllTestsDo = do
   putStrLn "corner points debug test"
@@ -47,3 +48,5 @@ runAllTestsDo = do
   cornerPointsWithDegreesTest
   putStrLn "sequenceTestDo"
   sequenceTestDo
+  putStrLn "faceConversionsTestDo"
+  faceConversionsTestDo
