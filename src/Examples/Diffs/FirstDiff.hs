@@ -8,7 +8,9 @@ import CornerPoints.Points(Point(..))
 import CornerPoints.CornerPointsWithDegrees(DegreeRange(..), CornerPointsWithDegrees(..), newCornerPointsWithDegreesList )
 import CornerPoints.FaceExtraction(extractFrontFace, extractFrontLeftLine, extractFrontRightLine, extractLeftFace,
                                   extractRightFace, extractBackRightLine)
-import CornerPoints.FaceConversions(toBackFace, invertFace, toFrontFace, backFaceFromFrontFace, getBackFaceFromRightFace, getBackFaceFromRightFaceFromCube)
+import CornerPoints.FaceConversions(toBackFace, invertFace, toFrontFace, backFaceFromFrontFace)
+import CornerPoints.FaceExtractAndConvert(getFrontFaceAsBackFace, getFrontLeftLineAsBackFace, getLeftFaceAsBackFace,
+                                          getFrontRightLineAsBackFace, getRightFaceAsBackFace, getBackRightLineAsBackFace)
 
 
 import Stl.StlCornerPointsWithDegrees(FacesWithRange(..), FacesWithRange(..), (|@~?+++^|) )
@@ -177,158 +179,95 @@ testMaybeForwards = do
   let f = arr Just >>> Kleisli print
   runKleisli f 4
 
-{-
-Strange: This compiled until I built buildHoleInSingleTriangle, then it fails with:
-No instance for (Num a0) arising from the literal ‘4’
-    The type variable ‘a0’ is ambiguous
-It's like the arrows are somehow attached.
-
---First arr needs a param supplied, so pass int (), but ignore it.
-testMaybeForwardsWithLambda = do
-  let f = arr (\_ -> Just 4) >>> Kleisli print
-  runKleisli f ()
--}
--- ======================================== lens: extract a face =====================================
-data Extractor a = Extract {_getFrontFace :: a -> CornerPoints,
-                            _getFrontFaceAsBackFace :: a -> CornerPoints,
-                            _getFrontLeftLineAsBackFace :: a -> CornerPoints,
-                            _getLeftFaceAsBackFace :: a -> CornerPoints,
-                            _getFrontRightLineAsBackFace :: a -> CornerPoints,
-                            _getRightFaceAsBackFace :: a -> CornerPoints,
-                            _getBackRightLineAsBackFace :: a -> CornerPoints}
-makeLenses ''Extractor
-
-extractor :: Extractor CornerPoints
-extractor = Extract extractFrontFace {-getFrontFace-}
-            (toBackFace . extractFrontFace) {-getFrontFaceAsBackFace-}
-            (toBackFace . extractFrontLeftLine){-getFrontLeftLineAsBackFace-}
-            (toBackFace . extractLeftFace){-getLeftFaceAsBackFace-}
-            (toBackFace . extractFrontRightLine){-getFrontRightLineAsBackFace-}
-            (toBackFace . extractRightFace){-getRightFaceAsBackFace-}
-            (toBackFace . extractBackRightLine)--getBackRighLineAsBackFace
-
-            
-getCpt (Just cpt) = cpt
-getCpt Nothing = CornerPointsError "error"
-
-rightOfGapCpnt = getCpt $ largeShapeMap^.at  (DegreeRange 0 45)
-
---the '$' is req'd to make it compile. Not sure why.
-myExtract =  extractor^.getFrontLeftLineAsBackFace $ rightOfGapCpnt 
-
-
+  
 {- ========================= the big one ============================
 Build the large shape with the small shape removed from the 0-45 degree cube.
 -}
 buildHoleInSingleTriangle = do
-  let frontRightLineOfLargeRightFaceOf45To90ToBackFace =
-          (\triangles -> (triangles,
-                          extractor^.getFrontRightLineAsBackFace $ (maybeMapResult $ largeShapeMap^.at  (DegreeRange 45 90))
-                         )
-          )
+  let 
+      --access large shape cubes
+      largeCube :: Double -> Double -> CornerPoints
+      largeCube start end = getCubeBase largeShapeMap start end
+
+      --access small shape(hole) cubes
+      smallCube :: Double -> Double -> CornerPoints
+      smallCube start end = getCubeBase smallShapeMap start end
+      
+      --keep large/smallCube DRY
+      getCubeBase :: M.Map DegreeRange CornerPoints -> Double -> Double -> CornerPoints
+      getCubeBase map start end = maybeMapResult $ map^.at  (DegreeRange start end)
         
-      backRightLineOfLargeRightFaceOf45To90ToBackFace =
-         (\triangles -> (triangles,
-                          extractor^.getBackRightLineAsBackFace $ (maybeMapResult $ largeShapeMap^.at  (DegreeRange 45 90))
-                         )
-          )
-
-      frontLeftLineOfLargeLeftFaceOf315To360ToBackFace =
-          (\triangles -> (triangles,
-                          extractor^.getFrontLeftLineAsBackFace $ (maybeMapResult $ largeShapeMap^.at  (DegreeRange 315 360))
-                         )
-          )
-
       
-      rightFaceOfLargeRightFaceOf45To90ToBackFace =
-       let
-          getTriangle = maybeMapResult $ largeShapeMap^.at  (DegreeRange 45 90)
-       in
-          (\triangles -> (triangles,
-                          (extractor^.getRightFaceAsBackFace $ getTriangle
-                          )
-                         )
-          )
-
-
-      leftFaceOfLargeRightFaceOf315To360ToBackFace =
-       let
-          getTriangle = maybeMapResult $ largeShapeMap^.at  (DegreeRange 315 360)
-       in
-          (\triangles -> (triangles,
-                          (invertFace $ extractor^.getLeftFaceAsBackFace $ getTriangle
-                          )
-                         )
-          )
-         
-      
-      invertedFrontFaceOfSmall degreeStart degreeEnd faces =
-        (\(triangles, largeCube) ->
-              triangles
-              S.><
-              (S.fromList  (faces +++^
-                            (largeCube +++ (invertFace $ extractFrontFace $ maybeMapResult $ smallShapeMap^.at  (DegreeRange degreeStart degreeEnd))))
-              )
-        )
-
-      
-      f = -- =========================== embed hole===========================
-          -- ========= 0-45 degrees of small shape===============
-          --get front face of large shape for 0'
-          arr (\_ -> S.fromList[])
-          >>> arr (\triangles ->
-                    let largeCube = extractor^.getFrontFaceAsBackFace $ (maybeMapResult $ largeShapeMap^.at  (DegreeRange 0 45))
-                        smallCube = invertFace $ extractFrontFace $ maybeMapResult $ smallShapeMap^.at  (DegreeRange 0 45)
+      f = -- 0-45 degrees of hole
+          arr (\triangles ->
+                    let largeCube' = getFrontFaceAsBackFace $ largeCube 0 45
+                        smallCube' = invertFace $ extractFrontFace $ smallCube 0 45
                         
-                    in   triangles S.>< (S.fromList (FacesBackBottomFrontTop +++^ (largeCube +++ smallCube)))
+                    in   triangles S.>< (S.fromList (FacesBackBottomFrontTop +++^ (largeCube' +++ smallCube')))
                   )
 
-          -- ============= 45-90 degrees of small triangle=================
-          >>>  arr frontRightLineOfLargeRightFaceOf45To90ToBackFace
-          --get the small cube at 45'
-          >>> arr (invertedFrontFaceOfSmall 45 90 FacesBackBottomFrontTop)
+          -- 45-90 degrees of hole
+          >>> arr (\triangles ->
+                    let largeCube' = getFrontRightLineAsBackFace $ largeCube 45 90
+                        smallCube' = invertFace $ extractFrontFace $ smallCube 45 90
+                        
+                    in   triangles S.>< (S.fromList (FacesBottomFrontTop +++^ (largeCube' +++ smallCube')))
+                  )
           
-          -- =========================== 90-135 degrees small cube ===========================================
-          >>>  arr frontRightLineOfLargeRightFaceOf45To90ToBackFace
-          --get the small cube at 45'
-          >>> arr (invertedFrontFaceOfSmall 90 135 FacesBackBottomFrontTop)
+          -- 90-135 degrees of hole
+          >>> arr (\triangles ->
+                    let largeCube' = getFrontRightLineAsBackFace $ largeCube 45 90
+                        smallCube' = invertFace $ extractFrontFace $ smallCube 90 135
+                        
+                    in   triangles S.>< (S.fromList (FacesBottomFrontTop +++^ (largeCube' +++ smallCube')))
+                  )
+          -- 135-180 degrees of hole
+          >>> arr (\triangles ->
+                    let largeCube' = getRightFaceAsBackFace $ largeCube 45 90
+                        smallCube' = invertFace $ extractFrontFace $ smallCube 135 180
+                        
+                    in   triangles S.>< (S.fromList (FacesBottomFrontTop +++^ (largeCube' +++ smallCube')))
+                  )
           
-          -- =========================== 135-180 degrees small cube ==================================
+          -- 180-225 degrees of hole
+          >>> arr (\triangles ->
+                    let largeCube' = getBackRightLineAsBackFace $ largeCube 45 90
+                        smallCube' = invertFace $ extractFrontFace $ smallCube 180 225
+                        
+                    in   triangles S.>< (S.fromList (FacesBottomFrontTop +++^ (largeCube' +++ smallCube')))
+                  )
           
-          >>> arr rightFaceOfLargeRightFaceOf45To90ToBackFace
-          >>> arr ( (invertedFrontFaceOfSmall 135 180 FacesBottomFrontTop))
-          {-
-          >>> arr frontRightLineOfLargeRightFaceOf45To90ToBackFace
-          >>> arr (invertedFrontFaceOfSmall 135 180 FacesBottomFrontTop)
-          -}
-          -- ============================ 180-225 degrees small cube==========================================
-          
-          >>> arr backRightLineOfLargeRightFaceOf45To90ToBackFace
-          >>> arr (invertedFrontFaceOfSmall 180 225 FacesBottomFrontTop)
-          {-
-          >>> arr rightFaceOfLargeRightFaceOf45To90ToBackFace
-          >>> arr (invertedFrontFaceOfSmall 180 225 FacesBottomFrontTop)
-          -}
-          -- ============================ 225-270 degrees small cube==========================================
-          >>> arr backRightLineOfLargeRightFaceOf45To90ToBackFace
-          >>> arr (invertedFrontFaceOfSmall 225 270 FacesBottomFrontTop)
+          -- 225-270 degrees of hole
+          >>> arr (\triangles ->
+                    let largeCube' = getBackRightLineAsBackFace $ largeCube 45 90
+                        smallCube' = invertFace $ extractFrontFace $ smallCube 225 270
+                        
+                    in   triangles S.>< (S.fromList (FacesBottomFrontTop +++^ (largeCube' +++ smallCube')))
+                  )
 
-          -- =========================== 270 315 degrees small cube ==================================
-          >>> arr leftFaceOfLargeRightFaceOf315To360ToBackFace
-          >>> arr (invertedFrontFaceOfSmall 270 315 FacesBottomFrontTop)
+          -- 270 315 degrees of hole
+          >>> arr (\triangles ->
+                    let largeCube' = invertFace $ getLeftFaceAsBackFace $ largeCube 315 360
+                        smallCube' = invertFace $ extractFrontFace $ (smallCube 270 315)
+                        
+                    in triangles S.>< (S.fromList(FacesBottomFrontTop +++^ (largeCube' +++ smallCube')))
 
-          -- =========================== 315-360 degrees small cube ===========================================
+                  )
           
-          --get right face of large shape for 45-90'
-          >>>  arr frontLeftLineOfLargeLeftFaceOf315To360ToBackFace
-          --get the small cube at 45'
-          >>> arr (invertedFrontFaceOfSmall 315 360 FacesBackBottomFrontTop)
+          -- 315-360 degrees of hole
+          >>> arr (\triangles ->
+                    let largeCube' = invertFace $ getFrontLeftLineAsBackFace $ largeCube 315 360
+                        smallCube' = invertFace $ extractFrontFace $ (smallCube 315 360)
+                        
+                    in triangles S.>< (S.fromList(FacesBottomFrontTop +++^ (largeCube' +++ smallCube')))
+
+                  )
           
-          -- =============================== show the large triangle==========================================
-          >>> arr (\triangles -> (S.fromList(FacesBottomFrontTop +++^
-                                 (maybeMapResult (largeShapeMap^.at  (DegreeRange 45 90))))) S.>< triangles)
-
-
+          -- show the rest of the large triangle
+          
+          >>> arr (\triangles -> (S.fromList(FacesBottomFrontTop +++^ (largeCube 45 90))) S.>< triangles)
+          
+         
           >>> arr (\triangles ->
                    (S.fromList
                     ( [largeShapeWithDegrees]
@@ -339,15 +278,16 @@ buildHoleInSingleTriangle = do
                     S.>< triangles
                    )
 
-          >>> arr (\triangles -> (triangles, Just (maybeMapResult $ largeShapeMap^.at  (DegreeRange 315 360)))) 
-          >>> arr (\(triangles, Just cube) -> triangles S.>< (S.fromList (FacesBottomFrontTop +++^ cube)))
+          >>> arr (\triangles ->
+                    let largeCube' = largeCube 315 360
+                    in  triangles S.>< (S.fromList (FacesBottomFrontTop +++^ largeCube'))
+                  )
           
           
-          
-          --print them out as stl
+          --print stl
           >>> Kleisli (\triangles -> writeStlToFile $ newStlShape "hole in the wall" (F.toList triangles))
           
-  runKleisli f ()
+  runKleisli f (S.fromList [])
   
   
 buildHoleInSingleTriangleTest = do
@@ -367,7 +307,7 @@ buildHoleInSingleTriangleTest = do
                    b3 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 10.0},
                    b4 = Point {x_axis = 0.0, y_axis = 0.0, z_axis = 0.0}})
         (let largeTriangle = maybeMapResult $ largeShapeMap^.at  (DegreeRange 45 90)
-         in  extractor^.getRightFaceAsBackFace $ largeTriangle
+         in  getRightFaceAsBackFace $ largeTriangle
         )
   runTestTT largeRightFaceAsBackFaceTest
 
@@ -403,7 +343,7 @@ buildHoleInSingleTriangleTest = do
        (let
            invertedFrontFace = invertFace $ extractFrontFace $ maybeMapResult $ smallShapeMap^.at  (DegreeRange 135 180)
            largeTriangle = maybeMapResult $ largeShapeMap^.at  (DegreeRange 45 90)
-           rightFaceAsBackFace =  extractor^.getRightFaceAsBackFace $ largeTriangle
+           rightFaceAsBackFace =  getRightFaceAsBackFace $ largeTriangle
         in  rightFaceAsBackFace +++ invertedFrontFace
        )
   runTestTT addTheFacesTest
