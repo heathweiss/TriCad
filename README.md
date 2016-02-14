@@ -1,8 +1,10 @@
 # Tricad
 
-Very much at the beginning stages.
+======================== depracated =================================
+Use the new ChampCad repository.
 
-It is a simple cad system for writing stl.
+Keep this in place until:
+Scanner executable is tested out. It has not yet been set up in ChampCad.
 
 
 
